@@ -1,0 +1,18 @@
+# WordPress .gitignore
+
+# Core files
+wp-config.php
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/cache/
+wp-content/backup-db/
+
+# MacOS
+.DS_Store
+
+# Log files
+*.log
+
+# Docker
+docker-compose.override.yml
+.env

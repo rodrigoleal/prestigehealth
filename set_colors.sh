@@ -1,0 +1,10 @@
+#!/bin/bash
+wp theme mod set storefront_button_background_color "#005492"
+wp theme mod set storefront_button_text_color "#ffffff"
+wp theme mod set storefront_button_alt_background_color "#42a4f4"
+wp theme mod set storefront_button_alt_text_color "#ffffff"
+wp theme mod set storefront_accent_color "#005492"
+wp theme mod set storefront_footer_background_color "#005492"
+wp theme mod set storefront_footer_text_color "#ffffff"
+wp theme mod set storefront_footer_link_color "#42a4f4"
+wp theme mod set storefront_footer_heading_color "#ffffff"
