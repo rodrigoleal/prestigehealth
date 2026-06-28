@@ -16,3 +16,8 @@ wp-content/backup-db/
 # Docker
 docker-compose.override.yml
 .env
+
+# Backups and Migrations
+*.sql
+*.tar
+wp-content/ai1wm-backups/
