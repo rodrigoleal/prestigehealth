@@ -166,3 +166,115 @@ function prestige_separate_login_registration_scripts() {
 }
 add_action( "wp_footer", "prestige_separate_login_registration_scripts" );
 
+/**
+ * Translate WooCommerce strings
+ */
+function prestige_translate_woocommerce_strings( $translated_text, $text, $domain ) {
+    if ( $domain === 'woocommerce' ) {
+        if ( $text === 'Have a coupon?' || strtolower($text) === 'have a coupon?' ) {
+            $translated_text = 'Tem um cupão?';
+        } elseif ( $text === 'Click here to enter your code' || strtolower($text) === 'click here to enter your code' ) {
+            $translated_text = 'Clique aqui para inserir o seu código';
+        }
+    }
+    return $translated_text;
+}
+add_filter( 'gettext', 'prestige_translate_woocommerce_strings', 20, 3 );
+/**
+ * Custom JS and CSS for cart icon and checkout sidebar
+ */
+function prestige_custom_cart_checkout_scripts() {
+    ?>
+    <style>
+        /* Hide sidebar on checkout page */
+        .woocommerce-checkout #secondary {
+            display: none !important;
+        }
+        .woocommerce-checkout #primary {
+            width: 100% !important;
+            float: none !important;
+        }
+        
+        /* Hide default storefront basket icon */
+        .site-header-cart .cart-contents::after,
+        .site-header-cart .cart-contents::before {
+            display: none !important;
+        }
+        
+        /* Custom Cart Icon injected via before */
+        ul.site-header-cart .cart-contents::before,
+        .site-icons .site-header-cart .cart-contents::before {
+            content: "" !important;
+            display: inline-block !important;
+            width: 22px;
+            height: 22px;
+            margin-right: 8px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            /* Empty Cart SVG */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="%23ffffff" d="M0 24C0 10.7 10.7 0 24 0H69.5c22 0 41.5 12.8 50.6 32h411c26.3 0 45.5 25 38.6 50.4l-41.1 152.3c-8.5 31.4-37 53.3-69.5 53.3H170.7l5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H199.7c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5H24C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"/></svg>');
+        }
+        
+        /* Full Cart SVG */
+        ul.site-header-cart .cart-contents.has-items::before,
+        .site-icons .site-header-cart .cart-contents.has-items::before {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="%23ffffff" d="M0 24C0 10.7 10.7 0 24 0H69.5c22 0 41.5 12.8 50.6 32h411c26.3 0 45.5 25 38.6 50.4l-41.1 152.3c-8.5 31.4-37 53.3-69.5 53.3H170.7l5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H199.7c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5H24C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"/><circle cx="288" cy="224" r="48" fill="%23ffcccc"/><circle cx="400" cy="224" r="48" fill="%23ccffcc"/><circle cx="176" cy="224" r="48" fill="%23ccccff"/></svg>');
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            function updateCartIcon() {
+                var cartLinks = document.querySelectorAll('.site-header-cart .cart-contents');
+                cartLinks.forEach(function(link) {
+                    var countEl = link.querySelector('.count');
+                    if (countEl) {
+                        var text = countEl.innerText.replace(/[^0-9]/g, '');
+                        if (parseInt(text, 10) > 0) {
+                            link.classList.add('has-items');
+                        } else {
+                            link.classList.remove('has-items');
+                        }
+                    }
+                });
+            }
+            
+            updateCartIcon();
+            
+            if (typeof jQuery !== 'undefined') {
+                jQuery(document.body).on('updated_cart_totals added_to_cart removed_from_cart', function(){
+                    setTimeout(updateCartIcon, 100);
+                });
+            }
+        });
+    </script>
+    <?php
+}
+add_action( "wp_footer", "prestige_custom_cart_checkout_scripts", 99 );
+
+/**
+ * Filter WooCommerce Product Categories widget to show only categories 
+ * that share products with the current category.
+ */
+function prestige_filter_category_widget_by_current_products( $list_args ) {
+    if ( is_product_category() ) {
+        global $wpdb;
+        $category_id = get_queried_object_id();
+        
+        $valid_cat_ids = $wpdb->get_col( $wpdb->prepare( "
+            SELECT DISTINCT tt2.term_id
+            FROM {$wpdb->term_relationships} tr1
+            INNER JOIN {$wpdb->term_relationships} tr2 ON tr1.object_id = tr2.object_id
+            INNER JOIN {$wpdb->term_taxonomy} tt1 ON tr1.term_taxonomy_id = tt1.term_taxonomy_id
+            INNER JOIN {$wpdb->term_taxonomy} tt2 ON tr2.term_taxonomy_id = tt2.term_taxonomy_id
+            WHERE tt1.term_id = %d AND tt1.taxonomy = 'product_cat'
+            AND tt2.taxonomy = 'product_cat'
+        ", $category_id ) );
+        
+        if ( ! empty( $valid_cat_ids ) ) {
+            $list_args['include'] = implode( ',', $valid_cat_ids );
+        }
+    }
+    return $list_args;
+}
+add_filter( 'woocommerce_product_categories_widget_args', 'prestige_filter_category_widget_by_current_products', 10, 1 );
