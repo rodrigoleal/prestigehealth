@@ -25,28 +25,28 @@ get_header(); ?>
 				<div class="col-full">
 					<h2 class="ts-section-title">Comprar por Categoria</h2>
 					<div class="ts-categories-grid">
-						<a href="<?php echo esc_url( get_term_link( 'biberoes', 'product_cat' ) ); ?>" class="ts-cat-card">
+						<a href="<?php echo esc_url( ts_get_term_link_safe( 'biberoes' ) ); ?>" class="ts-cat-card">
 							<div class="ts-cat-card-overlay"></div>
 							<div class="ts-cat-card-text">
 								<h3>Biberões</h3>
 								<span>Ver mais &rarr;</span>
 							</div>
 						</a>
-						<a href="<?php echo esc_url( get_term_link( 'copos', 'product_cat' ) ); ?>" class="ts-cat-card">
+						<a href="<?php echo esc_url( ts_get_term_link_safe( 'copos' ) ); ?>" class="ts-cat-card">
 							<div class="ts-cat-card-overlay"></div>
 							<div class="ts-cat-card-text">
 								<h3>Copos</h3>
 								<span>Ver mais &rarr;</span>
 							</div>
 						</a>
-						<a href="<?php echo esc_url( get_term_link( 'alimentacao', 'product_cat' ) ); ?>" class="ts-cat-card">
+						<a href="<?php echo esc_url( ts_get_term_link_safe( 'alimentacao' ) ); ?>" class="ts-cat-card">
 							<div class="ts-cat-card-overlay"></div>
 							<div class="ts-cat-card-text">
 								<h3>Alimentação</h3>
 								<span>Ver mais &rarr;</span>
 							</div>
 						</a>
-						<a href="<?php echo esc_url( get_term_link( 'carrinhos', 'product_cat' ) ); ?>" class="ts-cat-card">
+						<a href="<?php echo esc_url( ts_get_term_link_safe( 'carrinhos' ) ); ?>" class="ts-cat-card">
 							<div class="ts-cat-card-overlay"></div>
 							<div class="ts-cat-card-text">
 								<h3>Carrinhos</h3>

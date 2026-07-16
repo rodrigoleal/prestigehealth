@@ -80,12 +80,12 @@
 		<nav class="ts-nav" role="navigation">
 			<div class="col-full">
 				<ul class="ts-nav-menu">
-					<li><a href="<?php echo esc_url( get_term_link( 'carrinhos', 'product_cat' ) ); ?>">Carrinhos</a></li>
-					<li><a href="<?php echo esc_url( get_term_link( 'alimentacao', 'product_cat' ) ); ?>">Alimentação</a></li>
-					<li><a href="<?php echo esc_url( get_term_link( 'copos', 'product_cat' ) ); ?>">Copos</a></li>
-					<li><a href="<?php echo esc_url( get_term_link( 'biberoes', 'product_cat' ) ); ?>">Biberões</a></li>
-					<li><a href="<?php echo esc_url( get_term_link( 'banho', 'product_cat' ) ); ?>">Banho</a></li>
-					<li><a href="<?php echo esc_url( get_term_link( 'acessorios', 'product_cat' ) ); ?>">Acessórios</a></li>
+					<li><a href="<?php echo esc_url( ts_get_term_link_safe( 'carrinhos' ) ); ?>">Carrinhos</a></li>
+					<li><a href="<?php echo esc_url( ts_get_term_link_safe( 'alimentacao' ) ); ?>">Alimentação</a></li>
+					<li><a href="<?php echo esc_url( ts_get_term_link_safe( 'copos' ) ); ?>">Copos</a></li>
+					<li><a href="<?php echo esc_url( ts_get_term_link_safe( 'biberoes' ) ); ?>">Biberões</a></li>
+					<li><a href="<?php echo esc_url( ts_get_term_link_safe( 'banho' ) ); ?>">Banho</a></li>
+					<li><a href="<?php echo esc_url( ts_get_term_link_safe( 'acessorios' ) ); ?>">Acessórios</a></li>
 					<li><a href="<?php echo esc_url( home_url( '/loja/?store=twistshake&orderby=date' ) ); ?>">Novo</a></li>
 					<li><a href="<?php echo esc_url( home_url( '/loja/?store=twistshake&on_sale=1' ) ); ?>" class="ts-promo-link">Promoções</a></li>
 				</ul>

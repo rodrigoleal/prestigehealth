@@ -174,3 +174,29 @@ function custom_multidomain_tag_order( $order, $data ) {
     $source = $is_twistshake ? 'twistshakeportugal.pt' : 'loja.prestigehealth.pt';
     $order->update_meta_data( '_order_source_domain', $source );
 }
+
+/**
+ * Safe wrapper for get_term_link to prevent fatal errors when category slugs are missing/different between local and prod.
+ */
+function ts_get_term_link_safe( $slug, $taxonomy = 'product_cat' ) {
+    $link = get_term_link( $slug, $taxonomy );
+    if ( ! is_wp_error( $link ) ) {
+        return $link;
+    }
+    
+    // Fallbacks for local vs production differences
+    $fallbacks = array(
+        'carrinhos'   => 'carrinhos-de-passeio',
+        'biberoes'    => 'biberoes-e-acessorios',
+        'acessorios'  => 'chupetas-e-acessorios',
+    );
+    
+    if ( isset( $fallbacks[ $slug ] ) ) {
+        $fallback_link = get_term_link( $fallbacks[ $slug ], $taxonomy );
+        if ( ! is_wp_error( $fallback_link ) ) {
+            return $fallback_link;
+        }
+    }
+    
+    return '#';
+}
