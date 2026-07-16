@@ -1,4 +1,9 @@
 <?php
+if ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain_is_twistshake() ) {
+    get_template_part( 'header', 'twistshake' );
+    return;
+}
+
 /**
  * The header for our theme.
  *

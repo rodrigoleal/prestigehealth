@@ -278,3 +278,22 @@ function prestige_filter_category_widget_by_current_products( $list_args ) {
     return $list_args;
 }
 add_filter( 'woocommerce_product_categories_widget_args', 'prestige_filter_category_widget_by_current_products', 10, 1 );
+
+/**
+ * Enqueue styles and scripts for Twistshake domain
+ */
+function twistshake_multidomain_enqueue_styles() {
+    if ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain_is_twistshake() ) {
+        // Enqueue Google Font Outfit (modern, rounded and friendly for baby brand)
+        wp_enqueue_style( 'twistshake-google-font', 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap', array(), null );
+        
+        // Enqueue main Twistshake CSS
+        wp_enqueue_style(
+            'twistshake-styles',
+            get_stylesheet_directory_uri() . '/twistshake.css',
+            array( 'prestige-child-style' ),
+            filemtime( get_stylesheet_directory() . '/twistshake.css' )
+        );
+    }
+}
+add_action( 'wp_enqueue_scripts', 'twistshake_multidomain_enqueue_styles', 99 );
