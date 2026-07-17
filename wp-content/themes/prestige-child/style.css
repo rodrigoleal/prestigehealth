@@ -275,6 +275,17 @@ body {
     justify-content: space-between !important;
     gap: 20px !important;
 }
+
+/* Neutralize Storefront float/clear grid styles inside our custom header */
+.custom-middle-bar .site-branding,
+.custom-middle-bar .site-search,
+.custom-middle-bar .site-icons {
+    float: none !important;
+    width: auto !important;
+    margin: 0 !important;
+    clear: none !important;
+}
+
 .custom-middle-bar .site-branding {
     flex: 0 1 auto !important;
 }
@@ -283,10 +294,6 @@ body {
     max-width: 600px !important;
     padding: 0 15px !important;
 }
-.custom-middle-bar .site-search form input[type="search"],
-.custom-middle-bar .site-search form .search-field {
-    min-width: 0 !important; /* Allow search box to shrink gracefully */
-}
 .custom-middle-bar .site-icons {
     flex: 0 0 auto !important;
     display: flex !important;
@@ -294,6 +301,22 @@ body {
     align-items: center !important;
     gap: 25px !important;
     color: #fff !important;
+}
+
+/* Custom Search Form Flex Layout */
+.custom-middle-bar .site-search form {
+    display: flex !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+.custom-middle-bar .site-search form input[type="search"],
+.custom-middle-bar .site-search form .search-field {
+    flex: 1 1 auto !important;
+    width: auto !important; /* Override width: 100% which breaks flex math */
+    min-width: 150px !important; /* Ensure it never shrinks to 0 */
+}
+.custom-middle-bar .site-search form button[type="submit"] {
+    flex: 0 0 auto !important;
 }
 
 @media (max-width: 992px) {
