@@ -141,13 +141,10 @@
 				<div class="ts-payment-badges">
 					<span class="ts-lock-icon">🔒 Pagamentos 100% Seguros:</span>
 					<div class="ts-payment-icons">
-						<!-- Display payment gateway badges -->
-						<span class="ts-badge ts-badge-mbway">MB WAY</span>
-						<span class="ts-badge ts-badge-visa">VISA</span>
-						<span class="ts-badge ts-badge-mc">Mastercard</span>
-						<span class="ts-badge ts-badge-amex">AMEX</span>
-						<span class="ts-badge ts-badge-apple"> Pay</span>
-						<span class="ts-badge ts-badge-google">G Pay</span>
+						<!-- Display official colorful payment gateway logos -->
+						<img src="<?php echo esc_url( content_url( '/plugins/multibanco-ifthen-software-gateway-for-woocommerce/images/mbway_banner.svg' ) ); ?>" alt="MB WAY" class="ts-payment-logo">
+						<img src="<?php echo esc_url( content_url( '/plugins/multibanco-ifthen-software-gateway-for-woocommerce/images/multibanco_banner.svg' ) ); ?>" alt="Multibanco" class="ts-payment-logo">
+						<img src="<?php echo esc_url( content_url( '/plugins/multibanco-ifthen-software-gateway-for-woocommerce/images/creditcard_banner_and_icon.svg' ) ); ?>" alt="Cartão de Crédito" class="ts-payment-logo">
 					</div>
 				</div>
 

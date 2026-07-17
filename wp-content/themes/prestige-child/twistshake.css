@@ -699,15 +699,19 @@ body.twistshake-theme ul.products li.product .button:hover {
 }
 .ts-payment-icons {
     display: flex;
-    gap: 8px;
+    align-items: center;
+    gap: 12px;
 }
-.ts-badge {
-    background-color: #F9F6F0;
-    border: 1px solid #EAE5DB;
-    padding: 6px 12px;
+.ts-payment-logo {
+    height: 26px;
+    width: auto;
+    object-fit: contain;
+    display: inline-block;
+    vertical-align: middle;
+    background-color: #FFFFFF;
+    padding: 2px 6px;
     border-radius: 4px;
-    font-weight: 700;
-    font-size: 11px;
+    border: 1px solid #EAE5DB;
 }
 .ts-distributor-info {
     text-align: right;
