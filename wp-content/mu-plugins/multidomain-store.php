@@ -70,6 +70,36 @@ function custom_multidomain_home_url( $url ) {
 }
 
 /**
+ * Dynamically filter site name, description, and title parts for Twistshake Portugal.
+ */
+add_filter( 'option_blogname', 'custom_multidomain_blogname' );
+function custom_multidomain_blogname( $name ) {
+    if ( custom_multidomain_is_twistshake() ) {
+        return 'Twistshake Portugal';
+    }
+    return $name;
+}
+
+add_filter( 'option_blogdescription', 'custom_multidomain_blogdescription' );
+function custom_multidomain_blogdescription( $description ) {
+    if ( custom_multidomain_is_twistshake() ) {
+        return 'With passion for babies';
+    }
+    return $description;
+}
+
+add_filter( 'document_title_parts', 'custom_multidomain_document_title_parts' );
+function custom_multidomain_document_title_parts( $parts ) {
+    if ( custom_multidomain_is_twistshake() && is_array( $parts ) ) {
+        $parts['site'] = 'Twistshake Portugal';
+        if ( is_front_page() || is_home() ) {
+            $parts['tagline'] = 'With passion for babies';
+        }
+    }
+    return $parts;
+}
+
+/**
  * Helper function to apply product tax query filters.
  */
 function custom_apply_product_visibility_filter( $q, $is_twistshake ) {
