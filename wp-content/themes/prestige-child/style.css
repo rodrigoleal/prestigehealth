@@ -298,23 +298,30 @@ body {
 
 @media (max-width: 992px) {
     .custom-middle-bar .col-full {
-        flex-direction: column !important;
-        gap: 15px !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        justify-content: space-between !important;
         align-items: center !important;
+        row-gap: 15px !important;
+        padding-left: 15px !important;
+        padding-right: 15px !important;
     }
     .custom-middle-bar .site-branding {
-        flex: 0 0 100% !important;
-        text-align: center !important;
+        flex: 0 1 auto !important;
+        text-align: left !important;
+        margin: 0 !important;
     }
-    .custom-middle-bar .site-search {
-        flex: 0 0 100% !important;
-        padding: 0 15px !important;
-        width: 100% !important;
+    .custom-middle-bar .site-branding img {
+        max-height: 45px !important; /* Elegant compact logo */
+        width: auto !important;
     }
     .custom-middle-bar .site-icons {
-        flex: 0 0 100% !important;
+        flex: 0 0 auto !important;
         display: flex !important;
-        justify-content: center !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        margin: 0 !important;
+        order: 2 !important;
     }
     /* Force display cart icon which storefront defaults to display:none on mobile/tablet */
     .custom-middle-bar .site-icons .site-header-cart {
@@ -322,6 +329,16 @@ body {
         margin: 0 !important;
     }
     .site-icons .site-header-cart .cart-contents {
-        justify-content: center !important;
+        justify-content: flex-end !important;
+    }
+    .custom-middle-bar .site-search {
+        flex: 0 0 100% !important; /* Full width on Row 2 */
+        width: 100% !important;
+        padding: 0 !important;
+        order: 3 !important;
+    }
+    .custom-middle-bar .site-search form {
+        max-width: 100% !important;
+        width: 100% !important;
     }
 }
