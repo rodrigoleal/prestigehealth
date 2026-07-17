@@ -160,6 +160,15 @@ function custom_multidomain_woocommerce_product_query( $q ) {
 }
 
 /**
+ * Filter shortcode query args to vary transient keys (md5 hashes) by domain.
+ */
+add_filter( 'woocommerce_shortcode_products_query', 'custom_multidomain_shortcode_products_query', 10, 3 );
+function custom_multidomain_shortcode_products_query( $query_args, $attributes, $type ) {
+    $query_args['store'] = custom_multidomain_is_twistshake() ? 'twistshake' : 'prestige';
+    return $query_args;
+}
+
+/**
  * Filter WooCommerce CPT data store queries (wc_get_products, etc.).
  */
 add_filter( 'woocommerce_product_data_store_cpt_get_products_query', 'custom_multidomain_cpt_products_query', 10, 2 );
