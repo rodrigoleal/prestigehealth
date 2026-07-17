@@ -328,6 +328,10 @@ add_filter( 'term_link', 'custom_multidomain_append_store_param', 99, 1 );
 add_filter( 'wp_setup_nav_menu_item', 'custom_multidomain_filter_menu_item_url', 99, 1 );
 
 function custom_multidomain_append_store_param( $url ) {
+    if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+        return $url;
+    }
+    
     if ( ! isset( $_SERVER['HTTP_HOST'] ) ) {
         return $url;
     }
