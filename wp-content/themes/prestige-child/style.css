@@ -269,7 +269,34 @@ body {
 }
 
 /* Prestige Health Responsive Custom Header & Cart Icon Visibility */
-@media (max-width: 768px) {
+.custom-middle-bar .col-full {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
+}
+.custom-middle-bar .site-branding {
+    flex: 0 1 auto !important;
+}
+.custom-middle-bar .site-search {
+    flex: 1 1 auto !important;
+    max-width: 600px !important;
+    padding: 0 15px !important;
+}
+.custom-middle-bar .site-search form input[type="search"],
+.custom-middle-bar .site-search form .search-field {
+    min-width: 0 !important; /* Allow search box to shrink gracefully */
+}
+.custom-middle-bar .site-icons {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 25px !important;
+    color: #fff !important;
+}
+
+@media (max-width: 992px) {
     .custom-middle-bar .col-full {
         flex-direction: column !important;
         gap: 15px !important;
@@ -289,7 +316,7 @@ body {
         display: flex !important;
         justify-content: center !important;
     }
-    /* Force display cart icon which storefront defaults to display:none on mobile */
+    /* Force display cart icon which storefront defaults to display:none on mobile/tablet */
     .custom-middle-bar .site-icons .site-header-cart {
         display: flex !important;
         margin: 0 !important;
