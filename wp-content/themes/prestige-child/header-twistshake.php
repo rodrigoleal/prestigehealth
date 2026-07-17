@@ -23,9 +23,22 @@
 	<!-- Top Bar / Promo Bar -->
 	<div class="ts-promo-bar">
 		<div class="col-full ts-promo-content">
-			<span>✨ PORTES GRÁTIS EM COMPRAS SUPERIORES A 50€</span>
-			<span class="ts-separator">|</span>
-			<span>🚚 ENTREGA EM 24/48H</span>
+			<div class="ts-promo-item">
+				<span class="ts-promo-icon">🏅</span>
+				<span>Loja Oficial Twistshake Portugal</span>
+			</div>
+			<div class="ts-promo-item">
+				<span class="ts-promo-icon">🚚</span>
+				<span>Envio grátis em compras superiores a 50€</span>
+			</div>
+			<div class="ts-promo-item">
+				<span class="ts-promo-icon">📦</span>
+				<span>Entrega em 24/48h</span>
+			</div>
+			<div class="ts-promo-item">
+				<span class="ts-promo-icon">⭐</span>
+				<span>Avaliado 4.9/5 por mais de 2.000 clientes</span>
+			</div>
 		</div>
 	</div>
 
