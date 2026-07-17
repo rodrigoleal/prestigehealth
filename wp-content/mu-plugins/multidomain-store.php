@@ -293,3 +293,26 @@ function ts_get_term_link_safe( $slug, $taxonomy = 'product_cat' ) {
     
     return '#';
 }
+
+/**
+ * Update Twistshake cart count dynamically via AJAX.
+ */
+add_filter( 'woocommerce_add_to_cart_fragments', 'custom_multidomain_cart_link_fragment', 10, 1 );
+function custom_multidomain_cart_link_fragment( $fragments ) {
+    ob_start();
+    $cart_count = ( WC() && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
+    ?>
+    <span class="ts-cart-count" <?php if ( $cart_count == 0 ) echo 'style="display:none;"'; ?>><?php echo esc_html( $cart_count ); ?></span>
+    <?php
+    $fragments['span.ts-cart-count'] = ob_get_clean();
+    return $fragments;
+}
+
+/**
+ * Isolate WooCommerce session cookies for Twistshake and Prestige Health.
+ */
+add_filter( 'woocommerce_cookie', 'custom_multidomain_session_cookie_name', 10, 1 );
+function custom_multidomain_session_cookie_name( $cookie_name ) {
+    $suffix = custom_multidomain_is_twistshake() ? '_twistshake' : '_prestige';
+    return $cookie_name . $suffix;
+}
