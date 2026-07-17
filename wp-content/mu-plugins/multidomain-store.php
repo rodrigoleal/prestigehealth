@@ -318,6 +318,115 @@ function custom_multidomain_session_cookie_name( $cookie_name ) {
 }
 
 /**
+ * Isolate user persistent cart metadata by store.
+ */
+add_filter( 'get_user_metadata', 'custom_multidomain_get_user_persistent_cart', 10, 5 );
+function custom_multidomain_get_user_persistent_cart( $value, $object_id, $meta_key, $single, $meta_type ) {
+    $target_key = '_woocommerce_persistent_cart_' . get_current_blog_id();
+    if ( $meta_key === $target_key ) {
+        $suffix = custom_multidomain_is_twistshake() ? '_twistshake' : '_prestige';
+        $new_key = $meta_key . $suffix;
+        
+        remove_filter( 'get_user_metadata', 'custom_multidomain_get_user_persistent_cart', 10 );
+        $val = get_user_meta( $object_id, $new_key, $single );
+        add_filter( 'get_user_metadata', 'custom_multidomain_get_user_persistent_cart', 10, 5 );
+        
+        return $val;
+    }
+    return $value;
+}
+
+add_filter( 'update_user_metadata', 'custom_multidomain_update_user_persistent_cart', 10, 5 );
+function custom_multidomain_update_user_persistent_cart( $check, $object_id, $meta_key, $meta_value, $prev_value ) {
+    $target_key = '_woocommerce_persistent_cart_' . get_current_blog_id();
+    if ( $meta_key === $target_key ) {
+        $suffix = custom_multidomain_is_twistshake() ? '_twistshake' : '_prestige';
+        $new_key = $meta_key . $suffix;
+        
+        remove_filter( 'update_user_metadata', 'custom_multidomain_update_user_persistent_cart', 10 );
+        update_user_meta( $object_id, $new_key, $meta_value, $prev_value );
+        add_filter( 'update_user_metadata', 'custom_multidomain_update_user_persistent_cart', 10, 5 );
+        
+        return true;
+    }
+    return $check;
+}
+
+add_filter( 'delete_user_metadata', 'custom_multidomain_delete_user_persistent_cart', 10, 5 );
+function custom_multidomain_delete_user_persistent_cart( $check, $object_id, $meta_key, $meta_value, $delete_all ) {
+    $target_key = '_woocommerce_persistent_cart_' . get_current_blog_id();
+    if ( $meta_key === $target_key ) {
+        $suffix = custom_multidomain_is_twistshake() ? '_twistshake' : '_prestige';
+        $new_key = $meta_key . $suffix;
+        
+        remove_filter( 'delete_user_metadata', 'custom_multidomain_delete_user_persistent_cart', 10 );
+        delete_user_meta( $object_id, $new_key, $meta_value );
+        add_filter( 'delete_user_metadata', 'custom_multidomain_delete_user_persistent_cart', 10, 5 );
+        
+        return true;
+    }
+    return $check;
+}
+
+/**
+ * Define and register custom session handler to isolate active sessions for logged-in users.
+ */
+add_action( 'plugins_loaded', 'custom_multidomain_define_session_handler', 10 );
+function custom_multidomain_define_session_handler() {
+    if ( class_exists( 'WC_Session_Handler' ) && ! class_exists( 'Custom_Multidomain_Session_Handler' ) ) {
+        class Custom_Multidomain_Session_Handler extends WC_Session_Handler {
+            
+            private function get_suffixed_customer_id( $customer_id ) {
+                if ( is_numeric( $customer_id ) ) {
+                    $suffix = custom_multidomain_is_twistshake() ? '_twistshake' : '_prestige';
+                    if ( substr( $customer_id, -11 ) !== '_twistshake' && substr( $customer_id, -9 ) !== '_prestige' ) {
+                        return $customer_id . $suffix;
+                    }
+                }
+                return $customer_id;
+            }
+
+            public function get_session( $customer_id, $default_value = false ) {
+                $customer_id = $this->get_suffixed_customer_id( $customer_id );
+                return parent::get_session( $customer_id, $default_value );
+            }
+
+            public function delete_session( $customer_id ) {
+                $customer_id = $this->get_suffixed_customer_id( $customer_id );
+                parent::delete_session( $customer_id );
+            }
+
+            public function update_session_timestamp( $customer_id, $timestamp ) {
+                $customer_id = $this->get_suffixed_customer_id( $customer_id );
+                parent::update_session_timestamp( $customer_id, $timestamp );
+            }
+
+            public function save_data( $old_session_key = '' ) {
+                $original_customer_id = $this->_customer_id;
+                $this->_customer_id = $this->get_suffixed_customer_id( $this->_customer_id );
+                
+                if ( ! empty( $old_session_key ) ) {
+                    $old_session_key = $this->get_suffixed_customer_id( $old_session_key );
+                }
+                
+                parent::save_data( $old_session_key );
+                
+                $this->_customer_id = $original_customer_id;
+            }
+        }
+    }
+}
+
+add_filter( 'woocommerce_session_handler', 'custom_multidomain_session_handler_class' );
+function custom_multidomain_session_handler_class( $class ) {
+    if ( class_exists( 'Custom_Multidomain_Session_Handler' ) ) {
+        return 'Custom_Multidomain_Session_Handler';
+    }
+    return $class;
+}
+
+
+/**
  * Append the active store query parameter to all generated URLs when testing on localhost.
  */
 add_filter( 'home_url', 'custom_multidomain_append_store_param', 99, 1 );
