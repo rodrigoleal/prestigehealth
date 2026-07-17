@@ -316,3 +316,42 @@ function custom_multidomain_session_cookie_name( $cookie_name ) {
     $suffix = custom_multidomain_is_twistshake() ? '_twistshake' : '_prestige';
     return $cookie_name . $suffix;
 }
+
+/**
+ * Append the active store query parameter to all generated URLs when testing on localhost.
+ */
+add_filter( 'home_url', 'custom_multidomain_append_store_param', 99, 1 );
+add_filter( 'post_link', 'custom_multidomain_append_store_param', 99, 1 );
+add_filter( 'post_type_link', 'custom_multidomain_append_store_param', 99, 1 );
+add_filter( 'page_link', 'custom_multidomain_append_store_param', 99, 1 );
+add_filter( 'term_link', 'custom_multidomain_append_store_param', 99, 1 );
+add_filter( 'wp_setup_nav_menu_item', 'custom_multidomain_filter_menu_item_url', 99, 1 );
+
+function custom_multidomain_append_store_param( $url ) {
+    if ( ! isset( $_SERVER['HTTP_HOST'] ) ) {
+        return $url;
+    }
+    
+    $host = $_SERVER['HTTP_HOST'];
+    // Only apply this locally to ease multi-store testing on same hostname
+    if ( strpos( $host, 'localhost' ) === false && strpos( $host, '127.0.0.1' ) === false ) {
+        return $url;
+    }
+    
+    // Skip assets and admin pages
+    if ( strpos( $url, '/wp-admin/' ) !== false || preg_match( '/\.(js|css|png|jpe?g|gif|xml|txt|ico|svg|woff2?|otf|ttf|eot)(\?.*)?$/i', $url ) ) {
+        return $url;
+    }
+    
+    $is_twistshake = custom_multidomain_is_twistshake();
+    $store = $is_twistshake ? 'twistshake' : 'prestige';
+    
+    return add_query_arg( 'store', $store, $url );
+}
+
+function custom_multidomain_filter_menu_item_url( $menu_item ) {
+    if ( isset( $menu_item->url ) ) {
+        $menu_item->url = custom_multidomain_append_store_param( $menu_item->url );
+    }
+    return $menu_item;
+}
