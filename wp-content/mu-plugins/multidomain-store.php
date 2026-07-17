@@ -132,14 +132,19 @@ function custom_apply_product_visibility_filter( $q, $is_twistshake ) {
 /**
  * Filter main product queries (archives, search, categories).
  */
-add_action( 'pre_get_posts', 'custom_multidomain_pre_get_posts' );
+add_action( 'pre_get_posts', 'custom_multidomain_pre_get_posts', 99 );
 function custom_multidomain_pre_get_posts( $q ) {
     if ( is_admin() ) {
         return;
     }
     
-    // Only target main query on frontend for product-related page types
-    if ( $q->is_main_query() && ( $q->is_post_type_archive( 'product' ) || $q->is_search() || $q->is_tax( 'product_cat' ) || $q->is_tax( 'product_tag' ) ) ) {
+    $post_types = (array) $q->get( 'post_type' );
+    if ( in_array( 'product', $post_types ) ) {
+        // Skip single product pages and direct ID fetches (e.g. cart/checkout)
+        if ( $q->is_single() || $q->is_singular() || $q->get( 'p' ) || $q->get( 'post__in' ) ) {
+            return;
+        }
+        
         $is_twistshake = custom_multidomain_is_twistshake();
         custom_apply_product_visibility_filter( $q, $is_twistshake );
     }
