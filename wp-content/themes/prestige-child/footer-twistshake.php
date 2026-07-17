@@ -23,7 +23,7 @@
 				<div class="ts-badge-icon">📦</div>
 				<div class="ts-badge-text">
 					<strong>PORTES GRÁTIS</strong><br>
-					<span>Em compras superiores a 50€</span>
+					<span>Em compras superiores a 70€</span>
 				</div>
 			</div>
 			<div class="ts-badge-item">
