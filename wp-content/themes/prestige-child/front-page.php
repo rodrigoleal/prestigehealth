@@ -41,13 +41,10 @@ get_header(); ?>
 				<div class="col-full">
 
 					<?php
-					// Definir as categorias e subcategorias a mostrar na página principal
+					// Definir as categorias e subcategorias a mostrar na página principal (apenas não-Twistshake)
 					$home_categories = array(
-						'carrinhos-de-passeio' => 'Carrinhos',
 						'calcado' => 'Calçado',
-						'alimentacao' => 'Alimentação',
-						'chupetas-e-acessorios' => 'Chupetas e Acessórios',
-						'doudous' => 'Doudous',
+						'geriatria' => 'Apoio à Geriatria',
 						'produto-medicos-e-hospitalares' => 'Produtos Médicos'
 					);
 

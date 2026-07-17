@@ -166,6 +166,55 @@ function custom_multidomain_cpt_products_query( $query, $query_vars ) {
 }
 
 /**
+ * Dynamically hide Twistshake menu items on the Prestige Health domain.
+ */
+add_filter( 'wp_get_nav_menu_items', 'custom_multidomain_filter_menu_items', 10, 3 );
+function custom_multidomain_filter_menu_items( $items, $menu, $args ) {
+    if ( is_admin() ) {
+        return $items;
+    }
+    
+    $is_twistshake = custom_multidomain_is_twistshake();
+    
+    // Hide Twistshake links from Prestige Health
+    if ( ! $is_twistshake && is_array( $items ) ) {
+        $exclude_ids = array();
+        
+        // Find the Twistshake item
+        foreach ( $items as $item ) {
+            if ( $item->title === 'Twistshake' || $item->db_id == 734 ) {
+                $exclude_ids[] = $item->db_id;
+            }
+        }
+        
+        // Recursively exclude descendants
+        if ( ! empty( $exclude_ids ) ) {
+            $count = 0;
+            do {
+                $added = false;
+                foreach ( $items as $item ) {
+                    if ( in_array( $item->menu_item_parent, $exclude_ids ) && ! in_array( $item->db_id, $exclude_ids ) ) {
+                        $exclude_ids[] = $item->db_id;
+                        $added = true;
+                    }
+                }
+                $count++;
+            } while ( $added && $count < 5 );
+            
+            $filtered_items = array();
+            foreach ( $items as $item ) {
+                if ( ! in_array( $item->db_id, $exclude_ids ) ) {
+                    $filtered_items[] = $item;
+                }
+            }
+            return $filtered_items;
+        }
+    }
+    
+    return $items;
+}
+
+/**
  * Tag checkout orders with the domain source.
  */
 add_action( 'woocommerce_checkout_create_order', 'custom_multidomain_tag_order', 10, 2 );
