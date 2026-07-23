@@ -50,9 +50,9 @@ if ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain
                 <div class="footer-col footer-col-2">
                     <h3 class="footer-title">Empresa</h3>
                     <ul class="footer-links">
-                        <li><a href="<?php echo esc_url( get_term_link( 'carrinhos-de-passeio', 'product_cat' ) ); ?>">Carrinhos de Passeio</a></li>
-                        <li><a href="<?php echo esc_url( get_term_link( 'calcado', 'product_cat' ) ); ?>">Calçado</a></li>
-                        <li><a href="<?php echo esc_url( get_term_link( 'alimentacao', 'product_cat' ) ); ?>">Alimentação</a></li>
+                        <li><a href="<?php echo esc_url( ts_get_term_link_safe( 'calcado' ) ); ?>">Calçado</a></li>
+                        <li><a href="<?php echo esc_url( ts_get_term_link_safe( 'geriatria' ) ); ?>">Geriatria</a></li>
+                        <li><a href="<?php echo esc_url( ts_get_term_link_safe( 'produto-medicos-e-hospitalares' ) ); ?>">Produtos Médicos</a></li>
                         <li><a href="<?php echo esc_url( home_url('/termos-e-condicoes/') ); ?>">Termos e Condições</a></li>
                         <li><a href="<?php echo esc_url( home_url('/privacy-policy/') ); ?>">Política de Privacidade</a></li>
                     </ul>

@@ -331,7 +331,7 @@ function custom_multidomain_tag_order( $order, $data ) {
  */
 function ts_get_term_link_safe( $slug, $taxonomy = 'product_cat' ) {
     $link = get_term_link( $slug, $taxonomy );
-    if ( ! is_wp_error( $link ) ) {
+    if ( ! is_wp_error( $link ) && is_string( $link ) ) {
         return $link;
     }
     
@@ -344,7 +344,7 @@ function ts_get_term_link_safe( $slug, $taxonomy = 'product_cat' ) {
     
     if ( isset( $fallbacks[ $slug ] ) ) {
         $fallback_link = get_term_link( $fallbacks[ $slug ], $taxonomy );
-        if ( ! is_wp_error( $fallback_link ) ) {
+        if ( ! is_wp_error( $fallback_link ) && is_string( $fallback_link ) ) {
             return $fallback_link;
         }
     }
