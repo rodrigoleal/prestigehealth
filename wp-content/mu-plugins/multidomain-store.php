@@ -210,6 +210,64 @@ function custom_multidomain_cpt_products_query( $query, $query_vars ) {
 }
 
 /**
+ * Filter product_cat taxonomy terms by store (Prestige Health vs Twistshake).
+ */
+add_filter( 'terms_clauses', 'custom_multidomain_filter_terms_clauses', 10, 3 );
+function custom_multidomain_filter_terms_clauses( $clauses, $taxonomies, $args ) {
+    if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+        return $clauses;
+    }
+    
+    // Only filter if product_cat is in the queried taxonomies
+    if ( ! in_array( 'product_cat', (array) $taxonomies, true ) ) {
+        return $clauses;
+    }
+    
+    static $twistshake_term_ids = null;
+    static $fetching = false;
+    
+    if ( $fetching ) {
+        return $clauses;
+    }
+    
+    if ( null === $twistshake_term_ids ) {
+        $fetching = true;
+        remove_filter( 'terms_clauses', 'custom_multidomain_filter_terms_clauses', 10 );
+        
+        $parent_term = get_term_by( 'slug', 'twistshake', 'product_cat' );
+        if ( $parent_term && ! is_wp_error( $parent_term ) ) {
+            $children_ids = get_term_children( $parent_term->term_id, 'product_cat' );
+            if ( is_wp_error( $children_ids ) ) {
+                $children_ids = array();
+            }
+            $twistshake_term_ids = array_merge( array( $parent_term->term_id ), $children_ids );
+        } else {
+            $twistshake_term_ids = array();
+        }
+        
+        add_filter( 'terms_clauses', 'custom_multidomain_filter_terms_clauses', 10, 3 );
+        $fetching = false;
+    }
+    
+    if ( empty( $twistshake_term_ids ) ) {
+        return $clauses;
+    }
+    
+    $is_twistshake = custom_multidomain_is_twistshake();
+    $id_list = implode( ',', array_map( 'intval', $twistshake_term_ids ) );
+    
+    if ( $is_twistshake ) {
+        // Twistshake store: include ONLY Twistshake category and its children
+        $clauses['where'] .= " AND t.term_id IN ($id_list)";
+    } else {
+        // Prestige store: EXCLUDE Twistshake category and its children
+        $clauses['where'] .= " AND t.term_id NOT IN ($id_list)";
+    }
+    
+    return $clauses;
+}
+
+/**
  * Dynamically hide Twistshake menu items on the Prestige Health domain.
  */
 add_filter( 'wp_get_nav_menu_items', 'custom_multidomain_filter_menu_items', 10, 3 );
