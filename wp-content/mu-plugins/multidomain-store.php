@@ -331,7 +331,11 @@ function custom_multidomain_get_user_persistent_cart( $value, $object_id, $meta_
         $val = get_user_meta( $object_id, $new_key, $single );
         add_filter( 'get_user_metadata', 'custom_multidomain_get_user_persistent_cart', 10, 5 );
         
-        return $val;
+        if ( $single ) {
+            return array( $val );
+        } else {
+            return is_array( $val ) ? $val : array( $val );
+        }
     }
     return $value;
 }
