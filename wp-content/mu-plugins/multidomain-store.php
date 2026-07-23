@@ -70,6 +70,17 @@ function custom_multidomain_home_url( $url ) {
 }
 
 /**
+ * Disable canonical redirects on Twistshake domain to prevent WordPress from redirecting to siteurl option in DB.
+ */
+add_filter( 'redirect_canonical', 'custom_multidomain_prevent_canonical_redirect', 10, 2 );
+function custom_multidomain_prevent_canonical_redirect( $redirect_url, $requested_url ) {
+    if ( custom_multidomain_is_twistshake() ) {
+        return false;
+    }
+    return $redirect_url;
+}
+
+/**
  * Dynamically filter site name, description, and title parts for Twistshake Portugal.
  */
 add_filter( 'option_blogname', 'custom_multidomain_blogname' );
