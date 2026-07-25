@@ -575,7 +575,8 @@ function custom_is_portugal_islands( $postcode, $country = 'PT' ) {
  * Filter shipping rates:
  * 1. Limit Free Shipping (> 70€) exclusively to Portugal Continental.
  * 2. If destination is Islands (Madeira/Açores), remove Free Shipping.
- * 3. Update rate labels for clarity as requested.
+ * 3. Ensure Local Pickup (Levantamento na Loja) is available with store address.
+ * 4. Update rate labels for clarity as requested.
  */
 add_filter( 'woocommerce_package_rates', 'custom_multidomain_filter_shipping_rates', 10, 2 );
 function custom_multidomain_filter_shipping_rates( $rates, $package ) {
@@ -583,6 +584,27 @@ function custom_multidomain_filter_shipping_rates( $rates, $package ) {
     $postcode = isset( $package['destination']['postcode'] ) ? $package['destination']['postcode'] : '';
     
     $is_island = custom_is_portugal_islands( $postcode, $country );
+    
+    // Ensure Local Pickup rate is available
+    $has_pickup = false;
+    foreach ( $rates as $rate ) {
+        if ( 'local_pickup' === $rate->method_id ) {
+            $has_pickup = true;
+            $rate->label = 'Levantamento na Loja (0 €)';
+            break;
+        }
+    }
+    
+    if ( ! $has_pickup ) {
+        $pickup_rate = new WC_Shipping_Rate(
+            'local_pickup:famalicao',
+            'Levantamento na Loja (0 €)',
+            0,
+            array(),
+            'local_pickup'
+        );
+        $rates = array( 'local_pickup:famalicao' => $pickup_rate ) + $rates;
+    }
     
     if ( $is_island ) {
         // Islands (Madeira & Açores): remove free shipping method completely
@@ -617,6 +639,19 @@ function custom_multidomain_filter_shipping_rates( $rates, $package ) {
     }
     
     return $rates;
+}
+
+/**
+ * Format full label for Local Pickup to display the store address.
+ */
+add_filter( 'woocommerce_cart_shipping_method_full_label', 'custom_multidomain_shipping_method_full_label', 10, 2 );
+function custom_multidomain_shipping_method_full_label( $label, $method ) {
+    if ( 'local_pickup' === $method->method_id || false !== strpos( $method->id, 'local_pickup' ) ) {
+        $address = 'Rua Senador Sousa Fernandes 242, 4760-164 Vila Nova de Famalicão';
+        $label = 'Levantamento na Loja (0 €)';
+        $label .= '<span class="shipping-method-address" style="display: block; font-size: 0.85em; color: #666; font-weight: normal; margin-top: 2px;">(Morada: ' . esc_html( $address ) . ')</span>';
+    }
+    return $label;
 }
 
 /**
