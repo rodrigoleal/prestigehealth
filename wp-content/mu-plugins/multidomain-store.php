@@ -541,3 +541,91 @@ function custom_multidomain_filter_menu_item_url( $menu_item ) {
     }
     return $menu_item;
 }
+
+/**
+ * Helper to detect Portuguese Islands (Madeira and Açores) based on postal code.
+ * Madeira: 9000-000 to 9499-999
+ * Açores:  9500-000 to 9999-999
+ */
+function custom_is_portugal_islands( $postcode, $country = 'PT' ) {
+    if ( 'PT' !== $country ) {
+        return false;
+    }
+    $clean_code = preg_replace( '/[^0-9]/', '', $postcode );
+    if ( strlen( $clean_code ) >= 4 ) {
+        $prefix = (int) substr( $clean_code, 0, 4 );
+        if ( $prefix >= 9000 && $prefix <= 9999 ) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Filter shipping rates:
+ * 1. Limit Free Shipping (> 70€) exclusively to Portugal Continental.
+ * 2. If destination is Islands (Madeira/Açores), remove Free Shipping.
+ * 3. Update rate labels for clarity as requested.
+ */
+add_filter( 'woocommerce_package_rates', 'custom_multidomain_filter_shipping_rates', 10, 2 );
+function custom_multidomain_filter_shipping_rates( $rates, $package ) {
+    $country  = isset( $package['destination']['country'] ) ? $package['destination']['country'] : 'PT';
+    $postcode = isset( $package['destination']['postcode'] ) ? $package['destination']['postcode'] : '';
+    
+    $is_island = custom_is_portugal_islands( $postcode, $country );
+    
+    if ( $is_island ) {
+        // Islands (Madeira & Açores): remove free shipping method completely
+        foreach ( $rates as $rate_id => $rate ) {
+            if ( 'free_shipping' === $rate->method_id ) {
+                unset( $rates[ $rate_id ] );
+            }
+        }
+    } else {
+        // Portugal Continental:
+        $has_free_shipping = false;
+        foreach ( $rates as $rate ) {
+            if ( 'free_shipping' === $rate->method_id ) {
+                $has_free_shipping = true;
+                break;
+            }
+        }
+        
+        foreach ( $rates as $rate_id => $rate ) {
+            if ( 'free_shipping' === $rate->method_id ) {
+                $rate->label = 'Portugal Continental (0 €)';
+            } elseif ( 'flat_rate' === $rate->method_id ) {
+                if ( $has_free_shipping ) {
+                    // Hide flat rate if free shipping is available
+                    unset( $rates[ $rate_id ] );
+                } else {
+                    $formatted_cost = wc_price( $rate->cost );
+                    $rate->label = 'Portugal Continental (' . strip_tags( $formatted_cost ) . ')';
+                }
+            }
+        }
+    }
+    
+    return $rates;
+}
+
+/**
+ * Display notice above shipping methods on Checkout & Cart:
+ * "* Para as Ilhas Madeira e Açores, contacte-nos"
+ */
+add_action( 'woocommerce_review_order_before_shipping', 'custom_multidomain_render_islands_notice' );
+add_action( 'woocommerce_cart_totals_before_shipping', 'custom_multidomain_render_islands_notice' );
+function custom_multidomain_render_islands_notice() {
+    $is_twistshake = custom_multidomain_is_twistshake();
+    $contact_email = $is_twistshake ? 'geral@twistshakeportugal.pt' : 'geral@prestigehealth.pt';
+    $accent_color  = $is_twistshake ? '#e07a5f' : '#005492';
+    
+    ?>
+    <div class="custom-islands-shipping-notice" style="margin: 10px 0 15px 0; padding: 12px 16px; background-color: #f8f9fa; border: 1px solid #e2e8f0; border-left: 4px solid <?php echo esc_attr( $accent_color ); ?>; border-radius: 6px; font-size: 0.95em; color: #333; line-height: 1.5;">
+        <p style="margin: 0; font-weight: 500;">
+            <strong style="color: #2d3748;">* Para as Ilhas Madeira e Açores,</strong> 
+            <a href="mailto:<?php echo esc_attr( $contact_email ); ?>" style="color: <?php echo esc_attr( $accent_color ); ?>; text-decoration: underline; font-weight: 600;">contacte-nos</a>
+        </p>
+    </div>
+    <?php
+}

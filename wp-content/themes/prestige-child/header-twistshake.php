@@ -29,7 +29,7 @@
 			</div>
 			<div class="ts-promo-item">
 				<span class="ts-promo-icon">🚚</span>
-				<span>Envio grátis em compras superiores a 70€</span>
+				<span>Portes grátis em compras superiores a 70€ para Portugal Continental</span>
 			</div>
 			<div class="ts-promo-item">
 				<span class="ts-promo-icon">📦</span>

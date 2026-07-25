@@ -77,7 +77,7 @@ if ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain
 		</div>
 
 		<div class="custom-promo-bar" style="background-color: #005492; color: #fff; text-align: center; padding: 12px 0; font-weight: bold; font-size: 14px;">
-			Portes grátis para compras superiores a 70€.
+			Portes grátis para compras superiores a 70€ em Portugal Continental.
 		</div>
 
 	</header><!-- #masthead -->
