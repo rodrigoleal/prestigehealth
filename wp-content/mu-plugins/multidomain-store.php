@@ -642,15 +642,37 @@ add_action( 'woocommerce_review_order_before_shipping', 'custom_multidomain_rend
 add_action( 'woocommerce_cart_totals_before_shipping', 'custom_multidomain_render_islands_notice' );
 function custom_multidomain_render_islands_notice() {
     $is_twistshake = custom_multidomain_is_twistshake();
-    $contact_email = $is_twistshake ? 'geral@twistshakeportugal.pt' : 'geral@prestigehealth.pt';
-    $accent_color  = $is_twistshake ? '#e07a5f' : '#005492';
+    
+    if ( $is_twistshake ) {
+        $contact_email = 'geral@twistshakeportugal.pt';
+        $contact_phone = '+351 91 663 85 70';
+        $phone_link    = 'tel:+351916638570';
+        $phone_note    = '(Chamada para a rede móvel nacional)';
+        $accent_color  = '#e07a5f';
+    } else {
+        $contact_email = 'geral@prestigehealth.pt';
+        $contact_phone = '252 095 673';
+        $phone_link    = 'tel:252095673';
+        $phone_note    = '(Chamada para a rede fixa nacional)';
+        $accent_color  = '#005492';
+    }
     
     ?>
-    <div class="custom-islands-shipping-notice" style="margin: 10px 0 15px 0; padding: 12px 16px; background-color: #f8f9fa; border: 1px solid #e2e8f0; border-left: 4px solid <?php echo esc_attr( $accent_color ); ?>; border-radius: 6px; font-size: 0.95em; color: #333; line-height: 1.5;">
-        <p style="margin: 0; font-weight: 500;">
-            <strong style="color: #2d3748;">* Para as Ilhas Madeira e Açores,</strong> 
-            <a href="mailto:<?php echo esc_attr( $contact_email ); ?>" style="color: <?php echo esc_attr( $accent_color ); ?>; text-decoration: underline; font-weight: 600;">contacte-nos</a>
+    <div class="custom-islands-shipping-notice" style="margin: 10px 0 15px 0; padding: 14px 18px; background-color: #f8f9fa; border: 1px solid #e2e8f0; border-left: 4px solid <?php echo esc_attr( $accent_color ); ?>; border-radius: 6px; font-size: 0.93em; color: #333; line-height: 1.6;">
+        <p style="margin: 0 0 6px 0; font-weight: 600; color: #2d3748;">
+            * Para as Ilhas Madeira e Açores, contacte-nos por telefone ou email:
         </p>
+        <div style="font-size: 0.95em; color: #4a5568;">
+            <div>
+                📞 <strong>Telefone:</strong> 
+                <a href="<?php echo esc_url( $phone_link ); ?>" style="color: <?php echo esc_attr( $accent_color ); ?>; font-weight: 600; text-decoration: none;"><?php echo esc_html( $contact_phone ); ?></a> 
+                <span style="font-size: 0.85em; color: #718096;"><?php echo esc_html( $phone_note ); ?></span>
+            </div>
+            <div style="margin-top: 2px;">
+                ✉️ <strong>Email:</strong> 
+                <a href="mailto:<?php echo esc_attr( $contact_email ); ?>" style="color: <?php echo esc_attr( $accent_color ); ?>; font-weight: 600; text-decoration: underline;"><?php echo esc_html( $contact_email ); ?></a>
+            </div>
+        </div>
     </div>
     <?php
 }
