@@ -585,45 +585,25 @@ function custom_multidomain_filter_shipping_rates( $rates, $package ) {
     
     $is_island = custom_is_portugal_islands( $postcode, $country );
     
-    // Ensure Local Pickup rate is available
-    $has_pickup = false;
+    // Check if free shipping is available
+    $has_free_shipping = false;
     foreach ( $rates as $rate ) {
-        if ( 'local_pickup' === $rate->method_id ) {
-            $has_pickup = true;
-            $rate->label = 'Levantamento na Loja (0 €)';
+        if ( 'free_shipping' === $rate->method_id ) {
+            $has_free_shipping = true;
             break;
         }
     }
     
-    if ( ! $has_pickup ) {
-        $pickup_rate = new WC_Shipping_Rate(
-            'local_pickup:famalicao',
-            'Levantamento na Loja (0 €)',
-            0,
-            array(),
-            'local_pickup'
-        );
-        $rates = array( 'local_pickup:famalicao' => $pickup_rate ) + $rates;
-    }
-    
-    if ( $is_island ) {
-        // Islands (Madeira & Açores): remove free shipping method completely
-        foreach ( $rates as $rate_id => $rate ) {
+    foreach ( $rates as $rate_id => $rate ) {
+        if ( 'local_pickup' === $rate->method_id ) {
+            $rate->label = 'Levantamento na Loja (0 €)';
+        } elseif ( $is_island ) {
+            // Islands (Madeira & Açores): remove free shipping method completely
             if ( 'free_shipping' === $rate->method_id ) {
                 unset( $rates[ $rate_id ] );
             }
-        }
-    } else {
-        // Portugal Continental:
-        $has_free_shipping = false;
-        foreach ( $rates as $rate ) {
-            if ( 'free_shipping' === $rate->method_id ) {
-                $has_free_shipping = true;
-                break;
-            }
-        }
-        
-        foreach ( $rates as $rate_id => $rate ) {
+        } else {
+            // Portugal Continental:
             if ( 'free_shipping' === $rate->method_id ) {
                 $rate->label = 'Portugal Continental (0 €)';
             } elseif ( 'flat_rate' === $rate->method_id ) {
