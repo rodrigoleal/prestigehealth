@@ -11,6 +11,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * TOGGLE: Set to false to temporarily display & sell Twistshake products on Prestige Health
+ * while twistshakeportugal.pt 301 redirect is still active.
+ * Set to true to isolate Twistshake products once the domain alias is working.
+ */
+if ( ! defined( 'CUSTOM_HIDE_TWISTSHAKE_ON_PRESTIGE' ) ) {
+    define( 'CUSTOM_HIDE_TWISTSHAKE_ON_PRESTIGE', false );
+}
+
+/**
  * Determine if the current request is for the Twistshake storefront.
  */
 function custom_multidomain_is_twistshake() {
@@ -126,8 +135,9 @@ function custom_apply_product_visibility_filter( $q, $is_twistshake ) {
             'operator'         => 'IN',
             'include_children' => true,
         );
-    } else {
-        // EXCLUDE Twistshake products from main site
+        $q->set( 'tax_query', $tax_query );
+    } elseif ( defined( 'CUSTOM_HIDE_TWISTSHAKE_ON_PRESTIGE' ) && CUSTOM_HIDE_TWISTSHAKE_ON_PRESTIGE ) {
+        // EXCLUDE Twistshake products from main site only if constant is true
         $tax_query[] = array(
             'taxonomy'         => 'product_cat',
             'field'            => 'slug',
@@ -135,9 +145,8 @@ function custom_apply_product_visibility_filter( $q, $is_twistshake ) {
             'operator'         => 'NOT IN',
             'include_children' => true,
         );
+        $q->set( 'tax_query', $tax_query );
     }
-    
-    $q->set( 'tax_query', $tax_query );
 }
 
 /**
@@ -206,7 +215,8 @@ function custom_multidomain_cpt_products_query( $query, $query_vars ) {
             'operator'         => 'IN',
             'include_children' => true,
         );
-    } else {
+        $query['tax_query'] = $tax_query;
+    } elseif ( defined( 'CUSTOM_HIDE_TWISTSHAKE_ON_PRESTIGE' ) && CUSTOM_HIDE_TWISTSHAKE_ON_PRESTIGE ) {
         $tax_query[] = array(
             'taxonomy'         => 'product_cat',
             'field'            => 'slug',
@@ -214,9 +224,9 @@ function custom_multidomain_cpt_products_query( $query, $query_vars ) {
             'operator'         => 'NOT IN',
             'include_children' => true,
         );
+        $query['tax_query'] = $tax_query;
     }
     
-    $query['tax_query'] = $tax_query;
     return $query;
 }
 
@@ -270,8 +280,8 @@ function custom_multidomain_filter_terms_clauses( $clauses, $taxonomies, $args )
     if ( $is_twistshake ) {
         // Twistshake store: include ONLY Twistshake category and its children
         $clauses['where'] .= " AND t.term_id IN ($id_list)";
-    } else {
-        // Prestige store: EXCLUDE Twistshake category and its children
+    } elseif ( defined( 'CUSTOM_HIDE_TWISTSHAKE_ON_PRESTIGE' ) && CUSTOM_HIDE_TWISTSHAKE_ON_PRESTIGE ) {
+        // Prestige store: EXCLUDE Twistshake category and its children only if constant is true
         $clauses['where'] .= " AND t.term_id NOT IN ($id_list)";
     }
     
@@ -289,8 +299,8 @@ function custom_multidomain_filter_menu_items( $items, $menu, $args ) {
     
     $is_twistshake = custom_multidomain_is_twistshake();
     
-    // Hide Twistshake links from Prestige Health
-    if ( ! $is_twistshake && is_array( $items ) ) {
+    // Hide Twistshake links from Prestige Health only if constant is true
+    if ( ! $is_twistshake && defined( 'CUSTOM_HIDE_TWISTSHAKE_ON_PRESTIGE' ) && CUSTOM_HIDE_TWISTSHAKE_ON_PRESTIGE && is_array( $items ) ) {
         $exclude_ids = array();
         
         // Find the Twistshake item
