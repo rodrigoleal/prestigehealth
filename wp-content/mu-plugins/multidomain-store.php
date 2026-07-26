@@ -585,7 +585,7 @@ function custom_multidomain_filter_shipping_rates( $rates, $package ) {
     
     $is_island = custom_is_portugal_islands( $postcode, $country );
     
-    // Check if free shipping is available
+    // Check if free shipping is available (> 70€)
     $has_free_shipping = false;
     foreach ( $rates as $rate ) {
         if ( 'free_shipping' === $rate->method_id ) {
@@ -598,8 +598,9 @@ function custom_multidomain_filter_shipping_rates( $rates, $package ) {
         if ( 'local_pickup' === $rate->method_id ) {
             $rate->label = 'Levantamento na Loja (0 €)';
         } elseif ( $is_island ) {
-            // Islands (Madeira & Açores): remove free shipping method completely
-            if ( 'free_shipping' === $rate->method_id ) {
+            // Islands (Madeira & Açores): REMOVE BOTH flat_rate (4.99€) AND free_shipping (0€)!
+            // Online delivery is not permitted automatically; customer must contact store by phone/email.
+            if ( 'free_shipping' === $rate->method_id || 'flat_rate' === $rate->method_id ) {
                 unset( $rates[ $rate_id ] );
             }
         } else {
