@@ -572,6 +572,18 @@ function custom_is_portugal_islands( $postcode, $country = 'PT' ) {
 }
 
 /**
+ * Invalidate shipping package cache when postcode changes to guarantee fresh rate calculation.
+ */
+add_filter( 'woocommerce_cart_shipping_packages', 'custom_multidomain_invalidate_shipping_cache' );
+function custom_multidomain_invalidate_shipping_cache( $packages ) {
+    foreach ( $packages as $i => $package ) {
+        $postcode = isset( $package['destination']['postcode'] ) ? $package['destination']['postcode'] : '';
+        $packages[$i]['custom_version'] = md5( $postcode . '_v2' );
+    }
+    return $packages;
+}
+
+/**
  * Filter shipping rates:
  * 1. Limit Free Shipping (> 70€) exclusively to Portugal Continental.
  * 2. If destination is Islands (Madeira/Açores), remove Free Shipping.
