@@ -654,6 +654,12 @@ function custom_multidomain_shipping_method_full_label( $label, $method ) {
 add_action( 'woocommerce_review_order_before_shipping', 'custom_multidomain_render_islands_notice' );
 add_action( 'woocommerce_cart_totals_before_shipping', 'custom_multidomain_render_islands_notice' );
 function custom_multidomain_render_islands_notice() {
+    static $rendered = false;
+    if ( $rendered ) {
+        return;
+    }
+    $rendered = true;
+    
     $is_twistshake = custom_multidomain_is_twistshake();
     
     if ( $is_twistshake ) {
@@ -683,9 +689,25 @@ function custom_multidomain_render_islands_notice() {
             </div>
             <div style="margin-top: 2px;">
                 ✉️ <strong>Email:</strong> 
-                <a href="mailto:<?php echo esc_attr( $contact_email ); ?>" style="color: <?php echo esc_attr( $accent_color ); ?>; font-weight: 600; text-decoration: underline;"><?php echo esc_html( $contact_email ); ?></a>
+                <a href="mailto:<?php echo esc_attr( $contact_email ); ?>" style="color: <?php echo esc_attr( $accent_color ); ?>; text-decoration: underline; font-weight: 600;"><?php echo esc_html( $contact_email ); ?></a>
             </div>
         </div>
     </div>
+    <script>
+    if (typeof jQuery !== 'undefined') {
+        jQuery(function($) {
+            function removeDuplicateIslandsNotices() {
+                var $notices = $('.custom-islands-shipping-notice');
+                if ($notices.length > 1) {
+                    $notices.not(':first').remove();
+                }
+            }
+            removeDuplicateIslandsNotices();
+            $(document).on('updated_checkout updated_cart_totals updated_wc_div', function() {
+                removeDuplicateIslandsNotices();
+            });
+        });
+    }
+    </script>
     <?php
 }
