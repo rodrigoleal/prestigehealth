@@ -54,6 +54,14 @@ function custom_multidomain_is_twistshake() {
 }
 
 /**
+ * Automatically hide out-of-stock items from catalog, search, and category listings.
+ */
+add_filter( 'option_woocommerce_hide_out_of_stock_items', 'custom_multidomain_hide_out_of_stock' );
+function custom_multidomain_hide_out_of_stock( $val ) {
+    return 'yes';
+}
+
+/**
  * Dynamically filter site URL and home URL to matching domain.
  */
 add_filter( 'option_home', 'custom_multidomain_home_url' );
