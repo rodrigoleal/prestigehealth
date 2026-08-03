@@ -188,7 +188,7 @@ function custom_apply_product_visibility_filter( $q, $is_twistshake ) {
 }
 
 /**
- * Filter main product queries (archives, search, categories).
+ * Filter main product queries (archives, search, categories, on_sale).
  */
 add_action( 'pre_get_posts', 'custom_multidomain_pre_get_posts', 99 );
 function custom_multidomain_pre_get_posts( $q ) {
@@ -196,16 +196,36 @@ function custom_multidomain_pre_get_posts( $q ) {
         return;
     }
     
+    // Filter by on_sale=1 parameter
+    if ( isset( $_GET['on_sale'] ) && '1' === (string) $_GET['on_sale'] && $q->is_main_query() ) {
+        $on_sale_ids = function_exists( 'wc_get_product_ids_on_sale' ) ? wc_get_product_ids_on_sale() : array();
+        if ( empty( $on_sale_ids ) ) {
+            $on_sale_ids = array( 0 );
+        }
+        $q->set( 'post__in', $on_sale_ids );
+    }
+
     $post_types = (array) $q->get( 'post_type' );
-    if ( in_array( 'product', $post_types ) ) {
-        // Skip single product pages and direct ID fetches (e.g. cart/checkout)
-        if ( $q->is_single() || $q->is_singular() || $q->get( 'p' ) || $q->get( 'post__in' ) ) {
+    if ( in_array( 'product', $post_types ) || ( function_exists( 'is_shop' ) && is_shop() ) ) {
+        // Skip single product pages and single post fetches
+        if ( $q->is_single() || $q->is_singular() || $q->get( 'p' ) ) {
             return;
         }
         
         $is_twistshake = custom_multidomain_is_twistshake();
         custom_apply_product_visibility_filter( $q, $is_twistshake );
     }
+}
+
+/**
+ * Filter shop page title to 'Promoções' when on_sale filter is active.
+ */
+add_filter( 'woocommerce_page_title', 'custom_multidomain_woocommerce_page_title' );
+function custom_multidomain_woocommerce_page_title( $title ) {
+    if ( isset( $_GET['on_sale'] ) && '1' === (string) $_GET['on_sale'] ) {
+        return 'Promoções';
+    }
+    return $title;
 }
 
 /**
