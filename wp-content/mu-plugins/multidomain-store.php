@@ -205,6 +205,33 @@ function custom_multidomain_pre_get_posts( $q ) {
         $q->set( 'post__in', $on_sale_ids );
     }
 
+    // Filter by is_new=1 parameter
+    if ( isset( $_GET['is_new'] ) && '1' === (string) $_GET['is_new'] && $q->is_main_query() ) {
+        // Check if any product is explicitly marked as new/launch
+        $has_marked = get_posts( array(
+            'post_type'      => 'product',
+            'post_status'    => 'publish',
+            'meta_key'       => '_ts_is_new_launch',
+            'meta_value'     => '1',
+            'posts_per_page' => 1,
+            'fields'         => 'ids',
+        ) );
+
+        if ( ! empty( $has_marked ) ) {
+            $meta_query = (array) $q->get( 'meta_query' );
+            $meta_query[] = array(
+                'key'     => '_ts_is_new_launch',
+                'value'   => '1',
+                'compare' => '=',
+            );
+            $q->set( 'meta_query', $meta_query );
+        } else {
+            // Fallback: order by date descending
+            $q->set( 'orderby', 'date' );
+            $q->set( 'order', 'DESC' );
+        }
+    }
+
     $post_types = (array) $q->get( 'post_type' );
     if ( in_array( 'product', $post_types ) || ( function_exists( 'is_shop' ) && is_shop() ) ) {
         // Skip single product pages and single post fetches
@@ -218,14 +245,129 @@ function custom_multidomain_pre_get_posts( $q ) {
 }
 
 /**
- * Filter shop page title to 'Promoções' when on_sale filter is active.
+ * Filter shop page title to 'Promoções' or 'Novidades & Lançamentos' when filters are active.
  */
 add_filter( 'woocommerce_page_title', 'custom_multidomain_woocommerce_page_title' );
 function custom_multidomain_woocommerce_page_title( $title ) {
     if ( isset( $_GET['on_sale'] ) && '1' === (string) $_GET['on_sale'] ) {
         return 'Promoções';
     }
+    if ( isset( $_GET['is_new'] ) && '1' === (string) $_GET['is_new'] ) {
+        return 'Novidades & Lançamentos';
+    }
     return $title;
+}
+
+/**
+ * Add 'Novo / Lançamento' checkbox in WooCommerce Product Data > General metabox.
+ */
+add_action( 'woocommerce_product_options_general_product_data', 'custom_add_new_launch_product_field' );
+function custom_add_new_launch_product_field() {
+    echo '<div class="options_group">';
+    woocommerce_wp_checkbox( array(
+        'id'          => '_ts_is_new_launch',
+        'label'       => 'Marcar como Novo / Lançamento 🏷️',
+        'description' => 'Exibe o selo "NOVO" no produto e destaca-o na página de Novidades.',
+    ) );
+    echo '</div>';
+}
+
+/**
+ * Save 'Novo / Lançamento' field on product save.
+ */
+add_action( 'woocommerce_process_product_meta', 'custom_save_new_launch_product_field' );
+function custom_save_new_launch_product_field( $post_id ) {
+    $is_new = isset( $_POST['_ts_is_new_launch'] ) ? '1' : '0';
+    update_post_meta( $post_id, '_ts_is_new_launch', $is_new );
+}
+
+/**
+ * Add 'Novo / Lançamento' column to Products admin table.
+ */
+add_filter( 'manage_edit-product_columns', 'custom_add_new_launch_product_column', 20 );
+function custom_add_new_launch_product_column( $columns ) {
+    $new_columns = array();
+    foreach ( $columns as $key => $column ) {
+        $new_columns[$key] = $column;
+        if ( 'name' === $key ) {
+            $new_columns['ts_is_new'] = 'Novo / Lançamento';
+        }
+    }
+    return $new_columns;
+}
+
+/**
+ * Render content for 'Novo / Lançamento' column in Products admin table.
+ */
+add_action( 'manage_product_posts_custom_column', 'custom_render_new_launch_product_column', 10, 2 );
+function custom_render_new_launch_product_column( $column, $post_id ) {
+    if ( 'ts_is_new' === $column ) {
+        $is_new = get_post_meta( $post_id, '_ts_is_new_launch', true );
+        if ( '1' === $is_new ) {
+            echo '<span style="display:inline-block; background:#111; color:#fff; font-weight:bold; font-size:11px; padding:3px 8px; border-radius:10px;">⭐ NOVO</span>';
+        } else {
+            echo '<span style="color:#999;">—</span>';
+        }
+    }
+}
+
+/**
+ * Add Bulk Actions to Products list in WP-Admin.
+ */
+add_filter( 'bulk_actions-edit-product', 'custom_register_new_launch_bulk_actions' );
+function custom_register_new_launch_bulk_actions( $bulk_actions ) {
+    $bulk_actions['ts_mark_as_new'] = '🏷️ Marcar como Novo / Lançamento';
+    $bulk_actions['ts_unmark_as_new'] = '❌ Desmarcar Novo / Lançamento';
+    return $bulk_actions;
+}
+
+/**
+ * Handle Bulk Actions for 'Novo / Lançamento'.
+ */
+add_filter( 'handle_bulk_actions-edit-product', 'custom_handle_new_launch_bulk_actions', 10, 3 );
+function custom_handle_new_launch_bulk_actions( $redirect_to, $action, $post_ids ) {
+    if ( 'ts_mark_as_new' === $action ) {
+        foreach ( $post_ids as $post_id ) {
+            update_post_meta( $post_id, '_ts_is_new_launch', '1' );
+        }
+        $redirect_to = add_query_arg( 'ts_new_marked', count( $post_ids ), $redirect_to );
+    } elseif ( 'ts_unmark_as_new' === $action ) {
+        foreach ( $post_ids as $post_id ) {
+            update_post_meta( $post_id, '_ts_is_new_launch', '0' );
+        }
+        $redirect_to = add_query_arg( 'ts_new_unmarked', count( $post_ids ), $redirect_to );
+    }
+    return $redirect_to;
+}
+
+/**
+ * Display admin notice after bulk action.
+ */
+add_action( 'admin_notices', 'custom_new_launch_bulk_action_notice' );
+function custom_new_launch_bulk_action_notice() {
+    if ( ! empty( $_REQUEST['ts_new_marked'] ) ) {
+        $count = intval( $_REQUEST['ts_new_marked'] );
+        echo '<div class="updated notice is-dismissible"><p><strong>' . $count . ' produto(s) marcado(s) como Novo / Lançamento com sucesso! ⭐</strong></p></div>';
+    }
+    if ( ! empty( $_REQUEST['ts_new_unmarked'] ) ) {
+        $count = intval( $_REQUEST['ts_new_unmarked'] );
+        echo '<div class="updated notice is-dismissible"><p><strong>' . $count . ' produto(s) desmarcado(s) com sucesso.</strong></p></div>';
+    }
+}
+
+/**
+ * Display "NOVO" badge on product catalog loops.
+ */
+add_action( 'woocommerce_before_shop_loop_item_title', 'custom_display_new_launch_badge', 9 );
+function custom_display_new_launch_badge() {
+    global $product;
+    if ( ! $product ) {
+        return;
+    }
+    $is_new = $product->get_meta( '_ts_is_new_launch' );
+    if ( '1' === $is_new ) {
+        echo '<span class="ts-new-badge">NOVO</span>';
+    }
 }
 
 /**

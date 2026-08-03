@@ -97,7 +97,7 @@
 					<li><a href="<?php echo esc_url( ts_get_term_link_safe( 'biberoes' ) ); ?>">Biberões</a></li>
 					<li><a href="<?php echo esc_url( ts_get_term_link_safe( 'banho' ) ); ?>">Banho</a></li>
 					<li><a href="<?php echo esc_url( ts_get_term_link_safe( 'acessorios' ) ); ?>">Acessórios</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/shop/?store=twistshake&orderby=date' ) ); ?>">Novo</a></li>
+					<li><a href="<?php echo esc_url( home_url( '/shop/?store=twistshake&is_new=1' ) ); ?>">Novo</a></li>
 					<li><a href="<?php echo esc_url( home_url( '/shop/?store=twistshake&on_sale=1' ) ); ?>" class="ts-promo-link">Promoções</a></li>
 				</ul>
 			</div>

@@ -1029,6 +1029,29 @@ img.ts-payment-logo,
     grid-template-columns: 2fr 1fr 1.5fr !important;
 }
 
+/* Badge "NOVO" on product grid cards */
+ul.products li.product,
+.woocommerce ul.products li.product {
+    position: relative !important;
+}
+.ts-new-badge {
+    position: absolute !important;
+    top: 12px !important;
+    left: 12px !important;
+    background-color: #111111 !important;
+    color: #FFFFFF !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.1em !important;
+    padding: 5px 12px !important;
+    border-radius: 20px !important;
+    z-index: 8 !important;
+    text-transform: uppercase !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18) !important;
+    line-height: 1 !important;
+    pointer-events: none !important;
+}
+
 @media (max-width: 768px) {
     .ts-slide {
         flex-direction: column-reverse;
