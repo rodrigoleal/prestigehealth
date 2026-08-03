@@ -50,56 +50,39 @@ get_header(); ?>
 			}
 			if ( ! empty( $banners ) ) :
 			?>
-			<section class="ts-banner-slider-section">
-				<div class="col-full">
-					<div class="ts-banner-slider-wrapper">
-						<div class="ts-banner-slider" id="tsBannerSlider">
-							<?php 
-							$bgs = array(
-								'linear-gradient(135deg, #E6EEF4 0%, #D8E5F0 100%)',
-								'linear-gradient(135deg, #FFF7E6 0%, #FFEFC6 100%)',
-								'linear-gradient(135deg, #F3E8FF 0%, #E6D5FF 100%)'
-							);
-							$tag_bgs = array( '#005492', '#D69E2E', '#7E3AF2' );
-							foreach ( $banners as $i => $b ) : 
-								$bg = $b['bg'] ?? $bgs[$i % 3];
-								$tag_bg = $tag_bgs[$i % 3];
-							?>
-							<!-- Slide <?php echo $i + 1; ?> -->
-							<div class="ts-slide <?php echo $i === 0 ? 'active' : ''; ?>" style="background: <?php echo esc_attr($bg); ?>;">
-								<div class="ts-slide-content">
-									<?php if ( ! empty( $b['tag'] ) ) : ?>
-										<span class="ts-slide-tag" style="background-color: <?php echo esc_attr($tag_bg); ?>;"><?php echo esc_html( $b['tag'] ); ?></span>
-									<?php endif; ?>
-									<h2 class="ts-slide-title"><?php echo esc_html( $b['title'] ?? '' ); ?></h2>
-									<p class="ts-slide-desc"><?php echo esc_html( $b['desc'] ?? '' ); ?></p>
-									<?php if ( ! empty( $b['link'] ) && ! empty( $b['btn_text'] ) ) : ?>
-										<a href="<?php echo esc_url( $b['link'] ); ?>" class="ts-slide-btn" style="background-color: <?php echo esc_attr($tag_bg); ?>;"><?php echo esc_html( $b['btn_text'] ); ?></a>
-									<?php endif; ?>
-								</div>
-								<?php if ( ! empty( $b['img'] ) ) : ?>
-								<div class="ts-slide-image-wrapper">
-									<img src="<?php echo esc_url( $b['img'] ); ?>" alt="<?php echo esc_attr( $b['title'] ?? '' ); ?>" class="ts-slide-img">
-								</div>
-								<?php endif; ?>
-							</div>
-							<?php endforeach; ?>
-						</div>
-
-						<!-- Slider Arrows -->
-						<button class="ts-slider-arrow ts-slider-prev" id="tsSliderPrev" aria-label="Slide anterior">❮</button>
-						<button class="ts-slider-arrow ts-slider-next" id="tsSliderNext" aria-label="Próximo slide">❯</button>
-
-						<!-- Slider Navigation Dots -->
-						<div class="ts-slider-dots" id="tsSliderDots">
-							<?php foreach ( $banners as $i => $b ) : ?>
-								<span class="ts-dot <?php echo $i === 0 ? 'active' : ''; ?>" data-slide="<?php echo $i; ?>"></span>
-							<?php endforeach; ?>
+			<!-- Hero Banner Section -->
+			<section class="ts-hero-section">
+				<div class="col-full ts-hero-container">
+					
+					<!-- Left Column: Content -->
+					<div class="ts-hero-content">
+						<span class="ts-hero-tagline">VERÃO CHEGOU ☀️</span>
+						<h1 class="ts-hero-title">Design sueco<br>para o dia a dia do seu bebé</h1>
+						<p class="ts-hero-desc">Produtos seguros, funcionais e estilosos para cada fase do crescimento.</p>
+						<div class="ts-hero-buttons">
+							<a href="<?php echo esc_url( home_url( '/loja/?store=twistshake' ) ); ?>" class="ts-hero-btn-primary">Ver Produtos</a>
+							<a href="#about" class="ts-hero-btn-secondary">Saber Mais</a>
 						</div>
 					</div>
+					
+					<!-- Center Column: Discount Badge -->
+					<div class="ts-hero-badge-container">
+						<div class="ts-hero-badge">
+							<span class="ts-badge-sale">SUMMER SALE</span>
+							<span class="ts-badge-ate">ATÉ</span>
+							<span class="ts-badge-percentage">-60%</span>
+							<span class="ts-badge-extra">+20% EXTRA</span>
+							<div class="ts-badge-code">CÓDIGO: VERAO20</div>
+						</div>
+					</div>
+					
+					<!-- Right Column: Product Image -->
+					<div class="ts-hero-image-container">
+						<img src="<?php echo esc_url( content_url( '/uploads/twistshake_hero_bottle.png' ) ); ?>" alt="Twistshake Bottle" class="ts-hero-image">
+					</div>
+					
 				</div>
 			</section>
-			<?php endif; ?>
 
 			<!-- Categories Circle Nav Bar -->
 			<section class="ts-circles-nav">
@@ -214,8 +197,58 @@ get_header(); ?>
 							</div>
 						</div>
 					</div>
+			<!-- Dynamic Product Banner Slider Section -->
+			<?php if ( ! empty( $banners ) ) : ?>
+			<section class="ts-banner-slider-section">
+				<div class="col-full">
+					<div class="ts-banner-slider-wrapper">
+						<div class="ts-banner-slider" id="tsBannerSlider">
+							<?php 
+							$bgs = array(
+								'linear-gradient(135deg, #E6EEF4 0%, #D8E5F0 100%)',
+								'linear-gradient(135deg, #FFF7E6 0%, #FFEFC6 100%)',
+								'linear-gradient(135deg, #F3E8FF 0%, #E6D5FF 100%)'
+							);
+							$tag_bgs = array( '#005492', '#D69E2E', '#7E3AF2' );
+							foreach ( $banners as $i => $b ) : 
+								$bg = $b['bg'] ?? $bgs[$i % 3];
+								$tag_bg = $tag_bgs[$i % 3];
+							?>
+							<!-- Slide <?php echo $i + 1; ?> -->
+							<div class="ts-slide <?php echo $i === 0 ? 'active' : ''; ?>" style="background: <?php echo esc_attr($bg); ?>;">
+								<div class="ts-slide-content">
+									<?php if ( ! empty( $b['tag'] ) ) : ?>
+										<span class="ts-slide-tag" style="background-color: <?php echo esc_attr($tag_bg); ?>;"><?php echo esc_html( $b['tag'] ); ?></span>
+									<?php endif; ?>
+									<h2 class="ts-slide-title"><?php echo esc_html( $b['title'] ?? '' ); ?></h2>
+									<p class="ts-slide-desc"><?php echo esc_html( $b['desc'] ?? '' ); ?></p>
+									<?php if ( ! empty( $b['link'] ) && ! empty( $b['btn_text'] ) ) : ?>
+										<a href="<?php echo esc_url( $b['link'] ); ?>" class="ts-slide-btn" style="background-color: <?php echo esc_attr($tag_bg); ?>;"><?php echo esc_html( $b['btn_text'] ); ?></a>
+									<?php endif; ?>
+								</div>
+								<?php if ( ! empty( $b['img'] ) ) : ?>
+								<div class="ts-slide-image-wrapper">
+									<img src="<?php echo esc_url( $b['img'] ); ?>" alt="<?php echo esc_attr( $b['title'] ?? '' ); ?>" class="ts-slide-img">
+								</div>
+								<?php endif; ?>
+							</div>
+							<?php endforeach; ?>
+						</div>
+
+						<!-- Slider Arrows -->
+						<button class="ts-slider-arrow ts-slider-prev" id="tsSliderPrev" aria-label="Slide anterior">❮</button>
+						<button class="ts-slider-arrow ts-slider-next" id="tsSliderNext" aria-label="Próximo slide">❯</button>
+
+						<!-- Slider Navigation Dots -->
+						<div class="ts-slider-dots" id="tsSliderDots">
+							<?php foreach ( $banners as $i => $b ) : ?>
+								<span class="ts-dot <?php echo $i === 0 ? 'active' : ''; ?>" data-slide="<?php echo $i; ?>"></span>
+							<?php endforeach; ?>
+						</div>
+					</div>
 				</div>
 			</section>
+			<?php endif; ?>
 
 
 

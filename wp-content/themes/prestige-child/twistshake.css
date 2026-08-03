@@ -884,8 +884,8 @@ img.ts-payment-logo,
     height: 100% !important;
     opacity: 0 !important;
     visibility: hidden !important;
-    transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out !important;
-    display: flex !important;
+    display: none !important;
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out !important;
     align-items: center !important;
     justify-content: space-between !important;
     padding: 35px 50px !important;
@@ -894,6 +894,7 @@ img.ts-payment-logo,
 .ts-slide.active {
     opacity: 1 !important;
     visibility: visible !important;
+    display: flex !important;
     position: absolute !important;
     top: 0 !important;
     left: 0 !important;
