@@ -287,12 +287,12 @@ function twistshake_multidomain_enqueue_styles() {
         // Enqueue Google Font Outfit (modern, rounded and friendly for baby brand)
         wp_enqueue_style( 'twistshake-google-font', 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap', array(), null );
         
-        // Enqueue main Twistshake CSS
+        // Enqueue main Twistshake CSS with cache busting
         wp_enqueue_style(
             'twistshake-styles',
             get_stylesheet_directory_uri() . '/twistshake.css',
             array( 'prestige-child-style' ),
-            filemtime( get_stylesheet_directory() . '/twistshake.css' )
+            time()
         );
     }
 }
