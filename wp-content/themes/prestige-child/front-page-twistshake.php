@@ -88,9 +88,17 @@ get_header(); ?>
 					transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out !important;
 				}
 				.ts-banner-slider-section .ts-slide.active {
-					display: flex !important;
+					display: block !important;
 					opacity: 1 !important;
 					visibility: visible !important;
+				}
+				.ts-slide-mobile-link {
+					display: flex !important;
+					align-items: center !important;
+					justify-content: space-between !important;
+					width: 100% !important;
+					height: 100% !important;
+					text-decoration: none !important;
 				}
 				.ts-banner-slider-section .ts-slide-content {
 					flex: 0 1 45% !important;
@@ -271,6 +279,11 @@ get_header(); ?>
 						display: block !important;
 						opacity: 1 !important;
 						visibility: visible !important;
+					}
+					.ts-slide-mobile-link {
+						display: block !important;
+						width: 100% !important;
+						height: 100% !important;
 					}
 
 					/* Hide white text card on mobile screens */
