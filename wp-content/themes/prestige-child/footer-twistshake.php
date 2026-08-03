@@ -293,13 +293,20 @@
 					<span style="color:#666; font-size:11px;">Distribuído oficialmente em Portugal por:</span>
 					<div class="ts-distributor-logo" style="margin-top: 6px;">
 						<a href="https://prestigehealth.pt" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; text-decoration: none;">
-							<!-- Official Pristine Transparent Vector SVG Logo for Prestige Health -->
-							<svg width="180" height="34" viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="height: 34px; width: auto; background: transparent; display: block;">
-								<path d="M12 28.5L5.8 21.8C2.5 18.2 2.5 12.8 5.8 9.2C9.1 5.6 14.5 5.6 17.8 9.2L20 11.6L22.2 9.2C25.5 5.6 30.9 5.6 34.2 9.2C37.5 12.8 37.5 18.2 34.2 21.8L20 37L12 28.5Z" fill="#005492"/>
-								<rect x="17" y="14" width="6" height="12" rx="1" fill="#FFFFFF"/>
-								<rect x="14" y="17" width="12" height="6" rx="1" fill="#FFFFFF"/>
-								<text x="44" y="20" font-family="Arial, sans-serif" font-weight="800" font-size="15" fill="#005492" letter-spacing="0.5">PRESTIGE HEALTH</text>
-								<text x="44" y="32" font-family="Arial, sans-serif" font-weight="500" font-size="9" fill="#005492" letter-spacing="0.2">Soluções de Saúde</text>
+							<!-- Official Transparent Vector SVG Logo matching client image (Heart on left, PRESTIGE HEALTH on right) -->
+							<svg width="220" height="42" viewBox="0 0 220 42" fill="none" xmlns="http://www.w3.org/2000/svg" style="height: 38px; width: auto; background: transparent; display: block;">
+								<!-- Heart outline icon on the left side -->
+								<g transform="translate(0, 1)">
+									<path d="M 20 34 C 17.5 34 11 27.5 5 19.5 C -0.5 12.5 1 4.5 8.5 2.5 C 14.5 1 19.5 4.5 21 7.5 C 22.5 4.5 27.5 1 33.5 2.5 C 40 4.2 42.5 10 41 15" stroke="#0066B2" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+									<rect x="29" y="10" width="8" height="2.6" rx="0.8" fill="#004B87"/>
+									<rect x="31.7" y="7.3" width="2.6" height="8" rx="0.8" fill="#004B87"/>
+								</g>
+								<!-- PRESTIGE (bold dark blue) -->
+								<text x="48" y="21" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="17" fill="#004B87" letter-spacing="0.2">PRESTIGE</text>
+								<!-- HEALTH (lighter blue) -->
+								<text x="135" y="21" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="400" font-size="17" fill="#3B82A6" letter-spacing="0.2">HEALTH</text>
+								<!-- Soluções de Saúde (medium blue title case underneath) -->
+								<text x="48" y="35" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="500" font-size="11" fill="#0066B2" letter-spacing="0.1">Soluções de Saúde</text>
 							</svg>
 						</a>
 					</div>
