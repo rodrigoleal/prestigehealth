@@ -1231,3 +1231,13 @@ function custom_multidomain_ensure_legal_pages() {
         }
     }
 }
+
+/**
+ * Replace broken font icons in WooCommerce pagination with clean arrows.
+ */
+add_filter( 'woocommerce_pagination_args', 'custom_multidomain_clean_pagination_args', 99 );
+function custom_multidomain_clean_pagination_args( $args ) {
+    $args['prev_text'] = '‹';
+    $args['next_text'] = '›';
+    return $args;
+}
