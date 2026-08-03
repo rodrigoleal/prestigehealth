@@ -160,16 +160,150 @@ get_header(); ?>
 				</div>
 			</section>
 
-			<!-- Featured Products (Mais Vendidos) -->
-			<section class="ts-home-featured">
+			<!-- Automated Product Banner Slider Section -->
+			<section class="ts-banner-slider-section">
 				<div class="col-full">
-					<div class="ts-featured-header">
-						<h2>MAIS VENDIDOS</h2>
-						<div class="ts-featured-line"></div>
+					<div class="ts-banner-slider-wrapper">
+						<div class="ts-banner-slider" id="tsBannerSlider">
+							
+							<!-- Slide 1: Carrinhos & Passeio -->
+							<div class="ts-slide active" style="background: linear-gradient(135deg, #E6EEF4 0%, #D8E5F0 100%);">
+								<div class="ts-slide-content">
+									<span class="ts-slide-tag">NOVIDADE PASSEIO</span>
+									<h2 class="ts-slide-title">Carrinhos de Passeio Twistshake</h2>
+									<p class="ts-slide-desc">Leves, dobráveis em 1 segundo e com o conforto máximo para o seu bebé.</p>
+									<a href="<?php echo esc_url( ts_get_term_link_safe( 'carrinhos' ) ); ?>" class="ts-slide-btn">Descobrir Carrinhos</a>
+								</div>
+								<div class="ts-slide-image-wrapper">
+									<img src="<?php echo esc_url( content_url( '/uploads/2026/06/twist-1.jpg' ) ); ?>" alt="Carrinho Twistshake" class="ts-slide-img">
+								</div>
+							</div>
+
+							<!-- Slide 2: Alimentação & Vajilhas -->
+							<div class="ts-slide" style="background: linear-gradient(135deg, #FFF7E6 0%, #FFEFC6 100%);">
+								<div class="ts-slide-content">
+									<span class="ts-slide-tag" style="background-color: #D69E2E;">ALIMENTAÇÃO PRÁTICA</span>
+									<h2 class="ts-slide-title">Conjuntos de Refeição Inteligentes</h2>
+									<p class="ts-slide-desc">Pratos Click-Mat antiderramamento, talheres ergonómicos e babetes impermeáveis.</p>
+									<a href="<?php echo esc_url( ts_get_term_link_safe( 'alimentacao' ) ); ?>" class="ts-slide-btn" style="background-color: #D69E2E;">Ver Alimentação</a>
+								</div>
+								<div class="ts-slide-image-wrapper">
+									<img src="<?php echo esc_url( content_url( '/uploads/2026/06/twistshake-babero-manga-larga-fresas-416x541.png' ) ); ?>" alt="Alimentação Twistshake" class="ts-slide-img">
+								</div>
+							</div>
+
+							<!-- Slide 3: Biberões & Copos -->
+							<div class="ts-slide" style="background: linear-gradient(135deg, #F3E8FF 0%, #E6D5FF 100%);">
+								<div class="ts-slide-content">
+									<span class="ts-slide-tag" style="background-color: #7E3AF2;">ANTICÓLICAS & APRENDIZAGEM</span>
+									<h2 class="ts-slide-title">Biberões & Copos de Aprendizagem</h2>
+									<p class="ts-slide-desc">Sistema patenteado de rede misturadora e tetinas ultrasuaves livres de BPA.</p>
+									<a href="<?php echo esc_url( ts_get_term_link_safe( 'copos' ) ); ?>" class="ts-slide-btn" style="background-color: #7E3AF2;">Ver Biberões & Copos</a>
+								</div>
+								<div class="ts-slide-image-wrapper">
+									<img src="<?php echo esc_url( content_url( '/uploads/2026/06/twishake-straw-cup-kubek-pastel-green-1-416x482.png' ) ); ?>" alt="Biberões Twistshake" class="ts-slide-img">
+								</div>
+							</div>
+
+						</div>
+
+						<!-- Slider Arrows -->
+						<button class="ts-slider-arrow ts-slider-prev" id="tsSliderPrev" aria-label="Slide anterior">❮</button>
+						<button class="ts-slider-arrow ts-slider-next" id="tsSliderNext" aria-label="Próximo slide">❯</button>
+
+						<!-- Slider Navigation Dots -->
+						<div class="ts-slider-dots" id="tsSliderDots">
+							<span class="ts-dot active" data-slide="0"></span>
+							<span class="ts-dot" data-slide="1"></span>
+							<span class="ts-dot" data-slide="2"></span>
+						</div>
 					</div>
-					<?php echo do_shortcode( '[products limit="4" columns="4" orderby="popularity"]' ); ?>
 				</div>
 			</section>
+
+			<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				var slider = document.getElementById('tsBannerSlider');
+				if (!slider) return;
+
+				var slides = slider.querySelectorAll('.ts-slide');
+				var dots = document.querySelectorAll('.ts-dot');
+				var prevBtn = document.getElementById('tsSliderPrev');
+				var nextBtn = document.getElementById('tsSliderNext');
+				var currentIndex = 0;
+				var autoSlideTimer = null;
+
+				function showSlide(index) {
+					if (index >= slides.length) index = 0;
+					if (index < 0) index = slides.length - 1;
+
+					slides.forEach(function(slide, i) {
+						if (i === index) {
+							slide.classList.add('active');
+						} else {
+							slide.classList.remove('active');
+						}
+					});
+
+					dots.forEach(function(dot, i) {
+						if (i === index) {
+							dot.classList.add('active');
+						} else {
+							dot.classList.remove('active');
+						}
+					});
+
+					currentIndex = index;
+				}
+
+				function nextSlide() {
+					showSlide(currentIndex + 1);
+				}
+
+				function prevSlide() {
+					showSlide(currentIndex - 1);
+				}
+
+				function startAutoSlide() {
+					stopAutoSlide();
+					autoSlideTimer = setInterval(nextSlide, 5000);
+				}
+
+				function stopAutoSlide() {
+					if (autoSlideTimer) clearInterval(autoSlideTimer);
+				}
+
+				if (nextBtn) {
+					nextBtn.addEventListener('click', function() {
+						nextSlide();
+						startAutoSlide();
+					});
+				}
+
+				if (prevBtn) {
+					prevBtn.addEventListener('click', function() {
+						prevSlide();
+						startAutoSlide();
+					});
+				}
+
+				dots.forEach(function(dot) {
+					dot.addEventListener('click', function() {
+						var slideIdx = parseInt(this.getAttribute('data-slide'), 10);
+						showSlide(slideIdx);
+						startAutoSlide();
+					});
+				});
+
+				var wrapper = slider.closest('.ts-banner-slider-wrapper');
+				if (wrapper) {
+					wrapper.addEventListener('mouseenter', stopAutoSlide);
+					wrapper.addEventListener('mouseleave', startAutoSlide);
+				}
+
+				startAutoSlide();
+			});
+			</script>
 
 			<!-- Products Showcase by Category (using correct local slugs) -->
 			<div class="ts-home-products">

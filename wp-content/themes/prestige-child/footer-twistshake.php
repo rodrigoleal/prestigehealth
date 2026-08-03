@@ -34,13 +34,6 @@
 				</div>
 			</div>
 			<div class="ts-badge-item">
-				<div class="ts-badge-icon">🔄</div>
-				<div class="ts-badge-text">
-					<strong>DEVOLUÇÕES FÁCEIS</strong><br>
-					<span>Processo simples e rápido</span>
-				</div>
-			</div>
-			<div class="ts-badge-item">
 				<div class="ts-badge-icon">❤️</div>
 				<div class="ts-badge-text">
 					<strong>APOIO AO CLIENTE</strong><br>
@@ -86,30 +79,6 @@
 				</ul>
 			</div>
 
-			<!-- Help & Support Column -->
-			<div class="ts-footer-col">
-				<h3>AJUDA E SUPORTE</h3>
-				<ul class="ts-footer-links">
-					<li><a href="<?php echo esc_url( home_url( '/perguntas-frequentes/' ) ); ?>">Perguntas Frequentes</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/envios-e-entregas/' ) ); ?>">Envios e Entregas</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/devolucoes-e-trocas/' ) ); ?>">Devoluções e Trocas</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/formas-de-pagamento/' ) ); ?>">Formas de Pagamento</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/garantia-e-seguranca/' ) ); ?>">Garantia e Segurança</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/contactos/' ) ); ?>">Contactos</a></li>
-				</ul>
-			</div>
-
-			<!-- About Us Column -->
-			<div class="ts-footer-col">
-				<h3>SOBRE NÓS</h3>
-				<ul class="ts-footer-links">
-					<li><a href="<?php echo esc_url( home_url( '/a-nossa-historia/' ) ); ?>">A Nossa História</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/qualidade-twistshake/' ) ); ?>">Qualidade Twistshake</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/sustentabilidade/' ) ); ?>">Sustentabilidade</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/distribuidor-oficial/' ) ); ?>">Distribuidor Oficial</a></li>
-				</ul>
-			</div>
-
 			<!-- Contacts Column -->
 			<div class="ts-footer-col ts-contacts-col">
 				<h3>CONTACTOS</h3>
@@ -122,11 +91,6 @@
 						<span class="ts-contact-icon">📞</span>
 						<a href="tel:+351916638570">+351 91 663 85 70</a><br>
 						<small class="ts-contact-hours">(Dias úteis 9h - 18h)</small>
-					</li>
-					<li>
-						<span class="ts-contact-icon">💬</span>
-						<a href="https://wa.me/351916638570" target="_blank" rel="noopener">WhatsApp</a><br>
-						<small class="ts-contact-hours">Resposta rápida</small>
 					</li>
 				</ul>
 			</div>
@@ -152,9 +116,10 @@
 				<div class="ts-distributor-info">
 					<strong>LOJA OFICIAL TWISTSHAKE PORTUGAL</strong><br>
 					<span>Distribuído oficialmente em Portugal por:</span>
-					<div class="ts-distributor-logo">
-						<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#005492" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-						<strong>PRESTIGE HEALTH</strong>
+					<div class="ts-distributor-logo" style="margin-top: 6px;">
+						<a href="https://prestigehealth.pt" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; text-decoration: none;">
+							<img src="https://loja.prestigehealth.pt/wp-content/uploads/2026/06/Phealth-branco.png" alt="Prestige Health" style="height: 32px; width: auto; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1)); background-color: #005492; padding: 4px 10px; border-radius: 4px;">
+						</a>
 					</div>
 				</div>
 
