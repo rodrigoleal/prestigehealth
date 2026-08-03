@@ -23,34 +23,44 @@ if ( ! defined( 'CUSTOM_HIDE_TWISTSHAKE_ON_PRESTIGE' ) ) {
  * Determine if the current request is for the Twistshake storefront.
  */
 function custom_multidomain_is_twistshake() {
+    static $is_twistshake = null;
+    if ( null !== $is_twistshake ) {
+        return $is_twistshake;
+    }
+
     $host = $_SERVER['HTTP_HOST'] ?? '';
     
     // Check if the domain is the official Twistshake domain
     if ( strpos( $host, 'twistshakeportugal.pt' ) !== false || strpos( $host, 'twistshake' ) !== false ) {
-        return true;
+        $is_twistshake = true;
+        return $is_twistshake;
     }
     
     // Allow URL query parameters for testing (e.g. ?store=twistshake)
     if ( isset( $_GET['store'] ) ) {
         if ( $_GET['store'] === 'twistshake' ) {
             if ( ! headers_sent() ) {
-                setcookie( 'store', 'twistshake', time() + 3600 * 24 * 30, '/' );
+                @setcookie( 'store', 'twistshake', time() + 3600 * 24 * 30, '/' );
             }
-            return true;
+            $is_twistshake = true;
+            return $is_twistshake;
         } elseif ( $_GET['store'] === 'prestige' ) {
             if ( ! headers_sent() ) {
-                setcookie( 'store', '', time() - 3600, '/' );
+                @setcookie( 'store', '', time() - 3600, '/' );
             }
-            return false;
+            $is_twistshake = false;
+            return $is_twistshake;
         }
     }
     
     // Check if the cookie is set
     if ( isset( $_COOKIE['store'] ) && $_COOKIE['store'] === 'twistshake' ) {
-        return true;
+        $is_twistshake = true;
+        return $is_twistshake;
     }
     
-    return false;
+    $is_twistshake = false;
+    return $is_twistshake;
 }
 
 /**
