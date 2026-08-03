@@ -144,6 +144,20 @@ function custom_multidomain_document_title_parts( $parts ) {
 }
 
 /**
+ * Force front-page-twistshake.php template on Twistshake homepage.
+ */
+add_filter( 'template_include', 'custom_multidomain_front_page_template', 999 );
+function custom_multidomain_front_page_template( $template ) {
+    if ( custom_multidomain_is_twistshake() && ( is_front_page() || is_home() ) ) {
+        $ts_front = get_stylesheet_directory() . '/front-page-twistshake.php';
+        if ( file_exists( $ts_front ) ) {
+            return $ts_front;
+        }
+    }
+    return $template;
+}
+
+/**
  * Helper function to apply product tax query filters.
  */
 function custom_apply_product_visibility_filter( $q, $is_twistshake ) {
