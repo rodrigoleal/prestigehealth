@@ -9,6 +9,182 @@
 		</div><!-- .col-full -->
 	</div><!-- #content -->
 
+	<style>
+		/* OVERRIDE ALL STOREFRONT THEME DEFAULTS FOR TWISTSHAKE FOOTER */
+		footer.ts-footer,
+		.site-footer.ts-footer,
+		#colophon.ts-footer {
+			background-color: #F9F6F0 !important;
+			color: #333333 !important;
+			font-family: inherit !important;
+			padding: 0 !important;
+			margin: 0 !important;
+			border-top: 1px solid #EAE5DB !important;
+		}
+
+		footer.ts-footer *,
+		.site-footer.ts-footer * {
+			box-sizing: border-box !important;
+		}
+
+		/* RESET LISTS & STRIP ALL BULLET DOTS */
+		footer.ts-footer ul,
+		footer.ts-footer ul.ts-footer-links,
+		footer.ts-footer ul.ts-footer-contacts,
+		.site-footer ul.ts-footer-links,
+		.site-footer ul.ts-footer-contacts {
+			list-style: none !important;
+			list-style-type: none !important;
+			margin: 0 !important;
+			padding: 0 !important;
+		}
+
+		footer.ts-footer ul li,
+		footer.ts-footer ul.ts-footer-links li,
+		footer.ts-footer ul.ts-footer-contacts li,
+		.site-footer ul.ts-footer-links li,
+		.site-footer ul.ts-footer-contacts li {
+			list-style: none !important;
+			list-style-type: none !important;
+			margin: 0 0 12px 0 !important;
+			padding: 0 !important;
+			background: none !important;
+		}
+
+		footer.ts-footer ul li::before,
+		footer.ts-footer ul li::after,
+		.site-footer ul li::before,
+		.site-footer ul li::after {
+			content: none !important;
+			display: none !important;
+		}
+
+		/* FORCE FONT COLOR ON LINKS TO MATCH GENERAL SITE FONTS */
+		footer.ts-footer a,
+		footer.ts-footer ul.ts-footer-links li a,
+		footer.ts-footer ul.ts-footer-contacts li a,
+		.site-footer ul.ts-footer-links li a,
+		.site-footer ul.ts-footer-contacts li a {
+			color: #444444 !important;
+			text-decoration: none !important;
+			font-size: 13px !important;
+			font-weight: 500 !important;
+			transition: color 0.2s ease !important;
+		}
+
+		footer.ts-footer a:hover,
+		footer.ts-footer ul.ts-footer-links li a:hover,
+		footer.ts-footer ul.ts-footer-contacts li a:hover {
+			color: #111111 !important;
+			text-decoration: underline !important;
+		}
+
+		footer.ts-footer h3 {
+			font-size: 13px !important;
+			font-weight: 700 !important;
+			letter-spacing: 0.1em !important;
+			text-transform: uppercase !important;
+			margin: 0 0 25px 0 !important;
+			color: #111111 !important;
+		}
+
+		/* 3-COLUMN FLEX GRID */
+		footer.ts-footer .ts-footer-grid {
+			display: flex !important;
+			flex-direction: row !important;
+			flex-wrap: wrap !important;
+			justify-content: space-between !important;
+			align-items: flex-start !important;
+			gap: 40px !important;
+			padding: 60px 0 50px !important;
+			width: 100% !important;
+			max-width: 1200px !important;
+			margin: 0 auto !important;
+		}
+
+		footer.ts-footer .ts-footer-col {
+			flex: 1 1 240px !important;
+			margin: 0 !important;
+			float: none !important;
+			width: auto !important;
+		}
+
+		footer.ts-footer .ts-brand-col {
+			flex: 1.4 1 320px !important;
+		}
+
+		/* FOOTER BOTTOM BAR FLEX LAYOUT */
+		footer.ts-footer .ts-footer-bottom {
+			border-top: 1px solid #EAE5DB !important;
+			padding: 25px 0 !important;
+			background-color: #FFFFFF !important;
+			width: 100% !important;
+		}
+
+		footer.ts-footer .ts-bottom-container {
+			display: flex !important;
+			flex-direction: row !important;
+			justify-content: space-between !important;
+			align-items: center !important;
+			flex-wrap: wrap !important;
+			gap: 20px !important;
+			width: 100% !important;
+			max-width: 1200px !important;
+			margin: 0 auto !important;
+		}
+
+		footer.ts-footer .ts-payment-badges {
+			display: flex !important;
+			flex-direction: row !important;
+			align-items: center !important;
+			gap: 12px !important;
+		}
+
+		footer.ts-footer img.ts-payment-logo {
+			height: 24px !important;
+			max-height: 24px !important;
+			width: auto !important;
+			max-width: 75px !important;
+			object-fit: contain !important;
+			display: inline-block !important;
+			vertical-align: middle !important;
+			background-color: #FFFFFF !important;
+			padding: 2px 6px !important;
+			border-radius: 4px !important;
+			border: 1px solid #EAE5DB !important;
+		}
+
+		footer.ts-footer .ts-distributor-info {
+			display: flex !important;
+			flex-direction: column !important;
+			align-items: flex-end !important;
+			text-align: right !important;
+			font-size: 11px !important;
+			line-height: 1.4 !important;
+		}
+
+		/* COPYRIGHT BAR */
+		footer.ts-footer .ts-copyright-bar {
+			background-color: #F4EFE6 !important;
+			padding: 15px 0 !important;
+			font-size: 12px !important;
+			color: #666666 !important;
+			border-top: 1px solid #EAE5DB !important;
+		}
+
+		footer.ts-footer .ts-copyright-container {
+			display: flex !important;
+			flex-direction: row !important;
+			justify-content: space-between !important;
+			align-items: center !important;
+			flex-wrap: wrap !important;
+			gap: 15px !important;
+			width: 100% !important;
+			max-width: 1200px !important;
+			margin: 0 auto !important;
+		}
+	</style>
+
 	<!-- Trust Badges Bar (Footer Top) -->
 	<section class="ts-trust-badges">
 		<div class="col-full ts-trust-container">
@@ -103,8 +279,8 @@
 				
 				<!-- Secure Payments -->
 				<div class="ts-payment-badges">
-					<span class="ts-lock-icon">🔒 Pagamentos 100% Seguros:</span>
-					<div class="ts-payment-icons">
+					<span class="ts-lock-icon" style="font-weight:600; font-size:12px; color:#333;">🔒 Pagamentos 100% Seguros:</span>
+					<div class="ts-payment-icons" style="display:flex; align-items:center; gap:8px;">
 						<img src="<?php echo esc_url( content_url( '/plugins/multibanco-ifthen-software-gateway-for-woocommerce/images/mbway_banner.svg' ) ); ?>" alt="MB WAY" class="ts-payment-logo" style="height: 24px !important; width: auto !important; max-height: 24px !important; max-width: 75px !important; object-fit: contain;">
 						<img src="<?php echo esc_url( content_url( '/plugins/multibanco-ifthen-software-gateway-for-woocommerce/images/multibanco_banner.svg' ) ); ?>" alt="Multibanco" class="ts-payment-logo" style="height: 24px !important; width: auto !important; max-height: 24px !important; max-width: 75px !important; object-fit: contain;">
 						<img src="<?php echo esc_url( content_url( '/plugins/multibanco-ifthen-software-gateway-for-woocommerce/images/creditcard_banner_and_icon.svg' ) ); ?>" alt="Cartão de Crédito" class="ts-payment-logo" style="height: 24px !important; width: auto !important; max-height: 24px !important; max-width: 75px !important; object-fit: contain;">
@@ -113,11 +289,18 @@
 
 				<!-- Distributor Info -->
 				<div class="ts-distributor-info">
-					<strong>LOJA OFICIAL TWISTSHAKE PORTUGAL</strong><br>
-					<span>Distribuído oficialmente em Portugal por:</span>
+					<strong style="color:#111; font-size:11px;">LOJA OFICIAL TWISTSHAKE PORTUGAL</strong>
+					<span style="color:#666; font-size:11px;">Distribuído oficialmente em Portugal por:</span>
 					<div class="ts-distributor-logo" style="margin-top: 6px;">
 						<a href="https://prestigehealth.pt" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; text-decoration: none;">
-							<img src="https://loja.prestigehealth.pt/wp-content/uploads/2026/06/logo.png" alt="Prestige Health" style="height: 38px; width: auto; background: transparent; border: none; padding: 0;">
+							<!-- Official Pristine Transparent Vector SVG Logo for Prestige Health -->
+							<svg width="180" height="34" viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="height: 34px; width: auto; background: transparent; display: block;">
+								<path d="M12 28.5L5.8 21.8C2.5 18.2 2.5 12.8 5.8 9.2C9.1 5.6 14.5 5.6 17.8 9.2L20 11.6L22.2 9.2C25.5 5.6 30.9 5.6 34.2 9.2C37.5 12.8 37.5 18.2 34.2 21.8L20 37L12 28.5Z" fill="#005492"/>
+								<rect x="17" y="14" width="6" height="12" rx="1" fill="#FFFFFF"/>
+								<rect x="14" y="17" width="12" height="6" rx="1" fill="#FFFFFF"/>
+								<text x="44" y="20" font-family="Arial, sans-serif" font-weight="800" font-size="15" fill="#005492" letter-spacing="0.5">PRESTIGE HEALTH</text>
+								<text x="44" y="32" font-family="Arial, sans-serif" font-weight="500" font-size="9" fill="#005492" letter-spacing="0.2">Soluções de Saúde</text>
+							</svg>
 						</a>
 					</div>
 				</div>
@@ -129,7 +312,7 @@
 		<div class="ts-copyright-bar">
 			<div class="col-full ts-copyright-container">
 				<span>© <?php echo date('Y'); ?> Twistshake Portugal. Todos os direitos reservados.</span>
-				<div class="ts-legal-links">
+				<div class="ts-legal-links" style="display:flex; gap:15px;">
 					<a href="<?php echo esc_url( home_url( '/politica-de-privacidade/' ) ); ?>">Política de Privacidade</a>
 					<a href="<?php echo esc_url( home_url( '/termos-e-condicoes/' ) ); ?>">Termos e Condições</a>
 					<a href="https://www.livroreclamacoes.pt" target="_blank" rel="noopener">Livro de Reclamações</a>
