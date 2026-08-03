@@ -810,8 +810,11 @@ function custom_multidomain_render_banner_admin_page() {
             <?php wp_nonce_field( 'ts_save_banners_action', 'ts_banners_nonce' ); ?>
             <div id="ts-banners-list">
                 <?php foreach ( $banners as $idx => $b ) : ?>
-                    <div class="card" style="margin-bottom:20px; padding:20px; max-width:850px; border-radius:8px; border:1px solid #ccd0d4; background:#fff;">
-                        <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">Banner #<?php echo $idx + 1; ?></h3>
+                    <div class="card ts-banner-card" style="margin-bottom:20px; padding:20px; max-width:850px; border-radius:8px; border:1px solid #ccd0d4; background:#fff;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;">
+                            <h3 style="margin:0;">Banner #<span class="ts-banner-num"><?php echo $idx + 1; ?></span></h3>
+                            <button type="button" class="button button-link-delete ts-remove-banner-btn" style="color:#a00; text-decoration:none;">🗑️ Remover Banner</button>
+                        </div>
                         <table class="form-table">
                             <tr>
                                 <th>Etiqueta / Tag</th>
@@ -867,6 +870,11 @@ function custom_multidomain_render_banner_admin_page() {
                     </div>
                 <?php endforeach; ?>
             </div>
+
+            <p style="margin-top:15px; margin-bottom:25px;">
+                <button type="button" id="ts-add-banner-btn" class="button button-secondary button-large" style="font-weight:600;">➕ Adicionar Novo Banner</button>
+            </p>
+
             <p><input type="submit" name="ts_save_banners" class="button button-primary button-large" value="Guardar Alterações aos Banners"></p>
         </form>
     </div>
@@ -903,6 +911,95 @@ function custom_multidomain_render_banner_admin_page() {
                 $('#' + targetLinkId).val(selectedUrl);
             }
         });
+
+        // Remove Banner Card
+        $(document).on('click', '.ts-remove-banner-btn', function(e){
+            e.preventDefault();
+            if ($('.ts-banner-card').length <= 1) {
+                alert('A loja precisa de ter pelo menos 1 banner.');
+                return;
+            }
+            if (confirm('Tem a certeza que deseja remover este banner?')) {
+                $(this).closest('.ts-banner-card').remove();
+                reindexBanners();
+            }
+        });
+
+        // Add New Banner Card
+        $('#ts-add-banner-btn').on('click', function(e){
+            e.preventDefault();
+            var nextIdx = $('.ts-banner-card').length;
+            var uniqueId = Date.now();
+            var productsOptions = $('#ts-banners-list .ts-product-select').first().html() || '<option value="">-- Selecionar um Produto da Loja --</option>';
+
+            var cardHtml = `
+            <div class="card ts-banner-card" style="margin-bottom:20px; padding:20px; max-width:850px; border-radius:8px; border:1px solid #ccd0d4; background:#fff;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;">
+                    <h3 style="margin:0;">Banner #<span class="ts-banner-num">${nextIdx + 1}</span></h3>
+                    <button type="button" class="button button-link-delete ts-remove-banner-btn" style="color:#a00; text-decoration:none;">🗑️ Remover Banner</button>
+                </div>
+                <table class="form-table">
+                    <tr>
+                        <th>Etiqueta / Tag</th>
+                        <td><input type="text" name="banners[${nextIdx}][tag]" value="NOVIDADE" class="regular-text" placeholder="Ex: NOVIDADE PASSEIO"></td>
+                    </tr>
+                    <tr>
+                        <th>Título Principal</th>
+                        <td><input type="text" name="banners[${nextIdx}][title]" value="" class="regular-text" placeholder="Ex: Novo Produto Twistshake"></td>
+                    </tr>
+                    <tr>
+                        <th>Descrição Curta</th>
+                        <td><input type="text" name="banners[${nextIdx}][desc]" value="" class="large-text" placeholder="Ex: Leves e práticos para o dia a dia."></td>
+                    </tr>
+                    <tr>
+                        <th>Texto do Botão</th>
+                        <td><input type="text" name="banners[${nextIdx}][btn_text]" value="Ver Mais" class="regular-text" placeholder="Ex: Descobrir Carrinhos"></td>
+                    </tr>
+                    <tr>
+                        <th>Escolher Produto Cadastrado 🛍️</th>
+                        <td>
+                            <select class="regular-text ts-product-select" data-target-link="ts_link_${uniqueId}">
+                                ${productsOptions}
+                            </select>
+                            <p class="description">Ao selecionar um produto cadastrado, o link de destino abaixo é preenchido automaticamente.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Link de Destino (URL)</th>
+                        <td>
+                            <input type="url" id="ts_link_${uniqueId}" name="banners[${nextIdx}][link]" value="" class="large-text" placeholder="https://...">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Imagem do Banner 📷</th>
+                        <td>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <input type="url" id="ts_img_${uniqueId}" name="banners[${nextIdx}][img]" value="" class="large-text ts-img-input" placeholder="https://.../imagem.png">
+                                <button type="button" class="button button-secondary ts-upload-img-btn" data-target="ts_img_${uniqueId}">🖼️ Galeria / Upload</button>
+                            </div>
+                            <div class="ts-img-preview" id="preview_ts_img_${uniqueId}" style="margin-top:10px;"></div>
+                            <p class="description">Clique no botão para escolher uma imagem existente na Galeria de Mídia do WordPress ou carregar um novo ficheiro.</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>`;
+
+            $('#ts-banners-list').append(cardHtml);
+            reindexBanners();
+        });
+
+        function reindexBanners() {
+            $('.ts-banner-card').each(function(idx){
+                $(this).find('.ts-banner-num').text(idx + 1);
+                $(this).find('input, select').each(function(){
+                    var name = $(this).attr('name');
+                    if (name) {
+                        var newName = name.replace(/banners\[\d+\]/, 'banners[' + idx + ']');
+                        $(this).attr('name', newName);
+                    }
+                });
+            });
+        }
     });
     </script>
     <?php
