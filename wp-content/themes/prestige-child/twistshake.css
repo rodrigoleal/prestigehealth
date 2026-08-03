@@ -35,24 +35,24 @@ body.twistshake-theme .entry-title {
     width: 100%;
 }
 .ts-promo-content {
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    gap: 15px !important;
-    width: 100% !important;
-    max-width: 1200px !important;
-    margin: 0 auto !important;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 .ts-promo-item {
-    display: flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    white-space: nowrap !important;
-    flex-shrink: 0 !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 .ts-promo-item span {
-    white-space: nowrap !important;
+    white-space: nowrap;
 }
 .ts-promo-icon {
     font-size: 14px;

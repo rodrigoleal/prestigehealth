@@ -12,6 +12,135 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="profile" href="http://gmpg.org/xfn/11">
 <?php wp_head(); ?>
+<style id="ts-header-responsive-inline">
+	html, body {
+		overflow-x: hidden !important;
+		max-width: 100vw !important;
+	}
+	@media (max-width: 991px) {
+		/* Top Bar Mobile */
+		.ts-promo-bar {
+			padding: 8px 10px !important;
+			background-color: #FAF8F5 !important;
+			overflow: hidden !important;
+		}
+		.ts-promo-content {
+			display: flex !important;
+			flex-direction: row !important;
+			flex-wrap: wrap !important;
+			justify-content: center !important;
+			align-items: center !important;
+			gap: 8px 16px !important;
+			width: 100% !important;
+			max-width: 100% !important;
+			margin: 0 auto !important;
+		}
+		.ts-promo-item {
+			display: inline-flex !important;
+			align-items: center !important;
+			gap: 4px !important;
+			font-size: 11px !important;
+			white-space: nowrap !important;
+		}
+
+		/* Header Mobile Container */
+		.ts-header {
+			padding-top: 10px !important;
+		}
+		.ts-header-container {
+			display: flex !important;
+			flex-direction: column !important;
+			align-items: center !important;
+			justify-content: center !important;
+			padding: 10px 15px 12px !important;
+			gap: 12px !important;
+			width: 100% !important;
+			box-sizing: border-box !important;
+		}
+		.ts-branding {
+			flex: 0 0 auto !important;
+			width: 100% !important;
+			text-align: center !important;
+		}
+		.ts-logo-main {
+			font-size: 24px !important;
+			text-align: center !important;
+		}
+		.ts-logo-sub, .ts-logo-country {
+			text-align: center !important;
+		}
+		.ts-icons {
+			display: flex !important;
+			justify-content: center !important;
+			gap: 20px !important;
+			width: 100% !important;
+			margin-top: 2px !important;
+		}
+		.ts-search {
+			flex: 0 0 100% !important;
+			width: 100% !important;
+			max-width: 100% !important;
+			box-sizing: border-box !important;
+			order: 3 !important;
+		}
+		.ts-search-form {
+			width: 100% !important;
+			display: flex !important;
+			box-sizing: border-box !important;
+			background-color: #F9F6F0 !important;
+			border: 1px solid #EAE5DB !important;
+			border-radius: 25px !important;
+		}
+		.ts-search-field {
+			width: 100% !important;
+			font-size: 12px !important;
+			padding: 8px 14px !important;
+			box-sizing: border-box !important;
+		}
+
+		/* Mobile Navigation Pills */
+		.ts-nav {
+			width: 100% !important;
+			overflow-x: auto !important;
+			-webkit-overflow-scrolling: touch !important;
+			scrollbar-width: none !important;
+			background: #FFFFFF !important;
+			border-top: 1px solid #EAE5DB !important;
+			border-bottom: 1px solid #EAE5DB !important;
+			box-sizing: border-box !important;
+		}
+		.ts-nav::-webkit-scrollbar {
+			display: none !important;
+		}
+		.ts-nav-menu {
+			display: flex !important;
+			flex-wrap: nowrap !important;
+			justify-content: flex-start !important;
+			align-items: center !important;
+			gap: 10px !important;
+			padding: 10px 15px !important;
+			margin: 0 !important;
+			width: max-content !important;
+		}
+		.ts-nav-menu li {
+			flex-shrink: 0 !important;
+		}
+		.ts-nav-menu li a {
+			font-size: 11.5px !important;
+			white-space: nowrap !important;
+			padding: 6px 14px !important;
+			display: inline-block !important;
+			border-radius: 20px !important;
+			background-color: #F9F6F0 !important;
+			color: #111111 !important;
+			font-weight: 700 !important;
+		}
+		.ts-nav-menu li a.ts-promo-link {
+			background-color: #FEE2E2 !important;
+			color: #D32F2F !important;
+		}
+	}
+</style>
 </head>
 
 <body <?php body_class( 'twistshake-theme' ); ?>>
