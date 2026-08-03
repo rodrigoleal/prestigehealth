@@ -342,7 +342,7 @@ get_header(); ?>
 							?>
 							<!-- Slide <?php echo $i + 1; ?> -->
 							<div class="ts-slide <?php echo $i === 0 ? 'active' : ''; ?>" style="background: <?php echo esc_attr($bg); ?>;">
-								<a href="<?php echo $b_link; ?>" class="ts-slide-mobile-link" style="display: block; width: 100%; height: 100%; text-decoration: none;">
+								<a href="<?php echo $b_link; ?>" class="ts-slide-mobile-link">
 									<div class="ts-slide-content">
 										<?php if ( ! empty( $b['tag'] ) ) : ?>
 											<span class="ts-slide-tag" style="background-color: <?php echo esc_attr($tag_bg); ?>;"><?php echo esc_html( $b['tag'] ); ?></span>
@@ -359,6 +359,7 @@ get_header(); ?>
 									</div>
 									<?php endif; ?>
 								</a>
+							</div>
 							<?php endforeach; ?>
 						</div>
 
