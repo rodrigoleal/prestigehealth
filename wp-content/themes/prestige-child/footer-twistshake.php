@@ -319,10 +319,10 @@
 		<div class="ts-copyright-bar">
 			<div class="col-full ts-copyright-container">
 				<span>© <?php echo date('Y'); ?> Twistshake Portugal. Todos os direitos reservados.</span>
-				<div class="ts-legal-links" style="display:flex; gap:15px;">
-					<a href="<?php echo esc_url( home_url( '/politica-de-privacidade/' ) ); ?>">Política de Privacidade</a>
-					<a href="<?php echo esc_url( home_url( '/termos-e-condicoes/' ) ); ?>">Termos e Condições</a>
-					<a href="https://www.livroreclamacoes.pt" target="_blank" rel="noopener">Livro de Reclamações</a>
+				<div class="ts-legal-links" style="display:flex; gap:25px; align-items:center;">
+					<a href="<?php echo esc_url( home_url( '/politica-de-privacidade/' ) ); ?>" style="font-weight:600; color:#2D3748 !important; text-decoration:none !important; font-size:13px !important;">Política de Privacidade</a>
+					<a href="<?php echo esc_url( home_url( '/termos-e-condicoes/' ) ); ?>" style="font-weight:600; color:#2D3748 !important; text-decoration:none !important; font-size:13px !important;">Termos e Condições</a>
+					<a href="https://www.livroreclamacoes.pt" target="_blank" rel="noopener" style="font-weight:600; color:#2D3748 !important; text-decoration:none !important; font-size:13px !important;">Livro de Reclamações</a>
 				</div>
 			</div>
 		</div>

@@ -1187,3 +1187,47 @@ function custom_multidomain_get_default_banners() {
         ),
     );
 }
+
+/**
+ * Automatically ensure 'Política de Privacidade' and 'Termos e Condições' pages exist.
+ */
+add_action( 'init', 'custom_multidomain_ensure_legal_pages' );
+function custom_multidomain_ensure_legal_pages() {
+    static $run = false;
+    if ( $run ) {
+        return;
+    }
+    $run = true;
+
+    // 1. Política de Privacidade
+    $privacy_page = get_page_by_path( 'politica-de-privacidade' );
+    if ( ! $privacy_page ) {
+        $privacy_id = wp_insert_post( array(
+            'post_title'     => 'Política de Privacidade',
+            'post_name'      => 'politica-de-privacidade',
+            'post_content'   => '<h2>Política de Privacidade</h2><p>A privacidade e a proteção dos seus dados pessoais são fundamentais. Esta Política de Privacidade explica como recolhemos, utilizamos e protegemos as suas informações ao utilizar o nosso website e ao realizar encomendas.</p><h3>1. Recolha de Dados</h3><p>Recolhemos informações necessárias para o processamento das suas encomendas, tais como nome, morada de entrega, email, número de telefone e dados de faturação.</p><h3>2. Utilização das Informações</h3><p>Os seus dados são utilizados exclusivamente para processar pedidos, comunicar o estado da encomenda, fornecer apoio ao cliente e cumprir obrigações legais.</p><h3>3. Segurança</h3><p>Implementamos medidas de segurança técnicas e organizativas adequadas para proteger os seus dados pessoais contra acesso não autorizado, alteração ou destruição.</p><h3>4. Contacto</h3><p>Para qualquer questão sobre a nossa política de privacidade, contacte-nos através do email <strong>geral@prestigehealth.pt</strong>.</p>',
+            'post_status'    => 'publish',
+            'post_type'      => 'page',
+            'comment_status' => 'closed',
+        ) );
+        if ( $privacy_id && ! is_wp_error( $privacy_id ) ) {
+            update_option( 'wp_page_for_privacy_policy', $privacy_id );
+        }
+    }
+
+    // 2. Termos e Condições
+    $terms_page = get_page_by_path( 'termos-e-condicoes' );
+    if ( ! $terms_page ) {
+        $terms_id = wp_insert_post( array(
+            'post_title'     => 'Termos e Condições',
+            'post_name'      => 'termos-e-condicoes',
+            'post_content'   => '<h2>Termos e Condições de Utilização</h2><p>Bem-vindo ao nosso website. Ao aceder e efetuar compras nesta loja online, concorda com os seguintes termos e condições gerais de venda.</p><h3>1. Objeto</h3><p>As presentes condições regulam as vendas dos produtos apresentados nesta loja online.</p><h3>2. Encomendas e Preços</h3><p>Todos os preços apresentados incluem IVA à taxa legal em vigor. Reservamo-nos o direito de alterar os preços a qualquer momento, garantindo o preço em vigor no momento da confirmação da encomenda.</p><h3>3. Envio e Portes</h3><p>Os envios são efetuados para Portugal Continental e Ilhas. Portes grátis em compras superiores a 70€ para Portugal Continental.</p><h3>4. Devoluções e Direito de Livre Resolução</h3><p>Nos termos da legislação em vigor, o consumidor dispõe do prazo de 14 dias para proceder à devolução do produto adquiridos sem necessidade de indicar o motivo.</p><h3>5. Contactos</h3><p>Para suporte e questões comerciais, contacte <strong>geral@prestigehealth.pt</strong>.</p>',
+            'post_status'    => 'publish',
+            'post_type'      => 'page',
+            'comment_status' => 'closed',
+        ) );
+        if ( $terms_id && ! is_wp_error( $terms_id ) ) {
+            update_option( 'woocommerce_terms_page_id', $terms_id );
+        }
+    }
+}
