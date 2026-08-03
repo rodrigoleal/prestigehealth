@@ -378,6 +378,14 @@ body {
     font-weight: 700 !important;
     line-height: 1 !important;
     text-indent: 0 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .woocommerce-pagination a.prev::before,
@@ -385,7 +393,13 @@ body {
 .woocommerce-pagination span.prev::before,
 .woocommerce-pagination span.next::before,
 .page-numbers .prev::before,
-.page-numbers .next::before {
+.page-numbers .next::before,
+.woocommerce-pagination a.prev::after,
+.woocommerce-pagination a.next::after,
+.woocommerce-pagination span.prev::after,
+.woocommerce-pagination span.next::after,
+.page-numbers .prev::after,
+.page-numbers .next::after {
     content: none !important;
     display: none !important;
 }

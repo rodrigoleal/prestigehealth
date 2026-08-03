@@ -17,6 +17,42 @@
 		overflow-x: hidden !important;
 		max-width: 100vw !important;
 	}
+
+	/* Borderless Vector Pagination Arrows */
+	.woocommerce-pagination ul.page-numbers li a.prev,
+	.woocommerce-pagination ul.page-numbers li a.next,
+	.woocommerce-pagination ul.page-numbers li span.prev,
+	.woocommerce-pagination ul.page-numbers li span.next,
+	.woocommerce-pagination a.prev,
+	.woocommerce-pagination a.next,
+	.page-numbers .prev,
+	.page-numbers .next {
+		background: transparent !important;
+		background-color: transparent !important;
+		border: none !important;
+		box-shadow: none !important;
+		outline: none !important;
+		color: #111111 !important;
+		padding: 6px 10px !important;
+		display: inline-flex !important;
+		align-items: center !important;
+		justify-content: center !important;
+	}
+	.woocommerce-pagination a.prev::before,
+	.woocommerce-pagination a.next::before,
+	.woocommerce-pagination span.prev::before,
+	.woocommerce-pagination span.next::before,
+	.page-numbers .prev::before,
+	.page-numbers .next::before,
+	.woocommerce-pagination a.prev::after,
+	.woocommerce-pagination a.next::after,
+	.woocommerce-pagination span.prev::after,
+	.woocommerce-pagination span.next::after,
+	.page-numbers .prev::after,
+	.page-numbers .next::after {
+		content: none !important;
+		display: none !important;
+	}
 	@media (max-width: 991px) {
 		/* Top Bar Mobile */
 		.ts-promo-bar {

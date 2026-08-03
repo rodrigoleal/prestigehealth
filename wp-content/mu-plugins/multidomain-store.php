@@ -1237,7 +1237,7 @@ function custom_multidomain_ensure_legal_pages() {
  */
 add_filter( 'woocommerce_pagination_args', 'custom_multidomain_clean_pagination_args', 99 );
 function custom_multidomain_clean_pagination_args( $args ) {
-    $args['prev_text'] = '‹';
-    $args['next_text'] = '›';
+    $args['prev_text'] = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block;"><polyline points="15 18 9 12 15 6"></polyline></svg>';
+    $args['next_text'] = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block;"><polyline points="9 18 15 12 9 6"></polyline></svg>';
     return $args;
 }
