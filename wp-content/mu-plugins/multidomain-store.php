@@ -266,7 +266,7 @@ function custom_save_new_launch_product_field( $post_id ) {
 }
 
 /**
- * Add 'Novo / Lançamento' column to Products admin table.
+ * Add 'Novo' column to Products admin table.
  */
 add_filter( 'manage_edit-product_columns', 'custom_add_new_launch_product_column', 20 );
 function custom_add_new_launch_product_column( $columns ) {
@@ -274,10 +274,15 @@ function custom_add_new_launch_product_column( $columns ) {
     foreach ( $columns as $key => $column ) {
         $new_columns[$key] = $column;
         if ( 'name' === $key ) {
-            $new_columns['ts_is_new'] = 'Novo / Lançamento';
+            $new_columns['ts_is_new'] = 'Novo';
         }
     }
     return $new_columns;
+}
+
+add_action( 'admin_head', 'custom_new_launch_column_css' );
+function custom_new_launch_column_css() {
+    echo '<style>.column-ts_is_new { width: 75px !important; text-align: center !important; }</style>';
 }
 
 /**
