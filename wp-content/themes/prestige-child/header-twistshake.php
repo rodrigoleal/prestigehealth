@@ -98,42 +98,42 @@
 			box-sizing: border-box !important;
 		}
 
-		/* Mobile Navigation Pills */
+		/* Mobile Navigation Pills - Multi-row Flex Wrap */
 		.ts-nav {
 			width: 100% !important;
-			overflow-x: auto !important;
-			-webkit-overflow-scrolling: touch !important;
-			scrollbar-width: none !important;
 			background: #FFFFFF !important;
 			border-top: 1px solid #EAE5DB !important;
 			border-bottom: 1px solid #EAE5DB !important;
+			padding: 10px 12px !important;
 			box-sizing: border-box !important;
-		}
-		.ts-nav::-webkit-scrollbar {
-			display: none !important;
 		}
 		.ts-nav-menu {
 			display: flex !important;
-			flex-wrap: nowrap !important;
-			justify-content: flex-start !important;
+			flex-wrap: wrap !important;
+			justify-content: center !important;
 			align-items: center !important;
-			gap: 10px !important;
-			padding: 10px 15px !important;
+			gap: 8px 10px !important;
+			padding: 0 !important;
 			margin: 0 !important;
-			width: max-content !important;
+			width: 100% !important;
+			list-style: none !important;
 		}
 		.ts-nav-menu li {
-			flex-shrink: 0 !important;
+			flex: 0 0 auto !important;
+			margin: 0 !important;
 		}
 		.ts-nav-menu li a {
-			font-size: 11.5px !important;
+			font-size: 11px !important;
 			white-space: nowrap !important;
-			padding: 6px 14px !important;
+			padding: 7px 15px !important;
 			display: inline-block !important;
 			border-radius: 20px !important;
 			background-color: #F9F6F0 !important;
 			color: #111111 !important;
 			font-weight: 700 !important;
+			text-transform: uppercase !important;
+			letter-spacing: 0.04em !important;
+			box-shadow: 0 2px 5px rgba(0,0,0,0.03) !important;
 		}
 		.ts-nav-menu li a.ts-promo-link {
 			background-color: #FEE2E2 !important;

@@ -232,86 +232,82 @@ get_header(); ?>
 				}
 
 				@media (max-width: 991px) {
+					.ts-banner-slider-section {
+						margin: 12px 0 20px !important;
+					}
 					.ts-banner-slider-wrapper {
-						aspect-ratio: auto !important;
+						position: relative !important;
+						width: 100% !important;
+						aspect-ratio: 16 / 9 !important;
 						height: auto !important;
-						max-height: none !important;
 						min-height: auto !important;
-						border-radius: 18px !important;
+						max-height: none !important;
+						border-radius: 16px !important;
+						overflow: hidden !important;
+						background-color: #FAF6F0 !important;
+						box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+						border: none !important;
 					}
 					.ts-banner-slider {
-						height: auto !important;
-						min-height: auto !important;
 						position: relative !important;
+						width: 100% !important;
+						height: 100% !important;
 					}
 					.ts-banner-slider-section .ts-slide {
+						position: absolute !important;
+						top: 0 !important;
+						left: 0 !important;
+						width: 100% !important;
+						height: 100% !important;
+						padding: 0 !important;
+						margin: 0 !important;
+						box-sizing: border-box !important;
 						display: none !important;
 						opacity: 0 !important;
 						visibility: hidden !important;
-						position: relative !important;
-						width: 100% !important;
-						height: auto !important;
-						padding: 20px 16px 45px !important;
-						box-sizing: border-box !important;
-						transition: opacity 0.3s ease !important;
+						transition: opacity 0.4s ease !important;
 					}
 					.ts-banner-slider-section .ts-slide.active {
-						display: flex !important;
-						flex-direction: column !important;
-						justify-content: flex-start !important;
-						align-items: center !important;
-						text-align: center !important;
+						display: block !important;
 						opacity: 1 !important;
 						visibility: visible !important;
 					}
+
+					/* Hide white text card on mobile screens */
+					.ts-banner-slider-section .ts-slide-content {
+						display: none !important;
+					}
+
+					/* Full-bleed image fitted to screen */
 					.ts-banner-slider-section .ts-slide-image-wrapper {
-						flex: 0 0 auto !important;
 						width: 100% !important;
-						height: 200px !important;
-						margin-bottom: 14px !important;
-						display: flex !important;
-						justify-content: center !important;
-						align-items: center !important;
+						height: 100% !important;
+						max-width: 100% !important;
+						max-height: 100% !important;
+						margin: 0 !important;
+						padding: 0 !important;
+						display: block !important;
 					}
 					.ts-banner-slider-section .ts-slide-img {
-						max-height: 200px !important;
-						width: auto !important;
-						max-width: 92% !important;
-						object-fit: contain !important;
-						border-radius: 14px !important;
-						box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important;
-					}
-					.ts-banner-slider-section .ts-slide-content {
-						flex: 0 0 auto !important;
 						width: 100% !important;
-						padding: 18px 16px !important;
-						box-sizing: border-box !important;
-						text-align: center !important;
+						height: 100% !important;
+						max-width: 100% !important;
+						max-height: 100% !important;
+						object-fit: cover !important;
 						border-radius: 16px !important;
-						background: #FFFFFF !important;
-						box-shadow: 0 6px 20px rgba(0,0,0,0.05) !important;
-						border: 1px solid #F0ECE6 !important;
+						border: none !important;
+						box-shadow: none !important;
 					}
-					.ts-banner-slider-section .ts-slide-title {
-						font-size: 20px !important;
-						margin-bottom: 8px !important;
-						line-height: 1.25 !important;
-					}
-					.ts-banner-slider-section .ts-slide-desc {
-						font-size: 12.5px !important;
-						margin-bottom: 14px !important;
-						line-height: 1.4 !important;
-					}
-					.ts-banner-slider-section .ts-slide-btn {
-						font-size: 12.5px !important;
-						padding: 9px 25px !important;
-						border-radius: 25px !important;
-					}
+
+					/* Hide side arrows on mobile */
 					.ts-banner-slider-wrapper .ts-slider-arrow {
 						display: none !important;
 					}
+
+					/* Keep pagination selector dots */
 					.ts-banner-slider-wrapper .ts-slider-dots {
-						bottom: 12px !important;
+						bottom: 10px !important;
+						z-index: 10 !important;
 					}
 				}
 			</style>
@@ -329,25 +325,27 @@ get_header(); ?>
 							foreach ( $banners as $i => $b ) : 
 								$bg = $b['bg'] ?? $bgs[$i % 3];
 								$tag_bg = $tag_bgs[$i % 3];
+								$b_link = esc_url( $b['link'] ?? '#' );
 							?>
 							<!-- Slide <?php echo $i + 1; ?> -->
 							<div class="ts-slide <?php echo $i === 0 ? 'active' : ''; ?>" style="background: <?php echo esc_attr($bg); ?>;">
-								<div class="ts-slide-content">
-									<?php if ( ! empty( $b['tag'] ) ) : ?>
-										<span class="ts-slide-tag" style="background-color: <?php echo esc_attr($tag_bg); ?>;"><?php echo esc_html( $b['tag'] ); ?></span>
+								<a href="<?php echo $b_link; ?>" class="ts-slide-mobile-link" style="display: block; width: 100%; height: 100%; text-decoration: none;">
+									<div class="ts-slide-content">
+										<?php if ( ! empty( $b['tag'] ) ) : ?>
+											<span class="ts-slide-tag" style="background-color: <?php echo esc_attr($tag_bg); ?>;"><?php echo esc_html( $b['tag'] ); ?></span>
+										<?php endif; ?>
+										<h2 class="ts-slide-title"><?php echo esc_html( $b['title'] ?? '' ); ?></h2>
+										<p class="ts-slide-desc"><?php echo esc_html( $b['desc'] ?? '' ); ?></p>
+										<?php if ( ! empty( $b['link'] ) && ! empty( $b['btn_text'] ) ) : ?>
+											<span class="ts-slide-btn"><?php echo esc_html( $b['btn_text'] ); ?> →</span>
+										<?php endif; ?>
+									</div>
+									<?php if ( ! empty( $b['img'] ) ) : ?>
+									<div class="ts-slide-image-wrapper">
+										<img src="<?php echo esc_url( $b['img'] ); ?>" alt="<?php echo esc_attr( $b['title'] ?? '' ); ?>" class="ts-slide-img">
+									</div>
 									<?php endif; ?>
-									<h2 class="ts-slide-title"><?php echo esc_html( $b['title'] ?? '' ); ?></h2>
-									<p class="ts-slide-desc"><?php echo esc_html( $b['desc'] ?? '' ); ?></p>
-									<?php if ( ! empty( $b['link'] ) && ! empty( $b['btn_text'] ) ) : ?>
-										<a href="<?php echo esc_url( $b['link'] ); ?>" class="ts-slide-btn"><?php echo esc_html( $b['btn_text'] ); ?> →</a>
-									<?php endif; ?>
-								</div>
-								<?php if ( ! empty( $b['img'] ) ) : ?>
-								<div class="ts-slide-image-wrapper">
-									<img src="<?php echo esc_url( $b['img'] ); ?>" alt="<?php echo esc_attr( $b['title'] ?? '' ); ?>" class="ts-slide-img">
-								</div>
-								<?php endif; ?>
-							</div>
+								</a>
 							<?php endforeach; ?>
 						</div>
 
