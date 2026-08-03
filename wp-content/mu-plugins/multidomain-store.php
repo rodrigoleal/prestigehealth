@@ -844,7 +844,7 @@ function custom_multidomain_get_default_banners() {
             'desc'     => 'Leves, dobráveis em 1 segundo e com o conforto máximo para o seu bebé.',
             'btn_text' => 'Descobrir Carrinhos',
             'link'     => home_url( '/categoria-produto/twistshake/carrinhos-de-passeio/' ),
-            'img'      => content_url( '/uploads/2026/06/twist-1.jpg' ),
+            'img'      => content_url( '/uploads/2026/06/ts_banner_carrinhos.png' ),
             'bg'       => 'linear-gradient(135deg, #E6EEF4 0%, #D8E5F0 100%)',
         ),
         array(
@@ -853,7 +853,7 @@ function custom_multidomain_get_default_banners() {
             'desc'     => 'Pratos Click-Mat antiderramamento, talheres ergonómicos e babetes impermeáveis.',
             'btn_text' => 'Ver Alimentação',
             'link'     => home_url( '/categoria-produto/twistshake/alimentacao/' ),
-            'img'      => content_url( '/uploads/2026/06/twistshake-babero-manga-larga-fresas-416x541.png' ),
+            'img'      => content_url( '/uploads/2026/06/ts_banner_refeicao.png' ),
             'bg'       => 'linear-gradient(135deg, #FFF7E6 0%, #FFEFC6 100%)',
         ),
         array(
@@ -862,7 +862,7 @@ function custom_multidomain_get_default_banners() {
             'desc'     => 'Sistema patenteado de rede misturadora e tetinas ultrasuaves livres de BPA.',
             'btn_text' => 'Ver Biberões & Copos',
             'link'     => home_url( '/categoria-produto/twistshake/copos/' ),
-            'img'      => content_url( '/uploads/2026/06/twishake-straw-cup-kubek-pastel-green-1-416x482.png' ),
+            'img'      => content_url( '/uploads/2026/06/ts_banner_biberoes.png' ),
             'bg'       => 'linear-gradient(135deg, #F3E8FF 0%, #E6D5FF 100%)',
         ),
     );
