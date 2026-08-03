@@ -164,6 +164,72 @@ get_header(); ?>
 					box-shadow: 0 12px 30px rgba(0,0,0,0.1) !important;
 					border: 3px solid rgba(255,255,255,0.8) !important;
 				}
+				/* Navigation Arrows */
+				.ts-banner-slider-wrapper .ts-slider-arrow {
+					position: absolute !important;
+					top: 50% !important;
+					transform: translateY(-50%) !important;
+					width: 46px !important;
+					height: 46px !important;
+					background-color: #FFFFFF !important;
+					color: #111111 !important;
+					border: 1px solid rgba(0,0,0,0.1) !important;
+					border-radius: 50% !important;
+					font-size: 18px !important;
+					font-weight: 800 !important;
+					cursor: pointer !important;
+					z-index: 99 !important;
+					display: flex !important;
+					align-items: center !important;
+					justify-content: center !important;
+					transition: all 0.25s ease !important;
+					box-shadow: 0 6px 18px rgba(0,0,0,0.15) !important;
+					outline: none !important;
+					padding: 0 !important;
+				}
+				.ts-banner-slider-wrapper .ts-slider-arrow:hover {
+					background-color: #111111 !important;
+					color: #FFFFFF !important;
+					transform: translateY(-50%) scale(1.1) !important;
+					box-shadow: 0 8px 24px rgba(0,0,0,0.25) !important;
+				}
+				.ts-banner-slider-wrapper .ts-slider-prev {
+					left: 25px !important;
+				}
+				.ts-banner-slider-wrapper .ts-slider-next {
+					right: 25px !important;
+				}
+
+				/* Navigation Dots */
+				.ts-banner-slider-wrapper .ts-slider-dots {
+					position: absolute !important;
+					bottom: 22px !important;
+					left: 50% !important;
+					transform: translateX(-50%) !important;
+					display: flex !important;
+					gap: 10px !important;
+					z-index: 99 !important;
+					background: rgba(255, 255, 255, 0.75) !important;
+					backdrop-filter: blur(8px) !important;
+					padding: 6px 16px !important;
+					border-radius: 20px !important;
+					box-shadow: 0 4px 15px rgba(0,0,0,0.08) !important;
+					border: 1px solid rgba(255,255,255,0.8) !important;
+				}
+				.ts-banner-slider-wrapper .ts-dot {
+					width: 10px !important;
+					height: 10px !important;
+					border-radius: 50% !important;
+					background-color: rgba(0,0,0,0.25) !important;
+					cursor: pointer !important;
+					transition: all 0.3s ease !important;
+					display: inline-block !important;
+				}
+				.ts-banner-slider-wrapper .ts-dot.active {
+					background-color: #111111 !important;
+					width: 26px !important;
+					border-radius: 12px !important;
+				}
 			</style>
 			<section class="ts-banner-slider-section">
 				<div class="col-full">
