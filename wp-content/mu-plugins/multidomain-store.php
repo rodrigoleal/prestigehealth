@@ -766,6 +766,8 @@ function custom_multidomain_register_banner_admin_menu() {
 }
 
 function custom_multidomain_render_banner_admin_page() {
+    wp_enqueue_media();
+
     if ( isset( $_POST['ts_save_banners'] ) && check_admin_referer( 'ts_save_banners_action', 'ts_banners_nonce' ) ) {
         $banners = array();
         if ( isset( $_POST['banners'] ) && is_array( $_POST['banners'] ) ) {
@@ -791,16 +793,25 @@ function custom_multidomain_render_banner_admin_page() {
     if ( empty( $banners ) ) {
         $banners = custom_multidomain_get_default_banners();
     }
+
+    // Fetch published WooCommerce products
+    $products = get_posts( array(
+        'post_type'      => 'product',
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+        'orderby'        => 'title',
+        'order'          => 'ASC',
+    ) );
     ?>
     <div class="wrap">
         <h1>Gerir Banners da Página Inicial Twistshake 🖼️</h1>
-        <p>Altere as imagens, títulos, descrições e links dos banners rotativos da loja Twistshake.</p>
+        <p>Escolha produtos cadastrados, selecione imagens da galeria do WordPress ou insira informações personalizadas para os banners da loja Twistshake.</p>
         <form method="post" action="">
             <?php wp_nonce_field( 'ts_save_banners_action', 'ts_banners_nonce' ); ?>
             <div id="ts-banners-list">
                 <?php foreach ( $banners as $idx => $b ) : ?>
-                    <div class="card" style="margin-bottom:20px; padding:20px; max-width:800px; border-radius:8px; border:1px solid #ccc;">
-                        <h3>Banner #<?php echo $idx + 1; ?></h3>
+                    <div class="card" style="margin-bottom:20px; padding:20px; max-width:850px; border-radius:8px; border:1px solid #ccd0d4; background:#fff;">
+                        <h3 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">Banner #<?php echo $idx + 1; ?></h3>
                         <table class="form-table">
                             <tr>
                                 <th>Etiqueta / Tag</th>
@@ -819,12 +830,38 @@ function custom_multidomain_render_banner_admin_page() {
                                 <td><input type="text" name="banners[<?php echo $idx; ?>][btn_text]" value="<?php echo esc_attr( $b['btn_text'] ?? '' ); ?>" class="regular-text" placeholder="Ex: Descobrir Carrinhos"></td>
                             </tr>
                             <tr>
-                                <th>Link de Destino (URL)</th>
-                                <td><input type="url" name="banners[<?php echo $idx; ?>][link]" value="<?php echo esc_attr( $b['link'] ?? '' ); ?>" class="large-text" placeholder="https://..."></td>
+                                <th>Escolher Produto Cadastrado 🛍️</th>
+                                <td>
+                                    <select class="regular-text ts-product-select" data-target-link="ts_link_<?php echo $idx; ?>">
+                                        <option value="">-- Selecionar um Produto da Loja --</option>
+                                        <?php foreach ( $products as $prod ) : ?>
+                                            <?php $prod_link = get_permalink( $prod->ID ); ?>
+                                            <option value="<?php echo esc_url( $prod_link ); ?>"><?php echo esc_html( $prod->post_title ); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <p class="description">Ao selecionar um produto cadastrado, o link de destino abaixo é preenchido automaticamente.</p>
+                                </td>
                             </tr>
                             <tr>
-                                <th>URL da Imagem</th>
-                                <td><input type="url" name="banners[<?php echo $idx; ?>][img]" value="<?php echo esc_attr( $b['img'] ?? '' ); ?>" class="large-text" placeholder="https://.../imagem.jpg"></td>
+                                <th>Link de Destino (URL)</th>
+                                <td>
+                                    <input type="url" id="ts_link_<?php echo $idx; ?>" name="banners[<?php echo $idx; ?>][link]" value="<?php echo esc_attr( $b['link'] ?? '' ); ?>" class="large-text" placeholder="https://...">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Imagem do Banner 📷</th>
+                                <td>
+                                    <div style="display:flex; gap:10px; align-items:center;">
+                                        <input type="url" id="ts_img_<?php echo $idx; ?>" name="banners[<?php echo $idx; ?>][img]" value="<?php echo esc_attr( $b['img'] ?? '' ); ?>" class="large-text ts-img-input" placeholder="https://.../imagem.png">
+                                        <button type="button" class="button button-secondary ts-upload-img-btn" data-target="ts_img_<?php echo $idx; ?>">🖼️ Galeria / Upload</button>
+                                    </div>
+                                    <div class="ts-img-preview" id="preview_ts_img_<?php echo $idx; ?>" style="margin-top:10px;">
+                                        <?php if ( ! empty( $b['img'] ) ) : ?>
+                                            <img src="<?php echo esc_url( $b['img'] ); ?>" style="max-height:100px; max-width:200px; border-radius:6px; border:1px solid #ccc; background:#f9f9f9; padding:4px; object-fit:cover;">
+                                        <?php endif; ?>
+                                    </div>
+                                    <p class="description">Clique no botão para escolher uma imagem existente na Galeria de Mídia do WordPress ou carregar um novo ficheiro.</p>
+                                </td>
                             </tr>
                         </table>
                     </div>
@@ -833,6 +870,41 @@ function custom_multidomain_render_banner_admin_page() {
             <p><input type="submit" name="ts_save_banners" class="button button-primary button-large" value="Guardar Alterações aos Banners"></p>
         </form>
     </div>
+
+    <script>
+    jQuery(document).ready(function($){
+        // Media Library Picker
+        $(document).on('click', '.ts-upload-img-btn', function(e){
+            e.preventDefault();
+            var targetId = $(this).data('target');
+            var targetInput = $('#' + targetId);
+            var previewDiv = $('#preview_' + targetId);
+
+            var frame = wp.media({
+                title: 'Selecionar ou Carregar Imagem do Banner',
+                button: { text: 'Usar esta imagem' },
+                multiple: false
+            });
+
+            frame.on('select', function(){
+                var attachment = frame.state().get('selection').first().toJSON();
+                targetInput.val(attachment.url);
+                previewDiv.html('<img src="' + attachment.url + '" style="max-height:100px; max-width:200px; border-radius:6px; border:1px solid #ccc; background:#f9f9f9; padding:4px; object-fit:cover;">');
+            });
+
+            frame.open();
+        });
+
+        // Product Selector Listener
+        $(document).on('change', '.ts-product-select', function(){
+            var selectedUrl = $(this).val();
+            var targetLinkId = $(this).data('target-link');
+            if (selectedUrl) {
+                $('#' + targetLinkId).val(selectedUrl);
+            }
+        });
+    });
+    </script>
     <?php
 }
 
