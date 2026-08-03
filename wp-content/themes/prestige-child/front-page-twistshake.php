@@ -48,7 +48,6 @@ get_header(); ?>
 					);
 				}
 			}
-			if ( ! empty( $banners ) ) :
 			?>
 			<!-- Hero Banner Section -->
 			<section class="ts-hero-section">
@@ -197,6 +196,9 @@ get_header(); ?>
 							</div>
 						</div>
 					</div>
+				</div>
+			</section>
+
 			<!-- Dynamic Product Banner Slider Section -->
 			<?php if ( ! empty( $banners ) ) : ?>
 			<section class="ts-banner-slider-section">
