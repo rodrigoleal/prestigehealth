@@ -105,10 +105,9 @@
 				<div class="ts-payment-badges">
 					<span class="ts-lock-icon">🔒 Pagamentos 100% Seguros:</span>
 					<div class="ts-payment-icons">
-						<!-- Display official colorful payment gateway logos -->
-						<img src="<?php echo esc_url( content_url( '/plugins/multibanco-ifthen-software-gateway-for-woocommerce/images/mbway_banner.svg' ) ); ?>" alt="MB WAY" class="ts-payment-logo">
-						<img src="<?php echo esc_url( content_url( '/plugins/multibanco-ifthen-software-gateway-for-woocommerce/images/multibanco_banner.svg' ) ); ?>" alt="Multibanco" class="ts-payment-logo">
-						<img src="<?php echo esc_url( content_url( '/plugins/multibanco-ifthen-software-gateway-for-woocommerce/images/creditcard_banner_and_icon.svg' ) ); ?>" alt="Cartão de Crédito" class="ts-payment-logo">
+						<img src="<?php echo esc_url( content_url( '/plugins/multibanco-ifthen-software-gateway-for-woocommerce/images/mbway_banner.svg' ) ); ?>" alt="MB WAY" class="ts-payment-logo" style="height: 24px !important; width: auto !important; max-height: 24px !important; max-width: 75px !important; object-fit: contain;">
+						<img src="<?php echo esc_url( content_url( '/plugins/multibanco-ifthen-software-gateway-for-woocommerce/images/multibanco_banner.svg' ) ); ?>" alt="Multibanco" class="ts-payment-logo" style="height: 24px !important; width: auto !important; max-height: 24px !important; max-width: 75px !important; object-fit: contain;">
+						<img src="<?php echo esc_url( content_url( '/plugins/multibanco-ifthen-software-gateway-for-woocommerce/images/creditcard_banner_and_icon.svg' ) ); ?>" alt="Cartão de Crédito" class="ts-payment-logo" style="height: 24px !important; width: auto !important; max-height: 24px !important; max-width: 75px !important; object-fit: contain;">
 					</div>
 				</div>
 
