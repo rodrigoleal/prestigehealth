@@ -118,7 +118,7 @@
 					<span>Distribuído oficialmente em Portugal por:</span>
 					<div class="ts-distributor-logo" style="margin-top: 6px;">
 						<a href="https://prestigehealth.pt" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; text-decoration: none;">
-							<img src="https://loja.prestigehealth.pt/wp-content/uploads/2026/06/Phealth-azul.png" alt="Prestige Health" style="height: 38px; width: auto; background: transparent; border: none; padding: 0;">
+							<img src="https://loja.prestigehealth.pt/wp-content/uploads/2026/06/logo.png" alt="Prestige Health" style="height: 38px; width: auto; background: transparent; border: none; padding: 0;">
 						</a>
 					</div>
 				</div>

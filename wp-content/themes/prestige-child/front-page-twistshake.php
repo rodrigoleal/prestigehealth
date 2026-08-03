@@ -161,50 +161,47 @@ get_header(); ?>
 			</section>
 
 			<!-- Automated Product Banner Slider Section -->
+			<?php
+			$banners = get_option( 'twistshake_home_banners', array() );
+			if ( empty( $banners ) && function_exists( 'custom_multidomain_get_default_banners' ) ) {
+				$banners = custom_multidomain_get_default_banners();
+			}
+			if ( ! empty( $banners ) ) :
+			?>
 			<section class="ts-banner-slider-section">
 				<div class="col-full">
 					<div class="ts-banner-slider-wrapper">
 						<div class="ts-banner-slider" id="tsBannerSlider">
-							
-							<!-- Slide 1: Carrinhos & Passeio -->
-							<div class="ts-slide active" style="background: linear-gradient(135deg, #E6EEF4 0%, #D8E5F0 100%);">
+							<?php 
+							$bgs = array(
+								'linear-gradient(135deg, #E6EEF4 0%, #D8E5F0 100%)',
+								'linear-gradient(135deg, #FFF7E6 0%, #FFEFC6 100%)',
+								'linear-gradient(135deg, #F3E8FF 0%, #E6D5FF 100%)'
+							);
+							$tag_bgs = array( '#005492', '#D69E2E', '#7E3AF2' );
+							foreach ( $banners as $i => $b ) : 
+								$bg = $b['bg'] ?? $bgs[$i % 3];
+								$tag_bg = $tag_bgs[$i % 3];
+							?>
+							<!-- Slide <?php echo $i + 1; ?> -->
+							<div class="ts-slide <?php echo $i === 0 ? 'active' : ''; ?>" style="background: <?php echo esc_attr($bg); ?>;">
 								<div class="ts-slide-content">
-									<span class="ts-slide-tag">NOVIDADE PASSEIO</span>
-									<h2 class="ts-slide-title">Carrinhos de Passeio Twistshake</h2>
-									<p class="ts-slide-desc">Leves, dobráveis em 1 segundo e com o conforto máximo para o seu bebé.</p>
-									<a href="<?php echo esc_url( ts_get_term_link_safe( 'carrinhos' ) ); ?>" class="ts-slide-btn">Descobrir Carrinhos</a>
+									<?php if ( ! empty( $b['tag'] ) ) : ?>
+										<span class="ts-slide-tag" style="background-color: <?php echo esc_attr($tag_bg); ?>;"><?php echo esc_html( $b['tag'] ); ?></span>
+									<?php endif; ?>
+									<h2 class="ts-slide-title"><?php echo esc_html( $b['title'] ?? '' ); ?></h2>
+									<p class="ts-slide-desc"><?php echo esc_html( $b['desc'] ?? '' ); ?></p>
+									<?php if ( ! empty( $b['link'] ) && ! empty( $b['btn_text'] ) ) : ?>
+										<a href="<?php echo esc_url( $b['link'] ); ?>" class="ts-slide-btn" style="background-color: <?php echo esc_attr($tag_bg); ?>;"><?php echo esc_html( $b['btn_text'] ); ?></a>
+									<?php endif; ?>
 								</div>
+								<?php if ( ! empty( $b['img'] ) ) : ?>
 								<div class="ts-slide-image-wrapper">
-									<img src="<?php echo esc_url( content_url( '/uploads/2026/06/twist-1.jpg' ) ); ?>" alt="Carrinho Twistshake" class="ts-slide-img">
+									<img src="<?php echo esc_url( $b['img'] ); ?>" alt="<?php echo esc_attr( $b['title'] ?? '' ); ?>" class="ts-slide-img">
 								</div>
+								<?php endif; ?>
 							</div>
-
-							<!-- Slide 2: Alimentação & Vajilhas -->
-							<div class="ts-slide" style="background: linear-gradient(135deg, #FFF7E6 0%, #FFEFC6 100%);">
-								<div class="ts-slide-content">
-									<span class="ts-slide-tag" style="background-color: #D69E2E;">ALIMENTAÇÃO PRÁTICA</span>
-									<h2 class="ts-slide-title">Conjuntos de Refeição Inteligentes</h2>
-									<p class="ts-slide-desc">Pratos Click-Mat antiderramamento, talheres ergonómicos e babetes impermeáveis.</p>
-									<a href="<?php echo esc_url( ts_get_term_link_safe( 'alimentacao' ) ); ?>" class="ts-slide-btn" style="background-color: #D69E2E;">Ver Alimentação</a>
-								</div>
-								<div class="ts-slide-image-wrapper">
-									<img src="<?php echo esc_url( content_url( '/uploads/2026/06/twistshake-babero-manga-larga-fresas-416x541.png' ) ); ?>" alt="Alimentação Twistshake" class="ts-slide-img">
-								</div>
-							</div>
-
-							<!-- Slide 3: Biberões & Copos -->
-							<div class="ts-slide" style="background: linear-gradient(135deg, #F3E8FF 0%, #E6D5FF 100%);">
-								<div class="ts-slide-content">
-									<span class="ts-slide-tag" style="background-color: #7E3AF2;">ANTICÓLICAS & APRENDIZAGEM</span>
-									<h2 class="ts-slide-title">Biberões & Copos de Aprendizagem</h2>
-									<p class="ts-slide-desc">Sistema patenteado de rede misturadora e tetinas ultrasuaves livres de BPA.</p>
-									<a href="<?php echo esc_url( ts_get_term_link_safe( 'copos' ) ); ?>" class="ts-slide-btn" style="background-color: #7E3AF2;">Ver Biberões & Copos</a>
-								</div>
-								<div class="ts-slide-image-wrapper">
-									<img src="<?php echo esc_url( content_url( '/uploads/2026/06/twishake-straw-cup-kubek-pastel-green-1-416x482.png' ) ); ?>" alt="Biberões Twistshake" class="ts-slide-img">
-								</div>
-							</div>
-
+							<?php endforeach; ?>
 						</div>
 
 						<!-- Slider Arrows -->
@@ -213,13 +210,14 @@ get_header(); ?>
 
 						<!-- Slider Navigation Dots -->
 						<div class="ts-slider-dots" id="tsSliderDots">
-							<span class="ts-dot active" data-slide="0"></span>
-							<span class="ts-dot" data-slide="1"></span>
-							<span class="ts-dot" data-slide="2"></span>
+							<?php foreach ( $banners as $i => $b ) : ?>
+								<span class="ts-dot <?php echo $i === 0 ? 'active' : ''; ?>" data-slide="<?php echo $i; ?>"></span>
+							<?php endforeach; ?>
 						</div>
 					</div>
 				</div>
 			</section>
+			<?php endif; ?>
 
 			<script>
 			document.addEventListener('DOMContentLoaded', function() {

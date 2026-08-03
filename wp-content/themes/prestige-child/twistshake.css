@@ -632,16 +632,58 @@ body.twistshake-theme ul.products li.product .button:hover {
     border-radius: 50%;
     color: #111111;
     transition: background-color 0.2s, color 0.2s;
-}
-.ts-social-link:hover {
-    background-color: #111111;
-    color: #FFFFFF;
+.ts-footer-col h3 {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    margin-bottom: 25px !important;
+    color: #111111 !important;
 }
 
-.ts-footer-contacts {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+.ts-footer-links,
+ul.ts-footer-links {
+    list-style: none !important;
+    list-style-type: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.ts-footer-links li,
+ul.ts-footer-links li {
+    list-style: none !important;
+    list-style-type: none !important;
+    margin-bottom: 12px !important;
+    padding: 0 !important;
+}
+
+.ts-footer-links li::before,
+ul.ts-footer-links li::before {
+    content: none !important;
+    display: none !important;
+}
+
+.ts-footer-links li a,
+ul.ts-footer-links li a {
+    color: #444444 !important;
+    text-decoration: none !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    transition: color 0.2s ease !important;
+}
+
+.ts-footer-links li a:hover,
+ul.ts-footer-links li a:hover {
+    color: #111111 !important;
+    text-decoration: underline !important;
+}
+
+.ts-footer-contacts,
+ul.ts-footer-contacts {
+    list-style: none !important;
+    list-style-type: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 .ts-footer-contacts li {
     margin-bottom: 18px;

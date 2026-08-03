@@ -719,3 +719,121 @@ function custom_multidomain_render_islands_notice() {
     </script>
     <?php
 }
+
+/**
+ * Register Twistshake Banners admin menu and options page.
+ */
+add_action( 'admin_menu', 'custom_multidomain_register_banner_admin_menu' );
+function custom_multidomain_register_banner_admin_menu() {
+    add_submenu_page(
+        'woocommerce',
+        'Banners Twistshake',
+        'Banners Twistshake 🖼️',
+        'manage_options',
+        'twistshake-banners',
+        'custom_multidomain_render_banner_admin_page'
+    );
+}
+
+function custom_multidomain_render_banner_admin_page() {
+    if ( isset( $_POST['ts_save_banners'] ) && check_admin_referer( 'ts_save_banners_action', 'ts_banners_nonce' ) ) {
+        $banners = array();
+        if ( isset( $_POST['banners'] ) && is_array( $_POST['banners'] ) ) {
+            foreach ( $_POST['banners'] as $b ) {
+                if ( ! empty( $b['img'] ) || ! empty( $b['title'] ) ) {
+                    $banners[] = array(
+                        'tag'       => sanitize_text_field( $b['tag'] ?? '' ),
+                        'title'     => sanitize_text_field( $b['title'] ?? '' ),
+                        'desc'      => sanitize_text_field( $b['desc'] ?? '' ),
+                        'btn_text'  => sanitize_text_field( $b['btn_text'] ?? '' ),
+                        'link'      => esc_url_raw( $b['link'] ?? '' ),
+                        'img'       => esc_url_raw( $b['img'] ?? '' ),
+                        'bg'        => sanitize_text_field( $b['bg'] ?? '' ),
+                    );
+                }
+            }
+        }
+        update_option( 'twistshake_home_banners', $banners );
+        echo '<div class="updated" style="margin:20px 0; padding:12px; background:#e6f4ea; border-left:4px solid #2f855a;"><p><strong>Banners guardados com sucesso!</strong> Os novos banners já estão visíveis na página inicial da Twistshake.</p></div>';
+    }
+
+    $banners = get_option( 'twistshake_home_banners', array() );
+    if ( empty( $banners ) ) {
+        $banners = custom_multidomain_get_default_banners();
+    }
+    ?>
+    <div class="wrap">
+        <h1>Gerir Banners da Página Inicial Twistshake 🖼️</h1>
+        <p>Altere as imagens, títulos, descrições e links dos banners rotativos da loja Twistshake.</p>
+        <form method="post" action="">
+            <?php wp_nonce_field( 'ts_save_banners_action', 'ts_banners_nonce' ); ?>
+            <div id="ts-banners-list">
+                <?php foreach ( $banners as $idx => $b ) : ?>
+                    <div class="card" style="margin-bottom:20px; padding:20px; max-width:800px; border-radius:8px; border:1px solid #ccc;">
+                        <h3>Banner #<?php echo $idx + 1; ?></h3>
+                        <table class="form-table">
+                            <tr>
+                                <th>Etiqueta / Tag</th>
+                                <td><input type="text" name="banners[<?php echo $idx; ?>][tag]" value="<?php echo esc_attr( $b['tag'] ?? '' ); ?>" class="regular-text" placeholder="Ex: NOVIDADE PASSEIO"></td>
+                            </tr>
+                            <tr>
+                                <th>Título Principal</th>
+                                <td><input type="text" name="banners[<?php echo $idx; ?>][title]" value="<?php echo esc_attr( $b['title'] ?? '' ); ?>" class="regular-text" placeholder="Ex: Carrinhos de Passeio"></td>
+                            </tr>
+                            <tr>
+                                <th>Descrição Curta</th>
+                                <td><input type="text" name="banners[<?php echo $idx; ?>][desc]" value="<?php echo esc_attr( $b['desc'] ?? '' ); ?>" class="large-text" placeholder="Ex: Leves e dobráveis em 1 segundo."></td>
+                            </tr>
+                            <tr>
+                                <th>Texto do Botão</th>
+                                <td><input type="text" name="banners[<?php echo $idx; ?>][btn_text]" value="<?php echo esc_attr( $b['btn_text'] ?? '' ); ?>" class="regular-text" placeholder="Ex: Descobrir Carrinhos"></td>
+                            </tr>
+                            <tr>
+                                <th>Link de Destino (URL)</th>
+                                <td><input type="url" name="banners[<?php echo $idx; ?>][link]" value="<?php echo esc_attr( $b['link'] ?? '' ); ?>" class="large-text" placeholder="https://..."></td>
+                            </tr>
+                            <tr>
+                                <th>URL da Imagem</th>
+                                <td><input type="url" name="banners[<?php echo $idx; ?>][img]" value="<?php echo esc_attr( $b['img'] ?? '' ); ?>" class="large-text" placeholder="https://.../imagem.jpg"></td>
+                            </tr>
+                        </table>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <p><input type="submit" name="ts_save_banners" class="button button-primary button-large" value="Guardar Alterações aos Banners"></p>
+        </form>
+    </div>
+    <?php
+}
+
+function custom_multidomain_get_default_banners() {
+    return array(
+        array(
+            'tag'      => 'NOVIDADE PASSEIO',
+            'title'    => 'Carrinhos de Passeio Twistshake',
+            'desc'     => 'Leves, dobráveis em 1 segundo e com o conforto máximo para o seu bebé.',
+            'btn_text' => 'Descobrir Carrinhos',
+            'link'     => home_url( '/categoria-produto/twistshake/carrinhos-de-passeio/' ),
+            'img'      => content_url( '/uploads/2026/06/twist-1.jpg' ),
+            'bg'       => 'linear-gradient(135deg, #E6EEF4 0%, #D8E5F0 100%)',
+        ),
+        array(
+            'tag'      => 'ALIMENTAÇÃO PRÁTICA',
+            'title'    => 'Conjuntos de Refeição Inteligentes',
+            'desc'     => 'Pratos Click-Mat antiderramamento, talheres ergonómicos e babetes impermeáveis.',
+            'btn_text' => 'Ver Alimentação',
+            'link'     => home_url( '/categoria-produto/twistshake/alimentacao/' ),
+            'img'      => content_url( '/uploads/2026/06/twistshake-babero-manga-larga-fresas-416x541.png' ),
+            'bg'       => 'linear-gradient(135deg, #FFF7E6 0%, #FFEFC6 100%)',
+        ),
+        array(
+            'tag'      => 'ANTICÓLICAS & APRENDIZAGEM',
+            'title'    => 'Biberões & Copos de Aprendizagem',
+            'desc'     => 'Sistema patenteado de rede misturadora e tetinas ultrasuaves livres de BPA.',
+            'btn_text' => 'Ver Biberões & Copos',
+            'link'     => home_url( '/categoria-produto/twistshake/copos/' ),
+            'img'      => content_url( '/uploads/2026/06/twishake-straw-cup-kubek-pastel-green-1-416x482.png' ),
+            'bg'       => 'linear-gradient(135deg, #F3E8FF 0%, #E6D5FF 100%)',
+        ),
+    );
+}
