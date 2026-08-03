@@ -231,7 +231,7 @@ get_header(); ?>
 					border-radius: 12px !important;
 				}
 
-				@media (max-width: 768px) {
+				@media (max-width: 991px) {
 					.ts-banner-slider-wrapper {
 						aspect-ratio: auto !important;
 						height: auto !important;
@@ -244,7 +244,7 @@ get_header(); ?>
 						position: relative !important;
 					}
 					.ts-banner-slider-section .ts-slide {
-						padding: 15px 15px 60px !important;
+						padding: 15px 15px 55px !important;
 						position: absolute !important;
 						top: 0 !important;
 						left: 0 !important;
@@ -260,36 +260,36 @@ get_header(); ?>
 						text-align: center !important;
 					}
 					.ts-banner-slider-section .ts-slide-image-wrapper {
-						flex: 0 0 160px !important;
+						flex: 0 0 180px !important;
 						width: 100% !important;
-						height: 160px !important;
-						margin-bottom: 10px !important;
+						height: 180px !important;
+						margin-bottom: 12px !important;
 						display: flex !important;
 						justify-content: center !important;
 						align-items: center !important;
 					}
 					.ts-banner-slider-section .ts-slide-img {
-						max-height: 160px !important;
+						max-height: 180px !important;
 						width: auto !important;
-						max-width: 90% !important;
+						max-width: 92% !important;
 						object-fit: contain !important;
 						border-radius: 12px !important;
-						box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+						box-shadow: 0 6px 18px rgba(0,0,0,0.1) !important;
 					}
 					.ts-banner-slider-section .ts-slide-content {
 						flex: 0 0 auto !important;
 						width: 100% !important;
-						padding: 16px 14px !important;
-						margin: 0 !important;
+						padding: 18px 16px !important;
+						margin-bottom: 12px !important;
 						box-sizing: border-box !important;
 						text-align: center !important;
 						border-radius: 14px !important;
 						background: rgba(255, 255, 255, 0.95) !important;
-						box-shadow: 0 8px 25px rgba(0,0,0,0.06) !important;
+						box-shadow: 0 6px 20px rgba(0,0,0,0.05) !important;
 					}
 					.ts-banner-slider-section .ts-slide-title {
-						font-size: 18px !important;
-						margin-bottom: 6px !important;
+						font-size: 20px !important;
+						margin-bottom: 8px !important;
 						line-height: 1.25 !important;
 					}
 					.ts-banner-slider-section .ts-slide-desc {
