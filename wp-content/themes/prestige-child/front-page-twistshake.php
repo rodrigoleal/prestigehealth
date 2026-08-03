@@ -53,23 +53,24 @@ get_header(); ?>
 			<?php if ( ! empty( $banners ) ) : ?>
 			<style>
 				.ts-banner-slider-section {
-					margin: 0 0 30px !important;
+					margin: 15px 0 35px !important;
 				}
 				.ts-banner-slider-wrapper {
 					position: relative !important;
-					border-radius: 16px !important;
+					border-radius: 20px !important;
 					overflow: hidden !important;
-					box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+					box-shadow: 0 14px 40px rgba(0,0,0,0.07) !important;
 					width: 100% !important;
 					aspect-ratio: 16 / 9 !important;
-					max-height: 520px !important;
+					max-height: 480px !important;
 					min-height: 380px !important;
+					background-color: #FAF6F0 !important;
+					border: 1px solid #EFEAE4 !important;
 				}
 				.ts-banner-slider {
 					position: relative !important;
 					width: 100% !important;
 					height: 100% !important;
-					min-height: 380px !important;
 				}
 				.ts-banner-slider-section .ts-slide {
 					display: none !important;
@@ -82,7 +83,7 @@ get_header(); ?>
 					height: 100% !important;
 					align-items: center !important;
 					justify-content: space-between !important;
-					padding: 35px 50px !important;
+					padding: 40px 50px !important;
 					box-sizing: border-box !important;
 					transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out !important;
 				}
@@ -90,9 +91,78 @@ get_header(); ?>
 					display: flex !important;
 					opacity: 1 !important;
 					visibility: visible !important;
-					position: absolute !important;
-					top: 0 !important;
-					left: 0 !important;
+				}
+				.ts-banner-slider-section .ts-slide-content {
+					flex: 0 1 45% !important;
+					z-index: 3 !important;
+					padding: 35px 40px !important;
+					background: rgba(255, 255, 255, 0.88) !important;
+					backdrop-filter: blur(14px) !important;
+					-webkit-backdrop-filter: blur(14px) !important;
+					border-radius: 18px !important;
+					box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+					border: 1px solid rgba(255, 255, 255, 0.8) !important;
+				}
+				.ts-banner-slider-section .ts-slide-tag {
+					display: inline-block !important;
+					color: #FFFFFF !important;
+					font-size: 10px !important;
+					font-weight: 700 !important;
+					letter-spacing: 0.12em !important;
+					padding: 6px 16px !important;
+					border-radius: 20px !important;
+					margin-bottom: 14px !important;
+					text-transform: uppercase !important;
+					box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+				}
+				.ts-banner-slider-section .ts-slide-title {
+					font-size: 32px !important;
+					font-weight: 800 !important;
+					color: #111111 !important;
+					line-height: 1.25 !important;
+					margin-bottom: 14px !important;
+				}
+				.ts-banner-slider-section .ts-slide-desc {
+					font-size: 14px !important;
+					color: #4B5563 !important;
+					line-height: 1.6 !important;
+					margin-bottom: 24px !important;
+				}
+				.ts-banner-slider-section .ts-slide-btn {
+					display: inline-flex !important;
+					align-items: center !important;
+					gap: 8px !important;
+					background-color: #111111 !important;
+					color: #FFFFFF !important;
+					font-size: 13px !important;
+					font-weight: 700 !important;
+					padding: 13px 30px !important;
+					border-radius: 30px !important;
+					text-decoration: none !important;
+					box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
+					transition: all 0.3s ease !important;
+				}
+				.ts-banner-slider-section .ts-slide-btn:hover {
+					transform: translateY(-2px) !important;
+					box-shadow: 0 10px 25px rgba(0,0,0,0.25) !important;
+					background-color: #005492 !important;
+				}
+				.ts-banner-slider-section .ts-slide-image-wrapper {
+					flex: 0 1 50% !important;
+					height: 100% !important;
+					display: flex !important;
+					justify-content: center !important;
+					align-items: center !important;
+					z-index: 2 !important;
+				}
+				.ts-banner-slider-section .ts-slide-img {
+					width: 100% !important;
+					height: 100% !important;
+					max-height: 400px !important;
+					object-fit: cover !important;
+					border-radius: 14px !important;
+					box-shadow: 0 12px 30px rgba(0,0,0,0.1) !important;
+					border: 3px solid rgba(255,255,255,0.8) !important;
 				}
 			</style>
 			<section class="ts-banner-slider-section">
@@ -101,9 +171,9 @@ get_header(); ?>
 						<div class="ts-banner-slider" id="tsBannerSlider">
 							<?php 
 							$bgs = array(
-								'linear-gradient(135deg, #E6EEF4 0%, #D8E5F0 100%)',
-								'linear-gradient(135deg, #FFF7E6 0%, #FFEFC6 100%)',
-								'linear-gradient(135deg, #F3E8FF 0%, #E6D5FF 100%)'
+								'linear-gradient(135deg, #FBF8F5 0%, #F4ECE3 100%)',
+								'linear-gradient(135deg, #FFF9F0 0%, #FFF2D6 100%)',
+								'linear-gradient(135deg, #F8F5FA 0%, #EFE8F5 100%)'
 							);
 							$tag_bgs = array( '#005492', '#D69E2E', '#7E3AF2' );
 							foreach ( $banners as $i => $b ) : 
@@ -119,7 +189,7 @@ get_header(); ?>
 									<h2 class="ts-slide-title"><?php echo esc_html( $b['title'] ?? '' ); ?></h2>
 									<p class="ts-slide-desc"><?php echo esc_html( $b['desc'] ?? '' ); ?></p>
 									<?php if ( ! empty( $b['link'] ) && ! empty( $b['btn_text'] ) ) : ?>
-										<a href="<?php echo esc_url( $b['link'] ); ?>" class="ts-slide-btn" style="background-color: <?php echo esc_attr($tag_bg); ?>;"><?php echo esc_html( $b['btn_text'] ); ?></a>
+										<a href="<?php echo esc_url( $b['link'] ); ?>" class="ts-slide-btn"><?php echo esc_html( $b['btn_text'] ); ?> →</a>
 									<?php endif; ?>
 								</div>
 								<?php if ( ! empty( $b['img'] ) ) : ?>
