@@ -205,31 +205,15 @@ function custom_multidomain_pre_get_posts( $q ) {
         $q->set( 'post__in', $on_sale_ids );
     }
 
-    // Filter by is_new=1 parameter
+    // Filter by is_new=1 parameter (STRICT: only products explicitly marked as new)
     if ( isset( $_GET['is_new'] ) && '1' === (string) $_GET['is_new'] && $q->is_main_query() ) {
-        // Check if any product is explicitly marked as new/launch
-        $has_marked = get_posts( array(
-            'post_type'      => 'product',
-            'post_status'    => 'publish',
-            'meta_key'       => '_ts_is_new_launch',
-            'meta_value'     => '1',
-            'posts_per_page' => 1,
-            'fields'         => 'ids',
-        ) );
-
-        if ( ! empty( $has_marked ) ) {
-            $meta_query = (array) $q->get( 'meta_query' );
-            $meta_query[] = array(
-                'key'     => '_ts_is_new_launch',
-                'value'   => '1',
-                'compare' => '=',
-            );
-            $q->set( 'meta_query', $meta_query );
-        } else {
-            // Fallback: order by date descending
-            $q->set( 'orderby', 'date' );
-            $q->set( 'order', 'DESC' );
-        }
+        $meta_query = (array) $q->get( 'meta_query' );
+        $meta_query[] = array(
+            'key'     => '_ts_is_new_launch',
+            'value'   => '1',
+            'compare' => '=',
+        );
+        $q->set( 'meta_query', $meta_query );
     }
 
     $post_types = (array) $q->get( 'post_type' );
