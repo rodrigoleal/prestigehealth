@@ -1145,67 +1145,109 @@ ul.products li.product,
     background: transparent !important;
 }
 
+html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+}
+
 @media (max-width: 768px) {
-    /* Promo Bar Swipeable on Mobile */
+    /* Top Promo Bar Responsiveness */
     .ts-promo-bar {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
         scrollbar-width: none !important;
-        padding: 8px 12px !important;
+        padding: 8px 10px !important;
+        background-color: #FAF8F5 !important;
     }
     .ts-promo-bar::-webkit-scrollbar {
         display: none !important;
     }
     .ts-promo-content {
+        display: flex !important;
+        flex-direction: row !important;
         justify-content: flex-start !important;
-        gap: 20px !important;
+        align-items: center !important;
+        gap: 16px !important;
         width: max-content !important;
+        margin: 0 !important;
+    }
+    .ts-promo-item {
+        white-space: nowrap !important;
+        font-size: 11px !important;
     }
 
-    /* Main Header Mobile Layout */
+    /* Main Header Mobile Flex Layout */
     .ts-header-container {
-        flex-direction: column !important;
-        gap: 12px !important;
-        padding-bottom: 12px !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 12px 15px !important;
+        gap: 10px !important;
     }
     .ts-branding {
-        flex: 0 0 auto !important;
-        text-align: center !important;
+        flex: 1 1 auto !important;
+        text-align: left !important;
     }
     .ts-logo-main {
-        font-size: 26px !important;
+        font-size: 22px !important;
+    }
+    .ts-logo-sub {
+        font-size: 9px !important;
+    }
+    .ts-logo-country {
+        font-size: 10px !important;
+    }
+    .ts-icons {
+        flex: 0 0 auto !important;
+        gap: 15px !important;
     }
     .ts-search {
+        flex: 0 0 100% !important;
         width: 100% !important;
-        flex: 1 1 100% !important;
+        order: 3 !important;
+        margin-top: 4px !important;
+    }
+    .ts-search-form {
+        width: 100% !important;
+        background-color: #F9F6F0 !important;
     }
     .ts-search-field {
+        width: 100% !important;
         padding: 8px 14px !important;
         font-size: 12px !important;
     }
 
-    /* Navigation Mobile Swipeable Pills */
+    /* Navigation Mobile Swipeable Menu */
     .ts-nav {
+        width: 100% !important;
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
         scrollbar-width: none !important;
+        background: #FFFFFF !important;
+        border-top: 1px solid #EAE5DB !important;
         border-bottom: 1px solid #EAE5DB !important;
     }
     .ts-nav::-webkit-scrollbar {
         display: none !important;
     }
     .ts-nav-menu {
+        display: flex !important;
+        flex-wrap: nowrap !important;
         justify-content: flex-start !important;
+        align-items: center !important;
+        gap: 16px !important;
         padding: 10px 15px !important;
-        gap: 20px !important;
+        margin: 0 !important;
         width: max-content !important;
     }
     .ts-nav-menu li {
         flex-shrink: 0 !important;
     }
     .ts-nav-menu li a {
-        white-space: nowrap !important;
         font-size: 12px !important;
+        white-space: nowrap !important;
+        padding: 4px 6px !important;
     }
 
     /* Hero Banner Mobile Clean Layout */
@@ -1213,15 +1255,16 @@ ul.products li.product,
         aspect-ratio: auto !important;
         height: auto !important;
         max-height: none !important;
-        min-height: 500px !important;
+        min-height: 490px !important;
+        border-radius: 16px !important;
     }
     .ts-banner-slider {
         height: auto !important;
-        min-height: 500px !important;
+        min-height: 490px !important;
         position: relative !important;
     }
-    .ts-slide {
-        padding: 15px 15px 60px !important;
+    .ts-banner-slider-section .ts-slide {
+        padding: 15px 15px 55px !important;
         position: absolute !important;
         top: 0 !important;
         left: 0 !important;
@@ -1229,66 +1272,65 @@ ul.products li.product,
         height: 100% !important;
         box-sizing: border-box !important;
     }
-    .ts-slide.active {
+    .ts-banner-slider-section .ts-slide.active {
         display: flex !important;
         flex-direction: column !important;
         justify-content: flex-start !important;
         align-items: center !important;
         text-align: center !important;
     }
-    .ts-slide-image-wrapper {
-        flex: 0 0 170px !important;
-        width: 100% !important;
-        height: 170px !important;
-        margin-bottom: 10px !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-    }
-    .ts-slide-img {
-        max-height: 170px !important;
-        width: auto !important;
-        max-width: 90% !important;
-        object-fit: contain !important;
-        border-radius: 12px !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
-    }
-    .ts-slide-content {
+    .ts-banner-slider-section .ts-slide-content {
         flex: 0 0 auto !important;
         width: 100% !important;
-        padding: 16px 14px !important;
-        margin: 0 !important;
+        padding: 18px 16px !important;
+        margin-bottom: 12px !important;
         box-sizing: border-box !important;
         text-align: center !important;
         border-radius: 14px !important;
         background: rgba(255, 255, 255, 0.95) !important;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.06) !important;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.05) !important;
     }
-    .ts-slide-tag {
+    .ts-banner-slider-section .ts-slide-tag {
         font-size: 10px !important;
-        padding: 4px 10px !important;
-        margin-bottom: 6px !important;
+        padding: 4px 12px !important;
+        margin-bottom: 8px !important;
     }
-    .ts-slide-title {
-        font-size: 18px !important;
-        margin-bottom: 6px !important;
+    .ts-banner-slider-section .ts-slide-title {
+        font-size: 20px !important;
+        margin-bottom: 8px !important;
         line-height: 1.25 !important;
     }
-    .ts-slide-desc {
+    .ts-banner-slider-section .ts-slide-desc {
         font-size: 12px !important;
-        margin-bottom: 12px !important;
-        line-height: 1.35 !important;
+        margin-bottom: 14px !important;
+        line-height: 1.4 !important;
     }
-    .ts-slide-btn {
+    .ts-banner-slider-section .ts-slide-btn {
         font-size: 12px !important;
-        padding: 8px 22px !important;
+        padding: 9px 24px !important;
     }
-    /* Hide clunky side arrows on mobile for a clean layout */
-    .ts-slider-arrow {
+    .ts-banner-slider-section .ts-slide-image-wrapper {
+        flex: 0 0 160px !important;
+        width: 100% !important;
+        height: 160px !important;
+        margin: 0 auto !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+    .ts-banner-slider-section .ts-slide-img {
+        max-height: 160px !important;
+        width: auto !important;
+        max-width: 90% !important;
+        object-fit: contain !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08) !important;
+    }
+    .ts-banner-slider-wrapper .ts-slider-arrow {
         display: none !important;
     }
-    .ts-slider-dots {
-        bottom: 16px !important;
+    .ts-banner-slider-wrapper .ts-slider-dots {
+        bottom: 12px !important;
     }
 
     .ts-footer-grid {
