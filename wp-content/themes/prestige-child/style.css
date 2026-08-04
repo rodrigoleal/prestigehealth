@@ -774,6 +774,117 @@ a.remove:hover::before {
     color: #F59E0B !important;
 }
 
+/* 9. Added to Cart Link ("Ver carrinho") Styling & Vector SVG Arrow */
+a.added_to_cart,
+.added_to_cart {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: #111111 !important;
+    color: #ffffff !important;
+    padding: 8px 18px !important;
+    border-radius: 20px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    text-decoration: none !important;
+    margin-left: 10px !important;
+    vertical-align: middle !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
+}
+
+a.added_to_cart:hover,
+.added_to_cart:hover {
+    background-color: #333333 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+}
+
+a.added_to_cart::after,
+.added_to_cart::after,
+a.wc-forward::after,
+.wc-forward::after,
+.woocommerce-Button--next::after {
+    content: "" !important;
+    display: inline-block !important;
+    width: 14px !important;
+    height: 14px !important;
+    margin-left: 6px !important;
+    vertical-align: middle !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>') !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    font-family: inherit !important;
+}
+
+.woocommerce-Button--previous::before {
+    content: "" !important;
+    display: inline-block !important;
+    width: 14px !important;
+    height: 14px !important;
+    margin-right: 6px !important;
+    vertical-align: middle !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>') !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    font-family: inherit !important;
+}
+
+/* 10. Pagination & Navigation Arrows */
+.woocommerce-pagination .next::after,
+.woocommerce-pagination .prev::after,
+.site-main nav.navigation .nav-previous a::before,
+.site-main nav.navigation .nav-next a::after,
+.storefront-product-pagination a[rel=prev]::after,
+.storefront-product-pagination a[rel=next]::after {
+    font-family: Arial, sans-serif !important;
+}
+
+.woocommerce-pagination .next::after,
+.site-main nav.navigation .nav-next a::after,
+.storefront-product-pagination a[rel=next]::after {
+    content: "→" !important;
+}
+
+.woocommerce-pagination .prev::after,
+.site-main nav.navigation .nav-previous a::before,
+.storefront-product-pagination a[rel=prev]::after {
+    content: "←" !important;
+}
+
+/* 11. Breadcrumbs & Reset Links */
+.woocommerce-breadcrumb .breadcrumb-separator::after {
+    content: "/" !important;
+    font-family: Arial, sans-serif !important;
+    opacity: 0.5 !important;
+}
+
+a.reset_variations::before,
+a#variations_clear::before {
+    content: "" !important;
+    display: inline-block !important;
+    width: 12px !important;
+    height: 12px !important;
+    margin-right: 4px !important;
+    vertical-align: middle !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="%23666666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>') !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    font-family: inherit !important;
+}
+
+/* 12. Universal Fallback Reset for Storefront / WooCommerce Font Icons */
+.added_to_cart::before,
+.added_to_cart::after,
+.wc-forward::before,
+.wc-forward::after,
+.button::before,
+.button::after {
+    font-family: inherit !important;
+}
+
+
 
 
 
