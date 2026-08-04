@@ -511,4 +511,98 @@ body {
     display: inline-block !important;
 }
 
+/* ==========================================================================
+   Clean & Modern Vector SVG Icons (Fix Broken Font Icons)
+   ========================================================================== */
+
+/* 1. Gallery Zoom / Expand Button */
+.woocommerce-product-gallery__trigger {
+    background-color: #FFFFFF !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23333333" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>') !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 16px 16px !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+    border: 1px solid #E2E8F0 !important;
+    text-indent: -9999px !important;
+    overflow: hidden !important;
+    transition: all 0.2s ease !important;
+    top: 12px !important;
+    right: 12px !important;
+    z-index: 99 !important;
+}
+
+.woocommerce-product-gallery__trigger:hover {
+    transform: scale(1.08) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18) !important;
+}
+
+.woocommerce-product-gallery__trigger::before,
+.woocommerce-product-gallery__trigger::after {
+    content: "" !important;
+    display: none !important;
+}
+
+/* 2. Stock Status Icon (In Stock & Out of Stock) */
+p.stock::before,
+.stock.in-stock::before,
+.stock.out-of-stock::before,
+.stock::before {
+    content: "" !important;
+    display: inline-block !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin-right: 6px !important;
+    vertical-align: middle !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: contain !important;
+    font-family: inherit !important;
+}
+
+p.stock.in-stock::before,
+.stock.in-stock::before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="%2310B981"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>') !important;
+}
+
+p.stock.out-of-stock::before,
+.stock.out-of-stock::before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="%23EF4444"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>') !important;
+}
+
+p.stock {
+    display: flex !important;
+    align-items: center !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    margin: 12px 0 !important;
+}
+
+p.stock.in-stock {
+    color: #059669 !important;
+}
+
+p.stock.out-of-stock {
+    color: #DC2626 !important;
+}
+
+/* 3. Product Tabs & Accordions Fix */
+.woocommerce-tabs ul.tabs li::after,
+.woocommerce-tabs ul.tabs li a::after,
+.woocommerce-tabs ul.tabs li::before,
+.woocommerce-tabs ul.tabs li a::before,
+.wc-tabs li::after,
+.wc-tabs li a::after,
+.wc-tabs li::before,
+.wc-tabs li a::before,
+.woocommerce-tabs .panel h2::after,
+.woocommerce-tabs .panel h2::before {
+    content: "" !important;
+    display: none !important;
+}
+
+
 
