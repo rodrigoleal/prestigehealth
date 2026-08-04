@@ -1598,7 +1598,8 @@ a.button.wc-forward::after,
     font-family: inherit !important;
 }
 
-/* 5. Cart Table Remove Product Item Link (Red ×) */
+/* 5. Cart Table Remove Product Item Link (Clear Red × Icon) */
+td.product-remove a.remove,
 .woocommerce-cart-form .product-remove a.remove,
 a.remove {
     font-family: Arial, sans-serif !important;
@@ -1609,26 +1610,42 @@ a.remove {
     height: 24px !important;
     border-radius: 50% !important;
     color: #ef4444 !important;
-    font-size: 18px !important;
+    font-size: 16px !important;
     font-weight: 700 !important;
     line-height: 1 !important;
     text-decoration: none !important;
-    background: #fef2f2 !important;
-    border: 1px solid #fee2e2 !important;
+    background-color: #fef2f2 !important;
+    border: 1px solid #fecaca !important;
     transition: all 0.2s ease !important;
+    cursor: pointer !important;
 }
 
+td.product-remove a.remove::before,
+.woocommerce-cart-form .product-remove a.remove::before,
+a.remove::before {
+    content: "×" !important;
+    display: inline-block !important;
+    color: #ef4444 !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    font-family: Arial, sans-serif !important;
+}
+
+td.product-remove a.remove:hover,
+.woocommerce-cart-form .product-remove a.remove:hover,
 a.remove:hover {
     color: #ffffff !important;
     background-color: #ef4444 !important;
     border-color: #ef4444 !important;
 }
 
-a.remove::before,
-a.remove::after {
-    content: "" !important;
-    display: none !important;
+td.product-remove a.remove:hover::before,
+.woocommerce-cart-form .product-remove a.remove:hover::before,
+a.remove:hover::before {
+    color: #ffffff !important;
 }
+
 
 /* 6. Checkout Payment Method Radio Button Icons */
 .wc_payment_methods label::before,
