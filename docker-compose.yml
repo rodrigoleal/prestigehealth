@@ -15,13 +15,14 @@ services:
   wordpress:
     image: wordpress:latest
     ports:
-      - "80:80"
+      - "8081:80"
     restart: always
     environment:
       - WORDPRESS_DB_HOST=db
       - WORDPRESS_DB_USER=wordpress
       - WORDPRESS_DB_PASSWORD=wordpress
       - WORDPRESS_DB_NAME=wordpress
+      - WORDPRESS_TABLE_PREFIX=wpsk_
     volumes:
       - ./wp-content:/var/www/html/wp-content
     depends_on:

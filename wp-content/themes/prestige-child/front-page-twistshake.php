@@ -353,9 +353,20 @@ get_header(); ?>
 											<span class="ts-slide-btn"><?php echo esc_html( $b['btn_text'] ); ?> →</span>
 										<?php endif; ?>
 									</div>
-									<?php if ( ! empty( $b['img'] ) ) : ?>
+									<?php 
+									if ( ! empty( $b['img'] ) ) : 
+										$b_img_src = esc_url( $b['img'] );
+										$uploads   = wp_upload_dir();
+										if ( false !== strpos( $b_img_src, $uploads['baseurl'] ) ) {
+											$relative   = str_replace( $uploads['baseurl'], '', $b_img_src );
+											$local_path = $uploads['basedir'] . $relative;
+											if ( ! file_exists( $local_path ) ) {
+												$b_img_src = 'https://loja.prestigehealth.pt/wp-content/uploads' . $relative;
+											}
+										}
+									?>
 									<div class="ts-slide-image-wrapper">
-										<img src="<?php echo esc_url( $b['img'] ); ?>" alt="<?php echo esc_attr( $b['title'] ?? '' ); ?>" class="ts-slide-img">
+										<img src="<?php echo $b_img_src; ?>" alt="<?php echo esc_attr( $b['title'] ?? '' ); ?>" class="ts-slide-img">
 									</div>
 									<?php endif; ?>
 								</a>

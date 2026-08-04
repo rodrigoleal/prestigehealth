@@ -403,3 +403,112 @@ body {
     content: none !important;
     display: none !important;
 }
+
+/* Color Group Swatches Styling (Clean Twistshake Official Style) */
+.ts-color-swatches-wrapper {
+    margin: 20px 0 24px 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.ts-color-swatches-header {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #111111 !important;
+    margin-bottom: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    letter-spacing: 0.5px !important;
+}
+
+.ts-color-swatches-title {
+    color: #444444 !important;
+    font-weight: 600 !important;
+}
+
+.ts-color-swatches-active-label {
+    color: #111111 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+}
+
+.ts-color-swatches-list {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+}
+
+.ts-color-swatch-card-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+}
+
+.ts-color-swatch-item {
+    display: block !important;
+    width: 68px !important;
+    height: 68px !important;
+    border-radius: 6px !important;
+    padding: 2px !important;
+    background: #FAF9F6 !important;
+    border: 1px solid #E2E8F0 !important;
+    transition: all 0.2s ease-in-out !important;
+    text-decoration: none !important;
+    position: relative !important;
+    box-shadow: none !important;
+}
+
+.ts-color-swatch-img-box {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #FAF9F6 !important;
+    border-radius: 4px !important;
+    overflow: hidden !important;
+}
+
+.ts-color-swatch-img {
+    max-width: 92% !important;
+    max-height: 92% !important;
+    object-fit: contain !important;
+    display: block !important;
+}
+
+.ts-color-swatch-item:hover {
+    border-color: #111111 !important;
+    transform: translateY(-2px) !important;
+}
+
+.ts-color-swatch-item.ts-color-swatch-active {
+    border: 2px solid #111111 !important;
+    outline: 1px solid #111111 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.ts-color-swatch-stock-label {
+    font-size: 11px !important;
+    color: #DC2626 !important;
+    font-weight: 500 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    margin-top: 4px !important;
+}
+
+.ts-stock-dot {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background-color: #DC2626 !important;
+    display: inline-block !important;
+}
+
+

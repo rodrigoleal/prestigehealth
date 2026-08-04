@@ -254,15 +254,182 @@ function custom_add_new_launch_product_field() {
         'description' => 'Exibe o selo "NOVO" no produto e destaca-o na página de Novidades.',
     ) );
     echo '</div>';
+
+    echo '<div class="options_group">';
+    woocommerce_wp_text_input( array(
+        'id'          => '_ts_color_group',
+        'label'       => 'Grupo de Cores / Modelo 🎨',
+        'placeholder' => 'ex: biberon-anticolicas-180ml',
+        'description' => 'Insira o mesmo código/slug para agrupar produtos com cores diferentes.',
+        'desc_tip'    => true,
+    ) );
+    woocommerce_wp_text_input( array(
+        'id'          => '_ts_color_name',
+        'label'       => 'Nome da Cor deste Produto 🏷️',
+        'placeholder' => 'ex: Preto, Rosa, Pastel Blue',
+        'description' => 'Nome da cor exibido ao passar o cursor na miniatura (opcional).',
+        'desc_tip'    => true,
+    ) );
+    echo '</div>';
 }
 
 /**
- * Save 'Novo / Lançamento' field on product save.
+ * Save 'Novo / Lançamento' & 'Grupo de Cores' fields on product save.
  */
 add_action( 'woocommerce_process_product_meta', 'custom_save_new_launch_product_field' );
 function custom_save_new_launch_product_field( $post_id ) {
     $is_new = isset( $_POST['_ts_is_new_launch'] ) ? '1' : '0';
     update_post_meta( $post_id, '_ts_is_new_launch', $is_new );
+
+    if ( isset( $_POST['_ts_color_group'] ) ) {
+        update_post_meta( $post_id, '_ts_color_group', sanitize_text_field( $_POST['_ts_color_group'] ) );
+    }
+    if ( isset( $_POST['_ts_color_name'] ) ) {
+        update_post_meta( $post_id, '_ts_color_name', sanitize_text_field( $_POST['_ts_color_name'] ) );
+    }
+}
+
+/**
+ * Display Color Swatches on Single Product Page for products sharing the same _ts_color_group.
+ */
+add_action( 'woocommerce_before_add_to_cart_form', 'custom_display_product_color_group_swatches', 15 );
+function custom_display_product_color_group_swatches() {
+    global $product;
+    if ( ! $product ) {
+        return;
+    }
+
+    $current_id  = $product->get_id();
+    $color_group = get_post_meta( $current_id, '_ts_color_group', true );
+
+    if ( empty( $color_group ) ) {
+        return;
+    }
+
+    // Query published products in the same color group
+    $args = array(
+        'post_type'      => 'product',
+        'post_status'    => 'publish',
+        'posts_per_page' => 50,
+        'meta_query'     => array(
+            array(
+                'key'     => '_ts_color_group',
+                'value'   => $color_group,
+                'compare' => '=',
+            ),
+        ),
+        'orderby'        => 'title',
+        'order'          => 'ASC',
+    );
+
+    $group_query = new WP_Query( $args );
+
+    if ( ! $group_query->have_posts() || $group_query->post_count < 2 ) {
+        wp_reset_postdata();
+        return;
+    }
+
+    $current_color_name = get_post_meta( $current_id, '_ts_color_name', true );
+    if ( empty( $current_color_name ) ) {
+        $current_color_name = $product->get_attribute( 'pa_cor' );
+        if ( empty( $current_color_name ) ) {
+            $current_color_name = $product->get_attribute( 'cor' );
+        }
+    }
+
+    echo '<div class="ts-color-swatches-wrapper">';
+    echo '<div class="ts-color-swatches-header">';
+    echo '<span class="ts-color-swatches-title">COR:</span> ';
+    if ( ! empty( $current_color_name ) ) {
+        echo '<span class="ts-color-swatches-active-label">' . esc_html( mb_strtoupper( $current_color_name, 'UTF-8' ) ) . '</span>';
+    }
+    echo '</div>';
+    echo '<div class="ts-color-swatches-list">';
+
+    while ( $group_query->have_posts() ) {
+        $group_query->the_post();
+        $item_id      = get_the_ID();
+        $item_product = wc_get_product( $item_id );
+        if ( ! $item_product ) {
+            continue;
+        }
+
+        $is_active = ( $item_id === $current_id );
+        $permalink = get_permalink( $item_id );
+
+        // Color label
+        $color_name = get_post_meta( $item_id, '_ts_color_name', true );
+        if ( empty( $color_name ) ) {
+            $color_name = $item_product->get_attribute( 'pa_cor' );
+            if ( empty( $color_name ) ) {
+                $color_name = $item_product->get_attribute( 'cor' );
+            }
+            if ( empty( $color_name ) ) {
+                $color_name = get_the_title( $item_id );
+            }
+        }
+
+        $is_in_stock = $item_product->is_in_stock();
+
+        // Image URL
+        $thumb_id  = $item_product->get_image_id();
+        $thumb_url = $thumb_id ? wp_get_attachment_image_url( $thumb_id, 'medium' ) : wc_placeholder_img_src( 'woocommerce_thumbnail' );
+
+        $active_class = $is_active ? ' ts-color-swatch-active' : '';
+        $stock_class  = ! $is_in_stock ? ' ts-color-swatch-outofstock' : '';
+
+        echo '<div class="ts-color-swatch-card-wrap">';
+        echo '<a href="' . esc_url( $permalink ) . '" class="ts-color-swatch-item' . $active_class . $stock_class . '" title="' . esc_attr( $color_name ) . '" aria-label="' . esc_attr( $color_name ) . '">';
+        echo '<div class="ts-color-swatch-img-box">';
+        echo '<img src="' . esc_url( $thumb_url ) . '" alt="' . esc_attr( $color_name ) . '" class="ts-color-swatch-img" />';
+        echo '</div>';
+        echo '</a>';
+        if ( ! $is_in_stock ) {
+            echo '<span class="ts-color-swatch-stock-label"><span class="ts-stock-dot"></span> Esgotado</span>';
+        }
+        echo '</div>';
+    }
+
+    echo '</div>';
+    echo '</div>';
+
+    wp_reset_postdata();
+}
+
+/**
+ * Localhost fallback for missing upload images (proxies missing images to production server).
+ */
+add_filter( 'wp_get_attachment_url', 'custom_local_image_fallback_to_prod', 20, 2 );
+add_filter( 'wp_get_attachment_image_src', 'custom_local_image_src_fallback_to_prod', 20, 4 );
+
+function custom_local_image_fallback_to_prod( $url, $post_id ) {
+    if ( empty( $url ) ) {
+        return $url;
+    }
+    $uploads = wp_upload_dir();
+    if ( false !== strpos( $url, $uploads['baseurl'] ) ) {
+        $relative   = str_replace( $uploads['baseurl'], '', $url );
+        $local_path = $uploads['basedir'] . $relative;
+        if ( ! file_exists( $local_path ) ) {
+            return 'https://loja.prestigehealth.pt/wp-content/uploads' . $relative;
+        }
+    }
+    return $url;
+}
+
+function custom_local_image_src_fallback_to_prod( $image, $attachment_id, $size, $icon ) {
+    if ( ! is_array( $image ) || empty( $image[0] ) ) {
+        return $image;
+    }
+    $uploads = wp_upload_dir();
+    if ( false !== strpos( $image[0], $uploads['baseurl'] ) ) {
+        $relative   = str_replace( $uploads['baseurl'], '', $image[0] );
+        $local_path = $uploads['basedir'] . $relative;
+        if ( ! file_exists( $local_path ) ) {
+            $image[0] = 'https://loja.prestigehealth.pt/wp-content/uploads' . $relative;
+        }
+    }
+    return $image;
 }
 
 /**
