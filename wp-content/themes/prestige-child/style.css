@@ -988,9 +988,90 @@ input[type=submit].loading::after,
     animation: ts-spin 0.7s linear infinite !important;
     font-family: inherit !important;
     position: relative !important;
-    top: auto !important;
-    right: auto !important;
+/* 14. Order Action Buttons ("Ver") & My Account Buttons SVG Icons */
+.my_account_orders .button.view,
+.woocommerce-orders-table__cell-order-actions .button.view,
+.woocommerce-orders-table__cell-order-actions a.button,
+td.order-actions a.button,
+a.button.view,
+.button.view {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 6px 14px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
 }
+
+.my_account_orders .button.view::after,
+.woocommerce-orders-table__cell-order-actions .button.view::after,
+.woocommerce-orders-table__cell-order-actions a.view::after,
+td.order-actions a.view::after,
+a.button.view::after,
+.button.view::after {
+    content: "" !important;
+    display: inline-block !important;
+    width: 14px !important;
+    height: 14px !important;
+    margin-left: 6px !important;
+    vertical-align: middle !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%23333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>') !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    font-family: inherit !important;
+    transition: all 0.2s ease !important;
+}
+
+.my_account_orders .button.view:hover::after,
+.woocommerce-orders-table__cell-order-actions .button.view:hover::after,
+.woocommerce-orders-table__cell-order-actions a.view:hover::after,
+td.order-actions a.view:hover::after,
+a.button.view:hover::after,
+.button.view:hover::after {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>') !important;
+}
+
+p.order-again .button::after,
+.order-again a::after {
+    content: "" !important;
+    display: inline-block !important;
+    width: 14px !important;
+    height: 14px !important;
+    margin-left: 6px !important;
+    vertical-align: middle !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>') !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    font-family: inherit !important;
+}
+
+.woocommerce-MyAccount-downloads .button::after,
+.woocommerce-Table--downloadable-files .button::after {
+    content: "" !important;
+    display: inline-block !important;
+    width: 14px !important;
+    height: 14px !important;
+    margin-left: 6px !important;
+    vertical-align: middle !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>') !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    font-family: inherit !important;
+}
+
+/* 15. Absolute Master Font Reset for All Buttons & Links */
+[class*="button"]::after,
+[class*="button"]::before,
+td.order-actions a::after,
+td.order-actions a::before,
+.woocommerce-orders-table__cell-order-actions a::after,
+.woocommerce-orders-table__cell-order-actions a::before {
+    font-family: inherit !important;
+}
+
 
 
 
