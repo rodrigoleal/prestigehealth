@@ -1878,15 +1878,62 @@ a#variations_clear::before {
     font-family: inherit !important;
 }
 
-/* 12. Universal Fallback Reset for Storefront / WooCommerce Font Icons */
-.added_to_cart::before,
-.added_to_cart::after,
-.wc-forward::before,
-.wc-forward::after,
-.button::before,
-.button::after {
-    font-family: inherit !important;
+/* 13. Modern CSS Loading Spinner (Replaces Broken FontAwesome Spinner) */
+@keyframes ts-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
+
+.blockUI::before,
+.woocommerce .blockUI::before,
+.woocommerce-page .blockUI::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 32px !important;
+    height: 32px !important;
+    margin-top: -16px !important;
+    margin-left: -16px !important;
+    border: 3px solid rgba(0, 0, 0, 0.1) !important;
+    border-top-color: #111111 !important;
+    border-radius: 50% !important;
+    animation: ts-spin 0.75s linear infinite !important;
+    font-family: inherit !important;
+    text-indent: 0 !important;
+    display: block !important;
+    z-index: 99999 !important;
+}
+
+.blockUI.blockOverlay,
+.woocommerce .blockUI.blockOverlay {
+    background-color: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(2px) !important;
+    opacity: 1 !important;
+}
+
+button.loading::after,
+input[type=button].loading::after,
+input[type=reset].loading::after,
+input[type=submit].loading::after,
+.button.loading::after,
+.added_to_cart.loading::after {
+    content: "" !important;
+    display: inline-block !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin-left: 8px !important;
+    vertical-align: middle !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    border-top-color: #ffffff !important;
+    border-radius: 50% !important;
+    animation: ts-spin 0.7s linear infinite !important;
+    font-family: inherit !important;
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+}
+
 
 
 
