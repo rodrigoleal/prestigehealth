@@ -1062,15 +1062,72 @@ p.order-again .button::after,
     font-family: inherit !important;
 }
 
-/* 15. Absolute Master Font Reset for All Buttons & Links */
-[class*="button"]::after,
-[class*="button"]::before,
-td.order-actions a::after,
-td.order-actions a::before,
-.woocommerce-orders-table__cell-order-actions a::after,
-.woocommerce-orders-table__cell-order-actions a::before {
+/* 16. Address Titles Edit Button ("Editar") SVG Pencil Icon */
+.addresses header.title a,
+.woocommerce-Address-title a,
+.woocommerce-address-title a,
+header.title a.edit,
+a.edit,
+.woocommerce-Address-title a.edit {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
+    background-color: #f1f5f9 !important;
+    text-indent: -9999px !important;
+    overflow: hidden !important;
+    position: relative !important;
+    transition: all 0.2s ease !important;
+    vertical-align: middle !important;
+    margin-left: 10px !important;
+    border: none !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+    cursor: pointer !important;
+}
+
+.addresses header.title a::before,
+.woocommerce-Address-title a::before,
+.woocommerce-address-title a::before,
+header.title a.edit::before,
+a.edit::before,
+.woocommerce-Address-title a.edit::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 14px !important;
+    height: 14px !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%23475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 1 2 2h14a2 2 0 0 1 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>') !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    font-family: inherit !important;
+    text-indent: 0 !important;
+    transition: all 0.2s ease !important;
+}
+
+.addresses header.title a:hover,
+.woocommerce-Address-title a:hover,
+a.edit:hover {
+    background-color: #111111 !important;
+}
+
+.addresses header.title a:hover::before,
+.woocommerce-Address-title a:hover::before,
+a.edit:hover::before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 1 2 2h14a2 2 0 0 1 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>') !important;
+}
+
+/* Master Font Reset for All Header Title Links */
+header.title a::before,
+header.title a::after,
+.woocommerce-Address-title::before,
+.woocommerce-Address-title::after {
     font-family: inherit !important;
 }
+
 
 
 
