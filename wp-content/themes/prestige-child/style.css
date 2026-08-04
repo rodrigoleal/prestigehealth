@@ -1127,7 +1127,8 @@ a.edit:hover::before {
 
 span.show-password-input,
 button.show-password-input,
-.show-password-input {
+.show-password-input,
+.woocommerce-form-row .show-password-input {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -1140,22 +1141,19 @@ button.show-password-input,
     cursor: pointer !important;
     background: transparent !important;
     border: none !important;
-    text-indent: -9999px !important;
-    overflow: hidden !important;
+    text-indent: 0 !important;
+    overflow: visible !important;
     z-index: 10 !important;
+    font-size: 0 !important;
+    color: transparent !important;
 }
 
 span.show-password-input::after,
 button.show-password-input::after,
 .show-password-input::after,
-span.show-password-input::before,
-button.show-password-input::before,
-.show-password-input::before {
+.woocommerce-form-row .show-password-input::after {
     content: "" !important;
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
+    display: block !important;
     width: 18px !important;
     height: 18px !important;
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%2364748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>') !important;
@@ -1165,18 +1163,24 @@ button.show-password-input::before,
     text-indent: 0 !important;
 }
 
+span.show-password-input::before,
+button.show-password-input::before,
+.show-password-input::before,
+.woocommerce-form-row .show-password-input::before {
+    display: none !important;
+}
+
 span.show-password-input.display-password::after,
 button.show-password-input.display-password::after,
 .show-password-input.display-password::after,
-span.show-password-input.display-password::before,
-button.show-password-input.display-password::before,
-.show-password-input.display-password::before {
+.woocommerce-form-row .show-password-input.display-password::after {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%2364748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>') !important;
 }
 
 .woocommerce-password-strength::after {
     display: none !important;
 }
+
 
 
 

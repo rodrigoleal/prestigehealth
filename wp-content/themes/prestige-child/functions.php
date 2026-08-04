@@ -7,20 +7,21 @@
  * @package prestige-child
  */
 
-add_action( "wp_enqueue_scripts", "prestige_child_parent_theme_enqueue_styles" );
+add_action( "wp_enqueue_scripts", "prestige_child_parent_theme_enqueue_styles", 999 );
 
 /**
- * Enqueue scripts and styles.
+ * Enqueue scripts and styles with high priority and dependencies to override Storefront icons.
  */
 function prestige_child_parent_theme_enqueue_styles() {
 	wp_enqueue_style( "storefront-style", get_template_directory_uri() . "/style.css", array(), "0.1.0" );
 	wp_enqueue_style(
 		"prestige-child-style",
 		get_stylesheet_directory_uri() . "/style.css",
-		array( "storefront-style" ),
-		filemtime( get_stylesheet_directory() . "/style.css" )
+		array( "storefront-style", "storefront-icons", "storefront-woocommerce-style" ),
+		time()
 	);
 }
+
 
 /**
  * Hide shipping rates when free shipping is available.
@@ -280,20 +281,19 @@ function prestige_filter_category_widget_by_current_products( $list_args ) {
 add_filter( 'woocommerce_product_categories_widget_args', 'prestige_filter_category_widget_by_current_products', 10, 1 );
 
 /**
- * Enqueue styles and scripts for Twistshake domain
+ * Enqueue styles and scripts for Twistshake domain & global icon overrides
  */
 function twistshake_multidomain_enqueue_styles() {
-    if ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain_is_twistshake() ) {
-        // Enqueue Google Font Outfit (modern, rounded and friendly for baby brand)
-        wp_enqueue_style( 'twistshake-google-font', 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap', array(), null );
-        
-        // Enqueue main Twistshake CSS with cache busting
-        wp_enqueue_style(
-            'twistshake-styles',
-            get_stylesheet_directory_uri() . '/twistshake.css',
-            array( 'prestige-child-style' ),
-            time()
-        );
-    }
+    // Enqueue Google Font Outfit (modern, rounded and friendly for baby brand)
+    wp_enqueue_style( 'twistshake-google-font', 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap', array(), null );
+    
+    // Enqueue main Twistshake CSS with cache busting and explicit icon dependencies
+    wp_enqueue_style(
+        'twistshake-styles',
+        get_stylesheet_directory_uri() . '/twistshake.css',
+        array( 'prestige-child-style', 'storefront-icons', 'storefront-woocommerce-style' ),
+        time()
+    );
 }
-add_action( 'wp_enqueue_scripts', 'twistshake_multidomain_enqueue_styles', 99 );
+add_action( 'wp_enqueue_scripts', 'twistshake_multidomain_enqueue_styles', 9999 );
+
