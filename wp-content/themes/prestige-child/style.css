@@ -589,20 +589,41 @@ p.stock.out-of-stock {
     color: #DC2626 !important;
 }
 
-/* 3. Product Tabs & Accordions Fix */
-.woocommerce-tabs ul.tabs li::after,
-.woocommerce-tabs ul.tabs li a::after,
+/* 3. Product Tabs & Accordions Fix (Clean Chevron Down SVG Icon) */
 .woocommerce-tabs ul.tabs li::before,
 .woocommerce-tabs ul.tabs li a::before,
-.wc-tabs li::after,
-.wc-tabs li a::after,
 .wc-tabs li::before,
 .wc-tabs li a::before,
-.woocommerce-tabs .panel h2::after,
 .woocommerce-tabs .panel h2::before {
     content: "" !important;
     display: none !important;
 }
+
+.woocommerce-tabs ul.tabs li::after,
+.woocommerce-tabs ul.tabs li a::after,
+.wc-tabs li::after,
+.wc-tabs li a::after,
+.woocommerce-tabs .panel h2::after,
+.woocommerce-Tabs-panel h2::after,
+.wc-tab-title::after {
+    content: "" !important;
+    display: inline-block !important;
+    width: 14px !important;
+    height: 14px !important;
+    margin-left: 8px !important;
+    vertical-align: middle !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%23555555" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>') !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    transition: transform 0.2s ease !important;
+    font-family: inherit !important;
+}
+
+.woocommerce-tabs ul.tabs li.active::after,
+.woocommerce-tabs ul.tabs li.active a::after {
+    transform: rotate(180deg) !important;
+}
+
 
 
 
