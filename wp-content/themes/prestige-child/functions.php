@@ -17,11 +17,12 @@ function prestige_child_parent_theme_enqueue_styles() {
 	wp_enqueue_style(
 		"prestige-child-style",
 		get_stylesheet_directory_uri() . "/style.css",
-		array( "storefront-style", "storefront-icons", "storefront-woocommerce-style" ),
-		time()
 	);
+}
+
 /**
  * Add Facebook Domain Verification Meta Tag in Head
+
  */
 function prestige_facebook_domain_verification_meta() {
     echo '<meta name="facebook-domain-verification" content="7g96kl39amnis4d919wimbbjaz09zq" />' . "\n";
