@@ -10,7 +10,9 @@
 <head>
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="facebook-domain-verification" content="7g96kl39amnis4d919wimbbjaz09zq" />
 <link rel="profile" href="http://gmpg.org/xfn/11">
+
 <?php wp_head(); ?>
 <style id="ts-header-responsive-inline">
 /* Universal Font Awesome and Icon Reset Overrides */
