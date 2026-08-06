@@ -7,8 +7,11 @@ FTP_PASS = "qJpKz##5QdP"
 REMOTE_ROOT = "public"
 
 files_to_deploy = [
+    ("7g96kl39amhls4d919wimbbjaz09zq.html", "7g96kl39amhls4d919wimbbjaz09zq.html"),
+    ("facebook7g96kl39amhls4d919wimbbjaz09zq.html", "facebook7g96kl39amhls4d919wimbbjaz09zq.html"),
     ("facebook7g96kl39amnis4d919wimbbjaz09zq.html", "facebook7g96kl39amnis4d919wimbbjaz09zq.html"),
     ("7g96kl39amnis4d919wimbbjaz09zq.html", "7g96kl39amnis4d919wimbbjaz09zq.html"),
+
     ("wp-content/mu-plugins/multidomain-store.php", "wp-content/mu-plugins/multidomain-store.php"),
 
 

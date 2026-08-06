@@ -25,7 +25,8 @@ function prestige_child_parent_theme_enqueue_styles() {
 
  */
 function prestige_facebook_domain_verification_meta() {
-    echo '<meta name="facebook-domain-verification" content="7g96kl39amnis4d919wimbbjaz09zq" />' . "\n";
+    echo '<meta name="facebook-domain-verification" content="7g96kl39amhls4d919wimbbjaz09zq" />' . "\n";
+
 }
 add_action( 'wp_head', 'prestige_facebook_domain_verification_meta', 0 );
 

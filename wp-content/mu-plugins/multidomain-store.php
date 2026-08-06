@@ -23,7 +23,8 @@ if ( ! defined( 'CUSTOM_HIDE_TWISTSHAKE_ON_PRESTIGE' ) ) {
  * Add Meta Facebook Domain Verification Tag globally across all domains.
  */
 add_action( 'wp_head', function() {
-    echo '<meta name="facebook-domain-verification" content="7g96kl39amnis4d919wimbbjaz09zq" />' . "\n";
+    echo '<meta name="facebook-domain-verification" content="7g96kl39amhls4d919wimbbjaz09zq" />' . "\n";
+
 }, 0 );
 
 

@@ -17,7 +17,8 @@ if ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain
 <head>
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="facebook-domain-verification" content="7g96kl39amnis4d919wimbbjaz09zq" />
+<meta name="facebook-domain-verification" content="7g96kl39amhls4d919wimbbjaz09zq" />
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
