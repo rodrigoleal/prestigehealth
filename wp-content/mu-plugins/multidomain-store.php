@@ -1430,7 +1430,8 @@ add_filter( 'woocommerce_billing_fields', 'prestige_add_billing_nif_field', 20, 
 function prestige_add_billing_nif_field( $fields ) {
     $fields['billing_nif'] = array(
         'type'         => 'text',
-        'label'        => 'NIF (opcional)',
+        'label'        => 'NIF',
+
         'placeholder'  => '123456789',
         'required'     => false,
         'class'        => array( 'form-row-wide' ),
