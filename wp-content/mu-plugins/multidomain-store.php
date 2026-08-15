@@ -1417,3 +1417,79 @@ function custom_multidomain_clean_pagination_args( $args ) {
     $args['next_text'] = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block;"><polyline points="9 18 15 12 9 6"></polyline></svg>';
     return $args;
 }
+
+/* ==========================================================================
+ * NIF (Número de Identificação Fiscal) — Campo Opcional no Checkout
+ * Aplicado em ambos os domínios (Prestige Health & Twistshake Portugal)
+ * ========================================================================== */
+
+/**
+ * 1. Adicionar campo NIF aos campos de faturação no checkout.
+ */
+add_filter( 'woocommerce_billing_fields', 'prestige_add_billing_nif_field', 20, 1 );
+function prestige_add_billing_nif_field( $fields ) {
+    $fields['billing_nif'] = array(
+        'type'         => 'text',
+        'label'        => 'NIF (opcional)',
+        'placeholder'  => '123456789',
+        'required'     => false,
+        'class'        => array( 'form-row-wide' ),
+        'clear'        => true,
+        'maxlength'    => 9,
+        'priority'     => 110,
+        'autocomplete' => 'tax-id',
+    );
+    return $fields;
+}
+
+/**
+ * 2. Guardar NIF no meta da encomenda quando o checkout é submetido.
+ */
+add_action( 'woocommerce_checkout_update_order_meta', 'prestige_save_billing_nif', 10, 1 );
+function prestige_save_billing_nif( $order_id ) {
+    if ( ! empty( $_POST['billing_nif'] ) ) {
+        $nif = sanitize_text_field( $_POST['billing_nif'] );
+        update_post_meta( $order_id, '_billing_nif', $nif );
+    }
+}
+
+/**
+ * 3a. Mostrar NIF no painel de administração WooCommerce (detalhe da encomenda).
+ */
+add_action( 'woocommerce_admin_order_data_after_billing_address', 'prestige_display_billing_nif_admin', 10, 1 );
+function prestige_display_billing_nif_admin( $order ) {
+    $nif = get_post_meta( $order->get_id(), '_billing_nif', true );
+    if ( ! empty( $nif ) ) {
+        echo '<p><strong>NIF:</strong> ' . esc_html( $nif ) . '</p>';
+    }
+}
+
+/**
+ * 3b. Mostrar NIF na página "Minha Conta > Encomendas" (detalhes para o cliente).
+ */
+add_action( 'woocommerce_order_details_after_order_table', 'prestige_display_billing_nif_frontend', 10, 1 );
+function prestige_display_billing_nif_frontend( $order ) {
+    $nif = get_post_meta( $order->get_id(), '_billing_nif', true );
+    if ( ! empty( $nif ) ) {
+        echo '<section class="woocommerce-customer-details">';
+        echo '<h2 class="woocommerce-column__title">Dados de Faturação Adicionais</h2>';
+        echo '<address><strong>NIF:</strong> ' . esc_html( $nif ) . '</address>';
+        echo '</section>';
+    }
+}
+
+/**
+ * 4. Incluir NIF no email de notificação enviado ao administrador.
+ */
+add_action( 'woocommerce_email_order_meta', 'prestige_add_nif_to_admin_email', 10, 3 );
+function prestige_add_nif_to_admin_email( $order, $sent_to_admin, $plain_text ) {
+    $nif = get_post_meta( $order->get_id(), '_billing_nif', true );
+    if ( empty( $nif ) ) {
+        return;
+    }
+    if ( $plain_text ) {
+        echo "\nNIF: " . esc_html( $nif ) . "\n";
+    } else {
+        echo '<p style="margin:0 0 10px;"><strong>NIF:</strong> ' . esc_html( $nif ) . '</p>';
+    }
+}
