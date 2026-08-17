@@ -1504,7 +1504,11 @@ function prestige_add_nif_to_admin_email( $order, $sent_to_admin, $plain_text ) 
  * Helper: detecta a loja a partir do domínio ou do meta da encomenda (funciona em cron).
  */
 function prestige_email_is_twistshake( $email_object = null ) {
-    // 1. Tenta pelo objeto de email (ordem associada) — robusto em cron
+    // 1. Global definido via hooks de encomenda (robusto em cron/woo)
+    if ( ! empty( $GLOBALS['_prestige_email_domain_override'] ) ) {
+        return $GLOBALS['_prestige_email_domain_override'] === 'twistshakeportugal.pt';
+    }
+    // 2. Tenta pelo objeto de email (ordem associada)
     if ( $email_object && isset( $email_object->object ) ) {
         $order = $email_object->object;
         if ( $order instanceof WC_Abstract_Order ) {
@@ -1517,7 +1521,7 @@ function prestige_email_is_twistshake( $email_object = null ) {
             }
         }
     }
-    // 2. Fallback: detecção por HTTP_HOST (pedidos síncronos)
+    // 3. Fallback: detecção por HTTP_HOST (pedidos síncronos)
     return custom_multidomain_is_twistshake();
 }
 
@@ -1540,43 +1544,65 @@ function prestige_dynamic_email_from_address( $from_address, $email ) {
     return 'marketing@prestigehealth.pt';
 }
 
+/* ==========================================================================
+ * Links de Email — Substituição de Domínio por Loja
+ * Garante que os links nos emails apontam para o domínio correto.
+ * ========================================================================== */
+
 /**
- * Forçar home_url correto durante o envio de emails WooCommerce em cron.
- * Guarda o domínio da encomenda num global antes de gerar o conteúdo do email.
+ * 1. Definir contexto de domínio ANTES do envio dos emails de encomenda.
+ *    Dispara quando o status da encomenda muda (priority 1 = antes do WooCommerce enviar emails a priority 10).
  */
-add_action( 'woocommerce_email_before_send', 'prestige_email_set_store_context', 1, 3 );
-function prestige_email_set_store_context( $email, $to, $subject ) {
-    if ( ! isset( $email->object ) ) {
-        return;
-    }
-    $order = $email->object;
-    if ( ! $order instanceof WC_Abstract_Order ) {
-        return;
-    }
-    $source = get_post_meta( $order->get_id(), '_order_source_domain', true );
+add_action( 'woocommerce_order_status_changed', 'prestige_email_set_domain_for_order', 1, 3 );
+function prestige_email_set_domain_for_order( $order_id, $old_status, $new_status ) {
+    $source = get_post_meta( $order_id, '_order_source_domain', true );
     if ( $source ) {
         $GLOBALS['_prestige_email_domain_override'] = $source;
     }
 }
 
-add_action( 'woocommerce_email_after_send', 'prestige_email_clear_store_context', 99 );
-function prestige_email_clear_store_context() {
+/**
+ * 2. Definir contexto no checkout (nova encomenda).
+ *    Dispara antes dos emails de nova encomenda serem enviados.
+ */
+add_action( 'woocommerce_checkout_order_processed', 'prestige_email_set_domain_checkout', 1 );
+function prestige_email_set_domain_checkout( $order_id ) {
+    $source = get_post_meta( $order_id, '_order_source_domain', true );
+    if ( $source ) {
+        $GLOBALS['_prestige_email_domain_override'] = $source;
+    }
+}
+
+/**
+ * 3. Limpar contexto após os emails da encomenda serem enviados.
+ *    Priority 99 = depois dos emails WooCommerce (priority 10).
+ */
+add_action( 'woocommerce_order_status_changed', 'prestige_email_clear_domain_override', 99, 3 );
+function prestige_email_clear_domain_override( $order_id, $old_status, $new_status ) {
     unset( $GLOBALS['_prestige_email_domain_override'] );
 }
 
 /**
- * Adicionar detecção de contexto de email ao filtro option_home.
- * Garante que links nas emails apontem para o domínio correto mesmo em cron.
+ * 4. Post-processar o conteúdo de TODOS os emails WordPress:
+ *    Substituir domínio prestige por twistshake quando o contexto for Twistshake.
+ *    Esta é a camada mais fiável — age sobre o HTML final antes do envio.
  */
-add_filter( 'option_home', 'prestige_email_override_home_url', 98 );
-add_filter( 'option_siteurl', 'prestige_email_override_home_url', 98 );
-function prestige_email_override_home_url( $url ) {
-    if ( empty( $GLOBALS['_prestige_email_domain_override'] ) ) {
-        return $url;
+add_filter( 'wp_mail', 'prestige_fix_twistshake_email_links', 99 );
+function prestige_fix_twistshake_email_links( $args ) {
+    $is_twistshake = ! empty( $GLOBALS['_prestige_email_domain_override'] )
+        ? ( $GLOBALS['_prestige_email_domain_override'] === 'twistshakeportugal.pt' )
+        : custom_multidomain_is_twistshake();
+
+    if ( $is_twistshake && ! empty( $args['message'] ) ) {
+        $args['message'] = str_replace(
+            array(
+                'https://loja.prestigehealth.pt',
+                'http://loja.prestigehealth.pt',
+                'loja.prestigehealth.pt',
+            ),
+            'https://twistshakeportugal.pt',
+            $args['message']
+        );
     }
-    $source = $GLOBALS['_prestige_email_domain_override'];
-    if ( $source === 'twistshakeportugal.pt' ) {
-        return 'https://twistshakeportugal.pt';
-    }
-    return $url;
+    return $args;
 }
