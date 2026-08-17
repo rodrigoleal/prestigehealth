@@ -260,7 +260,7 @@
 				<ul class="ts-footer-contacts">
 					<li>
 						<span class="ts-contact-icon">✉️</span>
-						<a href="mailto:geral@prestigehealth.pt">geral@prestigehealth.pt</a>
+						<a href="mailto:marketing@prestigehealth.pt">marketing@prestigehealth.pt</a>
 					</li>
 					<li>
 						<span class="ts-contact-icon">📞</span>

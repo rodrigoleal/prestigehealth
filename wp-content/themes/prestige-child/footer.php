@@ -41,7 +41,7 @@ if ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain
                     <div class="footer-contact-block">
                         <p class="contact-lead">Tem alguma dúvida? Receba apoio direto</p>
                         <a href="tel:252095673" class="contact-main">252 095 673</a>
-                        <a href="mailto:geral@prestigehealth.pt" class="contact-main">geral@prestigehealth.pt</a>
+                        <a href="mailto:marketing@prestigehealth.pt" class="contact-main">marketing@prestigehealth.pt</a>
                         <span class="contact-note">(Chamada para a rede fixa nacional)</span>
                     </div>
                 </div>
