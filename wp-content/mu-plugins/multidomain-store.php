@@ -1494,3 +1494,30 @@ function prestige_add_nif_to_admin_email( $order, $sent_to_admin, $plain_text ) 
         echo '<p style="margin:0 0 10px;"><strong>NIF:</strong> ' . esc_html( $nif ) . '</p>';
     }
 }
+
+/* ==========================================================================
+ * Emails Dinâmicos por Loja — "De" Nome e Endereço
+ * Prestige Health vs. Twistshake Portugal
+ * ========================================================================== */
+
+/**
+ * Filtrar o nome "De" dos emails WooCommerce por domínio ativo.
+ */
+add_filter( 'woocommerce_email_from_name', 'prestige_dynamic_email_from_name', 99, 2 );
+function prestige_dynamic_email_from_name( $from_name, $email ) {
+    if ( custom_multidomain_is_twistshake() ) {
+        return 'Twistshake Portugal';
+    }
+    return 'Prestige Health';
+}
+
+/**
+ * Filtrar o endereço "De" dos emails WooCommerce por domínio ativo.
+ */
+add_filter( 'woocommerce_email_from_address', 'prestige_dynamic_email_from_address', 99, 2 );
+function prestige_dynamic_email_from_address( $from_address, $email ) {
+    if ( custom_multidomain_is_twistshake() ) {
+        return 'marketing@prestigehealth.pt';
+    }
+    return 'marketing@prestigehealth.pt';
+}
