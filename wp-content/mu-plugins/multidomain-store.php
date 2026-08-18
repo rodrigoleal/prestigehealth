@@ -1028,7 +1028,8 @@ function custom_multidomain_render_islands_notice() {
     $is_twistshake = custom_multidomain_is_twistshake();
     
     if ( $is_twistshake ) {
-        $contact_email = 'geral@twistshakeportugal.pt';
+        $contact_email = 'marketing@prestigehealth.pt';
+
         $contact_phone = '+351 91 663 85 70';
         $phone_link    = 'tel:+351916638570';
         $phone_note    = '(Chamada para a rede móvel nacional)';
