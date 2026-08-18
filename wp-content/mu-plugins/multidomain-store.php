@@ -1548,11 +1548,26 @@ function prestige_dynamic_email_from_address( $from_address, $email ) {
 /* ==========================================================================
  * Links de Email — Substituição de Domínio por Loja
  * Garante que os links nos emails apontam para o domínio correto.
+ *
+ * Estratégia: detectar o domínio no início do request (HTTP_HOST/cookie)
+ * e guardar numa constante global. O wp_mail filter usa essa constante
+ * para substituir os links no HTML final do email.
  * ========================================================================== */
 
+// Detectar e guardar contexto de loja no início do request.
+// Esta constante fica disponível durante TODO o ciclo de vida do request,
+// incluindo quando wp_mail é chamado posteriormente.
+if ( ! defined( 'PRESTIGE_CURRENT_STORE' ) ) {
+    if ( custom_multidomain_is_twistshake() ) {
+        define( 'PRESTIGE_CURRENT_STORE', 'twistshake' );
+    } else {
+        define( 'PRESTIGE_CURRENT_STORE', 'prestige' );
+    }
+}
+
 /**
- * 1. Definir contexto de domínio ANTES do envio dos emails de encomenda.
- *    Dispara quando o status da encomenda muda (priority 1 = antes do WooCommerce enviar emails a priority 10).
+ * 1. Definir contexto via order meta (para cron/emails futuros).
+ *    O meta '_order_source_domain' já é guardado em woocommerce_checkout_create_order.
  */
 add_action( 'woocommerce_order_status_changed', 'prestige_email_set_domain_for_order', 1, 3 );
 function prestige_email_set_domain_for_order( $order_id, $old_status, $new_status ) {
@@ -1562,46 +1577,46 @@ function prestige_email_set_domain_for_order( $order_id, $old_status, $new_statu
     }
 }
 
-/**
- * 2. Definir contexto no checkout (nova encomenda).
- *    Dispara antes dos emails de nova encomenda serem enviados.
- */
-add_action( 'woocommerce_checkout_order_processed', 'prestige_email_set_domain_checkout', 1 );
-function prestige_email_set_domain_checkout( $order_id ) {
-    $source = get_post_meta( $order_id, '_order_source_domain', true );
-    if ( $source ) {
-        $GLOBALS['_prestige_email_domain_override'] = $source;
-    }
-}
-
-/**
- * 3. Limpar contexto após os emails da encomenda serem enviados.
- *    Priority 99 = depois dos emails WooCommerce (priority 10).
- */
 add_action( 'woocommerce_order_status_changed', 'prestige_email_clear_domain_override', 99, 3 );
 function prestige_email_clear_domain_override( $order_id, $old_status, $new_status ) {
     unset( $GLOBALS['_prestige_email_domain_override'] );
 }
 
 /**
- * 4. Post-processar o conteúdo de TODOS os emails WordPress:
- *    Substituir domínio prestige por twistshake quando o contexto for Twistshake.
- *    Esta é a camada mais fiável — age sobre o HTML final antes do envio.
+ * 2. Post-processar o HTML final de TODOS os emails WordPress.
+ *    Usa 3 fontes de contexto em ordem de prioridade:
+ *    a) Global de encomenda (cron com status change)
+ *    b) Constante do request atual (HTTP_HOST/cookie detetado no início)
+ *    c) custom_multidomain_is_twistshake() como último fallback
  */
 add_filter( 'wp_mail', 'prestige_fix_twistshake_email_links', 99 );
 function prestige_fix_twistshake_email_links( $args ) {
-    $is_twistshake = ! empty( $GLOBALS['_prestige_email_domain_override'] )
-        ? ( $GLOBALS['_prestige_email_domain_override'] === 'twistshakeportugal.pt' )
-        : custom_multidomain_is_twistshake();
+    // Determinar se é Twistshake
+    if ( ! empty( $GLOBALS['_prestige_email_domain_override'] ) ) {
+        // Contexto de cron com status change
+        $is_twistshake = ( $GLOBALS['_prestige_email_domain_override'] === 'twistshakeportugal.pt' );
+    } elseif ( defined( 'PRESTIGE_CURRENT_STORE' ) ) {
+        // Constante definida no início do request (mais fiável)
+        $is_twistshake = ( PRESTIGE_CURRENT_STORE === 'twistshake' );
+    } else {
+        $is_twistshake = custom_multidomain_is_twistshake();
+    }
 
     if ( $is_twistshake && ! empty( $args['message'] ) ) {
+        // Substituir domínio nos links do email (não afeta endereços de email @)
         $args['message'] = str_replace(
             array(
                 'https://loja.prestigehealth.pt',
                 'http://loja.prestigehealth.pt',
-                'loja.prestigehealth.pt',
+                'href="https://loja.prestigehealth.pt',
+                'href="http://loja.prestigehealth.pt',
             ),
-            'https://twistshakeportugal.pt',
+            array(
+                'https://twistshakeportugal.pt',
+                'https://twistshakeportugal.pt',
+                'href="https://twistshakeportugal.pt',
+                'href="https://twistshakeportugal.pt',
+            ),
             $args['message']
         );
     }
