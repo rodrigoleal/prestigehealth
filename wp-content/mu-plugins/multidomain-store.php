@@ -1545,6 +1545,34 @@ function prestige_dynamic_email_from_address( $from_address, $email ) {
     return 'marketing@prestigehealth.pt';
 }
 
+/**
+ * Filtrar o nome do site (blogname) dinamicamente por loja.
+ * Usado pelo WooCommerce no corpo dos emails: cabeçalho, rodapé e texto "conta em X".
+ */
+add_filter( 'option_blogname', 'prestige_dynamic_blogname', 99 );
+function prestige_dynamic_blogname( $value ) {
+    if ( defined( 'PRESTIGE_CURRENT_STORE' ) && PRESTIGE_CURRENT_STORE === 'twistshake' ) {
+        return 'Twistshake Portugal';
+    }
+    if ( defined( 'PRESTIGE_CURRENT_STORE' ) && PRESTIGE_CURRENT_STORE === 'prestige' ) {
+        return 'Prestige Health';
+    }
+    return $value;
+}
+
+/**
+ * Filtrar o rodapé dos emails WooCommerce por loja.
+ * Inclui o URL e nome do site correto.
+ */
+add_filter( 'woocommerce_email_footer_text', 'prestige_dynamic_email_footer', 99 );
+function prestige_dynamic_email_footer( $text ) {
+    if ( defined( 'PRESTIGE_CURRENT_STORE' ) && PRESTIGE_CURRENT_STORE === 'twistshake' ) {
+        return 'Twistshake Portugal &bull; <a href="https://twistshakeportugal.pt">www.twistshakeportugal.pt</a> &bull; <a href="mailto:marketing@prestigehealth.pt">marketing@prestigehealth.pt</a>';
+    }
+    return 'Prestige Health &bull; <a href="https://loja.prestigehealth.pt">www.prestigehealth.pt</a> &bull; <a href="mailto:marketing@prestigehealth.pt">marketing@prestigehealth.pt</a>';
+}
+
+
 /* ==========================================================================
  * Links de Email — Substituição de Domínio por Loja
  * Garante que os links nos emails apontam para o domínio correto.
@@ -1602,23 +1630,143 @@ function prestige_fix_twistshake_email_links( $args ) {
         $is_twistshake = custom_multidomain_is_twistshake();
     }
 
-    if ( $is_twistshake && ! empty( $args['message'] ) ) {
-        // Substituir domínio nos links do email (não afeta endereços de email @)
-        $args['message'] = str_replace(
-            array(
-                'https://loja.prestigehealth.pt',
-                'http://loja.prestigehealth.pt',
-                'href="https://loja.prestigehealth.pt',
-                'href="http://loja.prestigehealth.pt',
-            ),
-            array(
-                'https://twistshakeportugal.pt',
-                'https://twistshakeportugal.pt',
-                'href="https://twistshakeportugal.pt',
-                'href="https://twistshakeportugal.pt',
-            ),
-            $args['message']
-        );
+    if ( $is_twistshake ) {
+        // ==========================================
+        // MODO: TWISTSHAKE PORTUGAL
+        // ==========================================
+        if ( ! empty( $args['subject'] ) ) {
+            $args['subject'] = str_replace(
+                array( 'PRESTIGE HEALTH', 'Prestige Health' ),
+                array( 'TWISTSHAKE PORTUGAL', 'Twistshake Portugal' ),
+                $args['subject']
+            );
+        }
+
+        if ( ! empty( $args['message'] ) ) {
+            $args['message'] = str_replace(
+                array(
+                    'https://loja.prestigehealth.pt',
+                    'http://loja.prestigehealth.pt',
+                    'href="https://loja.prestigehealth.pt',
+                    'href="http://loja.prestigehealth.pt',
+                    'www.prestigehealth.pt',
+                ),
+                array(
+                    'https://twistshakeportugal.pt',
+                    'https://twistshakeportugal.pt',
+                    'href="https://twistshakeportugal.pt',
+                    'href="https://twistshakeportugal.pt',
+                    'www.twistshakeportugal.pt',
+                ),
+                $args['message']
+            );
+        }
+    } else {
+        // ==========================================
+        // MODO: PRESTIGE HEALTH
+        // Substitui assinaturas e cabeçalhos hardcoded de Twistshake para Prestige Health
+        // ==========================================
+        if ( ! empty( $args['subject'] ) ) {
+            $args['subject'] = str_replace(
+                array( 'TWISTSHAKE PORTUGAL', 'Twistshake Portugal', 'TWISTSHAKE' ),
+                array( 'PRESTIGE HEALTH', 'Prestige Health', 'PRESTIGE HEALTH' ),
+                $args['subject']
+            );
+        }
+
+        if ( ! empty( $args['message'] ) ) {
+            $args['message'] = str_replace(
+                array(
+                    'https://twistshakeportugal.pt',
+                    'http://twistshakeportugal.pt',
+                    'href="https://twistshakeportugal.pt',
+                    'href="http://twistshakeportugal.pt',
+                    'www.twistshakeportugal.pt',
+                    'twistshakeportugal.pt',
+                    'TWISTSHAKE PORTUGAL',
+                    'Twistshake Portugal',
+                ),
+                array(
+                    'https://loja.prestigehealth.pt',
+                    'https://loja.prestigehealth.pt',
+                    'href="https://loja.prestigehealth.pt',
+                    'href="https://loja.prestigehealth.pt',
+                    'www.prestigehealth.pt',
+                    'loja.prestigehealth.pt',
+                    'PRESTIGE HEALTH',
+                    'Prestige Health',
+                ),
+                $args['message']
+            );
+        }
     }
+
     return $args;
+}
+
+
+/* ==========================================================================
+ * Configuração SMTP Nativa — sem plugin
+ * Apenas ativo em produção (não em localhost/Docker).
+ * Servidor: mail.prestigehealth.pt | Porta: 465 | SSL
+ * ========================================================================== */
+
+/**
+ * Detectar se estamos em ambiente local (Docker/localhost).
+ */
+function prestige_is_local_env() {
+    $host = isset( $_SERVER['HTTP_HOST'] ) ? $_SERVER['HTTP_HOST'] : '';
+    return (
+        strpos( $host, 'localhost' ) !== false ||
+        strpos( $host, '127.0.0.1' ) !== false ||
+        strpos( $host, ':8081' ) !== false ||
+        strpos( $host, '.local' ) !== false
+    );
+}
+
+/**
+ * Configurar PHPMailer para usar SMTP do hosting em produção.
+ * Substitui o mail() nativo do PHP — mais fiável e evita spam.
+ */
+add_action( 'phpmailer_init', 'prestige_configure_smtp' );
+function prestige_configure_smtp( $phpmailer ) {
+    // Não aplicar em ambiente local
+    if ( prestige_is_local_env() ) {
+        return;
+    }
+
+    // Usar relay local do hosting (localhost:25) — sem autenticação, sem SSL.
+    // É o método mais fiável em hosting partilhado: o Postfix local já trata
+    // do DKIM, SPF e entrega para qualquer destino externo.
+    $phpmailer->isSMTP();
+    $phpmailer->Host       = '127.0.0.1';
+    $phpmailer->Port       = 25;
+    $phpmailer->SMTPAuth   = false;
+    $phpmailer->SMTPSecure = '';
+    $phpmailer->SMTPAutoTLS = false;
+
+
+    // Remetente padrão (pode ser sobreposto pelos filtros de loja)
+    if ( empty( $phpmailer->From ) || $phpmailer->From === 'wordpress@' . gethostname() ) {
+        $phpmailer->From     = 'marketing@prestigehealth.pt';
+        $phpmailer->FromName = defined( 'PRESTIGE_CURRENT_STORE' ) && PRESTIGE_CURRENT_STORE === 'twistshake'
+            ? 'Twistshake Portugal'
+            : 'Prestige Health';
+    }
+}
+
+/**
+ * Definir remetente padrão via filtros WordPress (complementa phpmailer_init).
+ */
+add_filter( 'wp_mail_from', 'prestige_smtp_from_email' );
+function prestige_smtp_from_email( $email ) {
+    return 'marketing@prestigehealth.pt';
+}
+
+add_filter( 'wp_mail_from_name', 'prestige_smtp_from_name' );
+function prestige_smtp_from_name( $name ) {
+    if ( defined( 'PRESTIGE_CURRENT_STORE' ) && PRESTIGE_CURRENT_STORE === 'twistshake' ) {
+        return 'Twistshake Portugal';
+    }
+    return 'Prestige Health';
 }
