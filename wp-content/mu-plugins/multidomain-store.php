@@ -20,12 +20,88 @@ if ( ! defined( 'CUSTOM_HIDE_TWISTSHAKE_ON_PRESTIGE' ) ) {
 }
 
 /**
- * Add Meta Facebook Domain Verification Tag globally across all domains.
+ * Add Meta Facebook and Google Search Console Domain Verification Tags globally across all domains.
  */
 add_action( 'wp_head', function() {
     echo '<meta name="facebook-domain-verification" content="7g96kl39amhls4d919wimbbjaz09zq" />' . "\n";
-
+    echo '<meta name="google-site-verification" content="350ee7dc820bf150" />' . "\n";
 }, 0 );
+
+/**
+ * Google Analytics 4 (GA4) Tracking — Dynamic by Storefront
+ * Twistshake: G-E4VCC4K585 | Prestige Health: G-BBXSN7WY8Q
+ */
+add_action( 'wp_head', 'prestige_google_analytics_tag', 1 );
+function prestige_google_analytics_tag() {
+    $is_twistshake = custom_multidomain_is_twistshake();
+    $ga4_id = $is_twistshake ? 'G-E4VCC4K585' : 'G-BBXSN7WY8Q';
+
+    if ( empty( $ga4_id ) ) {
+        return;
+    }
+    ?>
+<!-- Google Analytics 4 (GA4) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo esc_attr( $ga4_id ); ?>"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '<?php echo esc_js( $ga4_id ); ?>', {
+    'send_page_view': true,
+    'cookie_flags': 'SameSite=None;Secure'
+  });
+</script>
+    <?php
+}
+
+/**
+ * GA4 E-commerce Purchase Event Tracking on Order Completed (Thank You Page)
+ */
+add_action( 'woocommerce_thankyou', 'prestige_ga4_ecommerce_purchase', 20 );
+function prestige_ga4_ecommerce_purchase( $order_id ) {
+    if ( ! $order_id ) {
+        return;
+    }
+    
+    $order = wc_get_order( $order_id );
+    if ( ! $order ) {
+        return;
+    }
+    
+    // Prevent duplicate purchase tracking on page refresh
+    if ( $order->get_meta( '_ga4_purchase_tracked' ) ) {
+        return;
+    }
+    $order->update_meta_data( '_ga4_purchase_tracked', '1' );
+    $order->save();
+    
+    $items = array();
+    foreach ( $order->get_items() as $item_id => $item ) {
+        $product = $item->get_product();
+        $items[] = array(
+            'item_id'   => $product ? ( $product->get_sku() ?: (string) $product->get_id() ) : (string) $item_id,
+            'item_name' => $item->get_name(),
+            'price'     => (float) ( $item->get_total() / max( 1, $item->get_quantity() ) ),
+            'quantity'  => (int) $item->get_quantity(),
+        );
+    }
+    
+    $purchase_data = array(
+        'transaction_id' => (string) $order->get_order_number(),
+        'value'          => (float) $order->get_total(),
+        'tax'            => (float) $order->get_total_tax(),
+        'shipping'       => (float) $order->get_shipping_total(),
+        'currency'       => $order->get_currency(),
+        'items'          => $items,
+    );
+    ?>
+<script>
+if (typeof gtag === 'function') {
+    gtag('event', 'purchase', <?php echo json_encode( $purchase_data ); ?>);
+}
+</script>
+    <?php
+}
 
 
 /**

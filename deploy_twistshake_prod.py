@@ -11,6 +11,7 @@ files_to_deploy = [
     ("facebook7g96kl39amhls4d919wimbbjaz09zq.html", "facebook7g96kl39amhls4d919wimbbjaz09zq.html"),
     ("facebook7g96kl39amnis4d919wimbbjaz09zq.html", "facebook7g96kl39amnis4d919wimbbjaz09zq.html"),
     ("7g96kl39amnis4d919wimbbjaz09zq.html", "7g96kl39amnis4d919wimbbjaz09zq.html"),
+    ("google350ee7dc820bf150.html", "google350ee7dc820bf150.html"),
 
     ("wp-content/mu-plugins/multidomain-store.php", "wp-content/mu-plugins/multidomain-store.php"),
 
