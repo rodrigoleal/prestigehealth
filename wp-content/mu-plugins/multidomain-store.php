@@ -1503,11 +1503,24 @@ function custom_multidomain_clean_pagination_args( $args ) {
 /**
  * 1. Tornar o telefone de faturação obrigatório no checkout e adicionar campo NIF.
  */
+add_filter( 'option_woocommerce_checkout_phone_field', function() {
+    return 'required';
+}, 999 );
+
+add_filter( 'woocommerce_default_address_fields', 'prestige_force_default_phone_required', 999 );
+function prestige_force_default_phone_required( $fields ) {
+    if ( isset( $fields['phone'] ) ) {
+        $fields['phone']['required'] = true;
+    }
+    return $fields;
+}
+
 add_filter( 'woocommerce_billing_fields', 'prestige_customize_billing_fields', 99, 1 );
 function prestige_customize_billing_fields( $fields ) {
     // Campo de telefone obrigatório em ambas as lojas
     if ( isset( $fields['billing_phone'] ) ) {
         $fields['billing_phone']['required'] = true;
+        $fields['billing_phone']['label']    = 'Telefone';
     }
 
     // Campo NIF (opcional)
@@ -1529,9 +1542,11 @@ add_filter( 'woocommerce_checkout_fields', 'prestige_force_checkout_phone_requir
 function prestige_force_checkout_phone_required( $fields ) {
     if ( isset( $fields['billing']['billing_phone'] ) ) {
         $fields['billing']['billing_phone']['required'] = true;
+        $fields['billing']['billing_phone']['label']    = 'Telefone';
     }
     return $fields;
 }
+
 
 
 /**
