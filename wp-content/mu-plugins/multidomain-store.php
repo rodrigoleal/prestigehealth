@@ -28,6 +28,181 @@ add_action( 'wp_head', function() {
 }, 0 );
 
 /**
+ * Universal High-Contrast Styles for WooCommerce Notices and Light Backgrounds
+ * Injected with priority 99999 to guarantee overrides over any Storefront customizer styles.
+ */
+add_action( 'wp_head', 'prestige_universal_contrast_styles', 99999 );
+add_action( 'wp_footer', 'prestige_universal_contrast_styles', 99999 );
+function prestige_universal_contrast_styles() {
+    static $printed = false;
+    if ( $printed ) {
+        return;
+    }
+    $printed = true;
+    ?>
+<style id="prestige-universal-notice-contrast-override">
+/* === 1. WooCommerce Error Notices === */
+.woocommerce-error,
+ul.woocommerce-error,
+div.woocommerce-error,
+.woocommerce-NoticeGroup .woocommerce-error,
+.woocommerce-NoticeGroup-checkout .woocommerce-error,
+body.twistshake-theme .woocommerce-error,
+body.twistshake-theme ul.woocommerce-error {
+    background-color: #FEF2F2 !important;
+    color: #991B1B !important;
+    border: 1px solid #FECACA !important;
+    border-left: 5px solid #EF4444 !important;
+    border-radius: 8px !important;
+    padding: 16px 20px 16px 50px !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 24px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    text-shadow: none !important;
+}
+
+.woocommerce-error li,
+ul.woocommerce-error li,
+.woocommerce-NoticeGroup .woocommerce-error li,
+.woocommerce-NoticeGroup-checkout .woocommerce-error li,
+body.twistshake-theme .woocommerce-error li,
+body.twistshake-theme ul.woocommerce-error li,
+.woocommerce-error *,
+ul.woocommerce-error * {
+    color: #991B1B !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    text-shadow: none !important;
+}
+
+.woocommerce-error a,
+ul.woocommerce-error a,
+.woocommerce-error a:hover,
+.woocommerce-error strong,
+.woocommerce-error b {
+    color: #7F1D1D !important;
+    font-weight: 700 !important;
+    text-decoration: underline !important;
+}
+
+.woocommerce-error::before {
+    color: #EF4444 !important;
+}
+
+/* === 2. WooCommerce Info Notices (Coupon & Login Boxes) === */
+.woocommerce-info,
+div.woocommerce-info,
+.woocommerce-NoticeGroup .woocommerce-info,
+.woocommerce-NoticeGroup-checkout .woocommerce-info,
+body.twistshake-theme .woocommerce-info,
+body.twistshake-theme div.woocommerce-info {
+    background-color: #EFF6FF !important;
+    color: #1E40AF !important;
+    border: 1px solid #BFDBFE !important;
+    border-left: 5px solid #3B82F6 !important;
+    border-radius: 8px !important;
+    padding: 16px 20px 16px 50px !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 24px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    text-shadow: none !important;
+}
+
+.woocommerce-info *,
+div.woocommerce-info *,
+body.twistshake-theme .woocommerce-info * {
+    color: #1E40AF !important;
+    text-shadow: none !important;
+}
+
+.woocommerce-info a,
+.woocommerce-info a.showcoupon,
+.woocommerce-info a.showlogin,
+.woocommerce-info a:hover,
+body.twistshake-theme .woocommerce-info a {
+    color: #1D4ED8 !important;
+    font-weight: 700 !important;
+    text-decoration: underline !important;
+}
+
+.woocommerce-info::before {
+    color: #3B82F6 !important;
+}
+
+/* === 3. WooCommerce Success Notices === */
+.woocommerce-message,
+div.woocommerce-message,
+.woocommerce-NoticeGroup .woocommerce-message,
+.woocommerce-NoticeGroup-checkout .woocommerce-message,
+body.twistshake-theme .woocommerce-message {
+    background-color: #F0FDF4 !important;
+    color: #166534 !important;
+    border: 1px solid #BBF7D0 !important;
+    border-left: 5px solid #22C55E !important;
+    border-radius: 8px !important;
+    padding: 16px 20px 16px 50px !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 24px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    text-shadow: none !important;
+}
+
+.woocommerce-message *,
+div.woocommerce-message *,
+body.twistshake-theme .woocommerce-message * {
+    color: #166534 !important;
+    text-shadow: none !important;
+}
+
+.woocommerce-message a,
+.woocommerce-message a:hover {
+    color: #14532D !important;
+    font-weight: 700 !important;
+    text-decoration: underline !important;
+}
+
+.woocommerce-message .button,
+.woocommerce-message .button:hover {
+    background-color: #166534 !important;
+    color: #FFFFFF !important;
+}
+
+.woocommerce-message::before {
+    color: #22C55E !important;
+}
+
+/* === 4. Inline Field Validation Errors on Checkout === */
+p.form-row.woocommerce-invalid label,
+p.form-row.woocommerce-invalid-required-field label {
+    color: #111111 !important;
+}
+
+p.form-row.woocommerce-invalid label span.required,
+p.form-row.woocommerce-invalid-required-field label span.required {
+    color: #EF4444 !important;
+}
+
+/* === 5. Payment Methods & Order Review Boxes === */
+.woocommerce-checkout #payment div.payment_box {
+    background-color: #F8FAFC !important;
+    color: #334155 !important;
+    border: 1px solid #E2E8F0 !important;
+}
+.woocommerce-checkout #payment div.payment_box * {
+    color: #334155 !important;
+}
+.woocommerce-checkout #payment div.payment_box::before {
+    border-bottom-color: #F8FAFC !important;
+}
+</style>
+    <?php
+}
+
+
+/**
  * Google Analytics 4 (GA4) Tracking — Dynamic by Storefront
  * Twistshake: G-E4VCC4K585 | Prestige Health: G-BBXSN7WY8Q
  */

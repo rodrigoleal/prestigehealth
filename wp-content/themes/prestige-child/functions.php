@@ -17,8 +17,20 @@ function prestige_child_parent_theme_enqueue_styles() {
 	wp_enqueue_style(
 		"prestige-child-style",
 		get_stylesheet_directory_uri() . "/style.css",
+		array( "storefront-style" ),
+		file_exists( get_stylesheet_directory() . "/style.css" ) ? filemtime( get_stylesheet_directory() . "/style.css" ) : "1.0.0"
 	);
+
+	if ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain_is_twistshake() ) {
+		wp_enqueue_style(
+			"twistshake-style",
+			get_stylesheet_directory_uri() . "/twistshake.css",
+			array( "prestige-child-style" ),
+			file_exists( get_stylesheet_directory() . "/twistshake.css" ) ? filemtime( get_stylesheet_directory() . "/twistshake.css" ) : "1.0.0"
+		);
+	}
 }
+
 
 /**
  * Add Facebook Domain Verification Meta Tag in Head
