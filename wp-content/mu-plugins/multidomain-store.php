@@ -1501,14 +1501,19 @@ function custom_multidomain_clean_pagination_args( $args ) {
  * ========================================================================== */
 
 /**
- * 1. Adicionar campo NIF aos campos de faturação no checkout.
+ * 1. Tornar o telefone de faturação obrigatório no checkout e adicionar campo NIF.
  */
-add_filter( 'woocommerce_billing_fields', 'prestige_add_billing_nif_field', 20, 1 );
-function prestige_add_billing_nif_field( $fields ) {
+add_filter( 'woocommerce_billing_fields', 'prestige_customize_billing_fields', 99, 1 );
+function prestige_customize_billing_fields( $fields ) {
+    // Campo de telefone obrigatório em ambas as lojas
+    if ( isset( $fields['billing_phone'] ) ) {
+        $fields['billing_phone']['required'] = true;
+    }
+
+    // Campo NIF (opcional)
     $fields['billing_nif'] = array(
         'type'         => 'text',
         'label'        => 'NIF',
-
         'placeholder'  => '123456789',
         'required'     => false,
         'class'        => array( 'form-row-wide' ),
@@ -1519,6 +1524,15 @@ function prestige_add_billing_nif_field( $fields ) {
     );
     return $fields;
 }
+
+add_filter( 'woocommerce_checkout_fields', 'prestige_force_checkout_phone_required', 99, 1 );
+function prestige_force_checkout_phone_required( $fields ) {
+    if ( isset( $fields['billing']['billing_phone'] ) ) {
+        $fields['billing']['billing_phone']['required'] = true;
+    }
+    return $fields;
+}
+
 
 /**
  * 2. Guardar NIF no meta da encomenda quando o checkout é submetido.
