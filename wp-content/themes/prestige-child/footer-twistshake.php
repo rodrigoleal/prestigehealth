@@ -317,7 +317,10 @@
 		<!-- Copyright & Legal Links -->
 		<div class="ts-copyright-bar">
 			<div class="col-full ts-copyright-container">
-				<span>© <?php echo date('Y'); ?> Twistshake Portugal. Todos os direitos reservados.</span>
+				<div class="ts-copyright-text" style="color: #666; font-size: 12px;">
+					<span>© <?php echo date('Y'); ?> Twistshake Portugal. Todos os direitos reservados.</span>
+					<span class="ts-dev-credit" style="margin-left: 10px; color: #888; font-size: 12px;">• Desenvolvido por <a href="https://rodrigoleal.com.br/" target="_blank" rel="noopener noreferrer" style="color: #e07a5f !important; font-weight: 600; text-decoration: none !important;">Rodrigo Leal</a></span>
+				</div>
 				<div class="ts-legal-links" style="display:flex; gap:25px; align-items:center;">
 					<a href="<?php echo esc_url( home_url( '/politica-de-privacidade/' ) ); ?>" style="font-weight:600; color:#2D3748 !important; text-decoration:none !important; font-size:13px !important;">Política de Privacidade</a>
 					<a href="<?php echo esc_url( home_url( '/termos-e-condicoes/' ) ); ?>" style="font-weight:600; color:#2D3748 !important; text-decoration:none !important; font-size:13px !important;">Termos e Condições</a>
@@ -325,6 +328,7 @@
 				</div>
 			</div>
 		</div>
+
 	</footer>
 
 </div><!-- #page -->

@@ -91,11 +91,13 @@ if ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain
             <div class="col-full" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                 <div class="copyright-text" style="color: #666; font-size: 13px;">
                     © <?php echo date('Y'); ?> PRESTIGE HEALTH - Todos os direitos reservados
+                    <span class="dev-credit" style="margin-left: 10px; color: #888; font-size: 12px;">• Desenvolvido por <a href="https://rodrigoleal.com.br/" target="_blank" rel="noopener noreferrer" style="color: #005492; font-weight: 600; text-decoration: none;">Rodrigo Leal</a></span>
                 </div>
                 <div class="legal-links" style="display: flex; gap: 25px; align-items: center;">
                     <a href="<?php echo esc_url( home_url( '/politica-de-privacidade/' ) ); ?>" style="font-weight: 600; color: #2D3748; font-size: 13px; text-decoration: none;">Política de Privacidade</a>
                     <a href="<?php echo esc_url( home_url( '/termos-e-condicoes/' ) ); ?>" style="font-weight: 600; color: #2D3748; font-size: 13px; text-decoration: none;">Termos e Condições</a>
                 </div>
+
                 <div class="payment-methods" style="display: flex; gap: 8px; align-items: center;">
                     <img src="<?php echo esc_url( plugins_url( 'multibanco-ifthen-software-gateway-for-woocommerce/images/mbway_banner.svg' ) ); ?>" alt="MB WAY" class="pay-logo" style="height: 24px; width: auto;">
                     <img src="<?php echo esc_url( plugins_url( 'multibanco-ifthen-software-gateway-for-woocommerce/images/multibanco_banner.svg' ) ); ?>" alt="Multibanco" class="pay-logo" style="height: 24px; width: auto;">
