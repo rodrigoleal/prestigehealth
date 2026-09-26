@@ -371,7 +371,7 @@ td.woocommerce-orders-table__cell-order-actions a:hover::after {
 			</div>
 			<div class="ts-promo-item">
 				<span class="ts-promo-icon">🚚</span>
-				<span>Portes grátis em compras superiores a 70€ para Portugal Continental</span>
+				<span><?php echo esc_html( function_exists( 'custom_get_shipping_promo_text' ) ? custom_get_shipping_promo_text( 'twistshake' ) : 'Portes grátis em compras superiores a 100€ para Portugal Continental' ); ?></span>
 			</div>
 			<div class="ts-promo-item">
 				<span class="ts-promo-icon">📦</span>

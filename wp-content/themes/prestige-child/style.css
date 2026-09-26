@@ -570,7 +570,7 @@ p.stock.in-stock::before,
 
 p.stock.out-of-stock::before,
 .stock.out-of-stock::before {
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="%23EF4444"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>') !important;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="%23D97706"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>') !important;
 }
 
 p.stock {
@@ -585,8 +585,74 @@ p.stock.in-stock {
     color: #059669 !important;
 }
 
-p.stock.out-of-stock {
-    color: #DC2626 !important;
+p.stock.out-of-stock,
+p.stock.custom-coming-soon {
+    color: #D97706 !important;
+}
+
+/* Back In Stock Notifier Form Styling */
+.cwginstock-subscribe-form {
+    margin: 20px 0 25px 0 !important;
+    padding: 20px !important;
+    background: #FFFDF9 !important;
+    border: 1px solid #FDE68A !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 15px rgba(217, 119, 6, 0.08) !important;
+}
+
+.cwginstock-subscribe-form .panel-primary {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+}
+
+.cwginstock-subscribe-form .panel-heading {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 0 10px 0 !important;
+}
+
+.cwginstock-subscribe-form h4 {
+    font-size: 1.1em !important;
+    font-weight: 600 !important;
+    color: #92400E !important;
+    margin: 0 !important;
+    text-align: left !important;
+}
+
+.cwginstock-subscribe-form .form-group {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    margin-bottom: 8px !important;
+}
+
+.cwginstock-subscribe-form input.cwgstock_email {
+    flex: 1 1 200px !important;
+    min-height: 44px !important;
+    padding: 8px 16px !important;
+    border: 1px solid #D1D5DB !important;
+    border-radius: 6px !important;
+    background-color: #FFFFFF !important;
+    font-size: 14px !important;
+}
+
+.cwginstock-subscribe-form button.cwgstock_button {
+    min-height: 44px !important;
+    padding: 8px 22px !important;
+    background: #005492 !important;
+    color: #FFFFFF !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    border: none !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease !important;
+}
+
+.cwginstock-subscribe-form button.cwgstock_button:hover {
+    background: #003e6d !important;
 }
 
 /* 3. Product Tabs & Accordions Fix (Clean & Clutter-Free, No Extra Arrows) */

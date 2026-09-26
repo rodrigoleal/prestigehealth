@@ -255,7 +255,7 @@ td.woocommerce-orders-table__cell-order-actions a:hover::after {
 		</div>
 
 		<div class="custom-promo-bar" style="background-color: #005492; color: #fff; text-align: center; padding: 12px 0; font-weight: bold; font-size: 14px;">
-			Portes grátis para compras superiores a 70€ em Portugal Continental.
+			<?php echo esc_html( function_exists( 'custom_get_shipping_promo_text' ) ? custom_get_shipping_promo_text( 'prestige' ) : 'Portes grátis para compras superiores a 100€ em Portugal Continental.' ); ?>
 		</div>
 
 	</header><!-- #masthead -->

@@ -316,3 +316,74 @@ function twistshake_multidomain_enqueue_styles() {
 }
 add_action( 'wp_enqueue_scripts', 'twistshake_multidomain_enqueue_styles', 9999 );
 
+/**
+ * ---------------------------------------------------------------------------
+ * Gestão de Artigos Esgotados: "Disponível brevemente" & Notificador de Stock
+ * ---------------------------------------------------------------------------
+ */
+
+// 1. Garantir que os artigos esgotados NUNCA desaparecem do catálogo/loja
+add_filter( 'pre_option_woocommerce_hide_out_of_stock_items', function() {
+    return 'no';
+}, 99 );
+
+// 2. Alterar o texto de "Esgotado" para "Disponível brevemente" na página do produto
+function prestige_custom_out_of_stock_availability( $availability, $product ) {
+    if ( ! $product->is_in_stock() ) {
+        $availability['availability'] = __( 'Disponível brevemente', 'prestige-child' );
+        $availability['class'] = 'out-of-stock custom-coming-soon';
+    }
+    return $availability;
+}
+add_filter( 'woocommerce_get_availability', 'prestige_custom_out_of_stock_availability', 99, 2 );
+
+function prestige_custom_out_of_stock_text( $text, $product ) {
+    if ( ! $product->is_in_stock() ) {
+        return __( 'Disponível brevemente', 'prestige-child' );
+    }
+    return $text;
+}
+add_filter( 'woocommerce_get_availability_text', 'prestige_custom_out_of_stock_text', 99, 2 );
+
+// 3. Alterar o botão da listagem/grelha da loja quando o artigo não tem stock
+function prestige_out_of_stock_loop_button_text( $text, $product ) {
+    if ( ! $product->is_in_stock() ) {
+        return __( 'Disponível brevemente', 'prestige-child' );
+    }
+    return $text;
+}
+add_filter( 'woocommerce_product_add_to_cart_text', 'prestige_out_of_stock_loop_button_text', 99, 2 );
+
+// 4. Configurar textos padrão em Português para o plugin Back In Stock Notifier
+function prestige_default_back_in_stock_settings( $settings ) {
+    if ( ! is_array( $settings ) ) {
+        $settings = array();
+    }
+    $defaults = array(
+        'form_title'              => 'Avise-me quando estiver disponível',
+        'form_placeholder'        => 'O seu endereço de e-mail',
+        'name_placeholder'        => 'O seu nome',
+        'button_label'            => 'Avisar-me',
+        'hide_name_field'         => '1', // Apenas pede e-mail por simplicidade e maior conversão
+        'empty_error_message'     => 'O endereço de e-mail não pode estar vazio.',
+        'invalid_email_error'     => 'Por favor, introduza um endereço de e-mail válido.',
+        'success_subscription'    => 'Obrigado! Irá receber uma notificação por e-mail assim que o stock for reposto.',
+        'already_subscribed'      => 'Já se encontra inscrito(a) para receber este alerta.',
+        'enable_instock_mail'     => '1',
+        'instock_mail_subject'    => '{product_name} já se encontra disponível!',
+        'enable_success_sub_mail' => '1',
+        'success_sub_subject'     => 'Subscrição confirmada: {product_name} em {shopname}',
+    );
+
+    foreach ( $defaults as $key => $val ) {
+        if ( empty( $settings[ $key ] ) ) {
+            $settings[ $key ] = $val;
+        }
+    }
+    return $settings;
+}
+add_filter( 'option_cwginstocksettings', 'prestige_default_back_in_stock_settings', 20, 1 );
+add_filter( 'default_option_cwginstocksettings', 'prestige_default_back_in_stock_settings', 20, 1 );
+add_filter( 'cwginstock_default_values', 'prestige_default_back_in_stock_settings', 20, 1 );
+
+

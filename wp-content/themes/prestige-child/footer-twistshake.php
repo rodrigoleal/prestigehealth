@@ -199,7 +199,7 @@
 				<div class="ts-badge-icon">📦</div>
 				<div class="ts-badge-text">
 					<strong>PORTES GRÁTIS</strong><br>
-					<span>Em compras superiores a 70€ (PT Continental)</span>
+					<span><?php echo esc_html( function_exists( 'custom_get_shipping_footer_twistshake_text' ) ? custom_get_shipping_footer_twistshake_text() : 'Em compras superiores a 100€ (PT Continental)' ); ?></span>
 				</div>
 			</div>
 			<div class="ts-badge-item">

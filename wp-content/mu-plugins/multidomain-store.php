@@ -41,6 +41,11 @@ function prestige_universal_contrast_styles() {
     $printed = true;
     ?>
 <style id="prestige-universal-notice-contrast-override">
+/* Ocultar definitivamente qualquer mensagem antiga de envio para as Ilhas */
+.custom-islands-shipping-notice {
+    display: none !important;
+}
+
 /* === 1. WooCommerce Error Notices === */
 .woocommerce-error,
 ul.woocommerce-error,
@@ -330,11 +335,11 @@ function custom_multidomain_is_twistshake() {
 }
 
 /**
- * Automatically hide out-of-stock items from catalog, search, and category listings.
+ * Ensure out-of-stock items remain visible with 'Disponível brevemente' and waitlist notification.
  */
-add_filter( 'option_woocommerce_hide_out_of_stock_items', 'custom_multidomain_hide_out_of_stock' );
+add_filter( 'option_woocommerce_hide_out_of_stock_items', 'custom_multidomain_hide_out_of_stock', 99 );
 function custom_multidomain_hide_out_of_stock( $val ) {
-    return 'yes';
+    return 'no';
 }
 
 /**
@@ -1126,16 +1131,23 @@ function custom_multidomain_session_handler_class( $class ) {
 
 
 /**
- * Append the active store query parameter to all generated URLs when testing on localhost.
+ * Garante que no ambiente local (localhost / 127.0.0.1) todos os links apontem exclusivamente para o host local
+ * e preserva o parâmetro ?store= para manter a loja selecionada.
  */
-add_filter( 'home_url', 'custom_multidomain_append_store_param', 99, 1 );
 add_filter( 'post_link', 'custom_multidomain_append_store_param', 99, 1 );
 add_filter( 'post_type_link', 'custom_multidomain_append_store_param', 99, 1 );
 add_filter( 'page_link', 'custom_multidomain_append_store_param', 99, 1 );
 add_filter( 'term_link', 'custom_multidomain_append_store_param', 99, 1 );
 add_filter( 'wp_setup_nav_menu_item', 'custom_multidomain_filter_menu_item_url', 99, 1 );
+add_filter( 'nav_menu_link_attributes', 'custom_multidomain_filter_nav_menu_link_attributes', 99, 2 );
+add_filter( 'woocommerce_product_get_permalink', 'custom_multidomain_append_store_param', 99, 1 );
 
 function custom_multidomain_append_store_param( $url ) {
+    static $is_recursing = false;
+    if ( $is_recursing || empty( $url ) || ! is_string( $url ) ) {
+        return $url;
+    }
+
     if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
         return $url;
     }
@@ -1145,12 +1157,31 @@ function custom_multidomain_append_store_param( $url ) {
     }
     
     $host = $_SERVER['HTTP_HOST'];
-    // Only apply this locally to ease multi-store testing on same hostname
-    if ( strpos( $host, 'localhost' ) === false && strpos( $host, '127.0.0.1' ) === false ) {
+    $is_local = ( strpos( $host, 'localhost' ) !== false || strpos( $host, '127.0.0.1' ) !== false );
+    
+    // No ambiente local, substituir domínios de produção pelo host local atual
+    if ( $is_local ) {
+        $is_recursing = true;
+        $prod_domains = array(
+            'https://loja.prestigehealth.pt',
+            'http://loja.prestigehealth.pt',
+            'https://twistshakeportugal.pt',
+            'http://twistshakeportugal.pt',
+            'https://prestigehealth.pt',
+            'http://prestigehealth.pt',
+            '//loja.prestigehealth.pt',
+            '//twistshakeportugal.pt',
+            '//prestigehealth.pt',
+        );
+        $scheme = ( isset( $_SERVER['HTTPS'] ) && 'on' === $_SERVER['HTTPS'] ) ? 'https://' : 'http://';
+        $local_home = $scheme . $host;
+        $url = str_replace( $prod_domains, $local_home, $url );
+        $is_recursing = false;
+    } else {
         return $url;
     }
     
-    // Skip assets and admin pages
+    // Ignorar ficheiros estáticos e admin
     if ( strpos( $url, '/wp-admin/' ) !== false || preg_match( '/\.(js|css|png|jpe?g|gif|xml|txt|ico|svg|woff2?|otf|ttf|eot)(\?.*)?$/i', $url ) ) {
         return $url;
     }
@@ -1166,6 +1197,13 @@ function custom_multidomain_filter_menu_item_url( $menu_item ) {
         $menu_item->url = custom_multidomain_append_store_param( $menu_item->url );
     }
     return $menu_item;
+}
+
+function custom_multidomain_filter_nav_menu_link_attributes( $atts, $item ) {
+    if ( isset( $atts['href'] ) ) {
+        $atts['href'] = custom_multidomain_append_store_param( $atts['href'] );
+    }
+    return $atts;
 }
 
 /**
@@ -1200,49 +1238,141 @@ function custom_multidomain_invalidate_shipping_cache( $packages ) {
 }
 
 /**
- * Filter shipping rates:
- * 1. Limit Free Shipping (> 70€) exclusively to Portugal Continental.
- * 2. If destination is Islands (Madeira/Açores), remove Free Shipping.
- * 3. Ensure Local Pickup (Levantamento na Loja) is available with store address.
- * 4. Update rate labels for clarity as requested.
+ * ============================================================================
+ * PORTES DE ENVIO, MENSAGENS PROMOCIONAIS E CONTROLO DE DESTINOS
+ * ============================================================================
  */
-add_filter( 'woocommerce_package_rates', 'custom_multidomain_filter_shipping_rates', 10, 2 );
+
+/**
+ * Retorna o valor padrão dos portes normais (Taxa Fixa). Padrão: 6.00 €
+ */
+function custom_get_standard_shipping_cost() {
+    $cost = get_option( 'custom_shipping_standard_cost', '' );
+    if ( '' !== $cost && is_numeric( $cost ) ) {
+        return (float) $cost;
+    }
+    // Fallback: tentar ler do método flat_rate nas zonas do WooCommerce
+    if ( class_exists( 'WC_Shipping_Zones' ) ) {
+        $zones = WC_Shipping_Zones::get_zones();
+        foreach ( $zones as $zone ) {
+            if ( ! empty( $zone['shipping_methods'] ) ) {
+                foreach ( $zone['shipping_methods'] as $method ) {
+                    if ( 'flat_rate' === $method->id && $method->is_enabled() ) {
+                        if ( isset( $method->cost ) && is_numeric( $method->cost ) ) {
+                            return (float) $method->cost;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return 6.00;
+}
+
+/**
+ * Retorna o valor mínimo para Portes Grátis. Padrão: 100.00 €
+ */
+function custom_get_free_shipping_min_amount() {
+    $threshold = get_option( 'custom_shipping_free_threshold', '' );
+    if ( '' !== $threshold && is_numeric( $threshold ) ) {
+        return (float) $threshold;
+    }
+    // Fallback: tentar ler do método free_shipping nas zonas do WooCommerce
+    if ( class_exists( 'WC_Shipping_Zones' ) ) {
+        $zones = WC_Shipping_Zones::get_zones();
+        foreach ( $zones as $zone ) {
+            if ( ! empty( $zone['shipping_methods'] ) ) {
+                foreach ( $zone['shipping_methods'] as $method ) {
+                    if ( 'free_shipping' === $method->id && $method->is_enabled() ) {
+                        if ( ! empty( $method->min_amount ) && is_numeric( $method->min_amount ) ) {
+                            return (float) $method->min_amount;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return 100.00;
+}
+
+/**
+ * Retorna o texto promocional de envio para o topo do site (Prestige Health ou Twistshake)
+ */
+function custom_get_shipping_promo_text( $store = 'prestige' ) {
+    $min_amount = custom_get_free_shipping_min_amount();
+    $min_formatted = number_format( $min_amount, ( fmod( $min_amount, 1.0 ) !== 0.0 ? 2 : 0 ), ',', '' ) . '€';
+    $cost = custom_get_standard_shipping_cost();
+    $cost_formatted = number_format( $cost, ( fmod( $cost, 1.0 ) !== 0.0 ? 2 : 0 ), ',', '' ) . '€';
+
+    if ( 'twistshake' === $store ) {
+        $template = get_option( 'custom_shipping_promo_twistshake', 'Portes grátis em compras superiores a {min_amount} para Portugal Continental' );
+    } else {
+        $template = get_option( 'custom_shipping_promo_prestige', 'Portes grátis para compras superiores a {min_amount} em Portugal Continental.' );
+    }
+
+    return str_replace( array( '{min_amount}', '{shipping_cost}' ), array( $min_formatted, $cost_formatted ), $template );
+}
+
+/**
+ * Retorna o texto do selo de portes grátis no rodapé da Twistshake
+ */
+function custom_get_shipping_footer_twistshake_text() {
+    $min_amount = custom_get_free_shipping_min_amount();
+    $min_formatted = number_format( $min_amount, ( fmod( $min_amount, 1.0 ) !== 0.0 ? 2 : 0 ), ',', '' ) . '€';
+    $cost = custom_get_standard_shipping_cost();
+    $cost_formatted = number_format( $cost, ( fmod( $cost, 1.0 ) !== 0.0 ? 2 : 0 ), ',', '' ) . '€';
+
+    $template = get_option( 'custom_shipping_footer_twistshake', 'Em compras superiores a {min_amount} (PT Continental)' );
+    return str_replace( array( '{min_amount}', '{shipping_cost}' ), array( $min_formatted, $cost_formatted ), $template );
+}
+
+/**
+ * Filtro dinâmico de taxas de envio:
+ * 1. Remove qualquer método de envio se o destino for Ilhas (Madeira e Açores: 9000-9999).
+ * 2. Aplica Portes Grátis (0€) exclusivamente a Portugal Continental quando o carrinho atinge o valor mínimo (100€).
+ * 3. Aplica Taxa Normal (6,00€) para compras abaixo do valor mínimo.
+ * 4. Mantém Levantamento na Loja disponível com morada física.
+ */
+add_filter( 'woocommerce_package_rates', 'custom_multidomain_filter_shipping_rates', 20, 2 );
 function custom_multidomain_filter_shipping_rates( $rates, $package ) {
     $country  = isset( $package['destination']['country'] ) ? $package['destination']['country'] : 'PT';
     $postcode = isset( $package['destination']['postcode'] ) ? $package['destination']['postcode'] : '';
     
     $is_island = custom_is_portugal_islands( $postcode, $country );
     
-    // Check if free shipping is available (> 70€)
-    $has_free_shipping = false;
-    foreach ( $rates as $rate ) {
-        if ( 'free_shipping' === $rate->method_id ) {
-            $has_free_shipping = true;
-            break;
-        }
+    // Ilhas (Madeira e Açores): Bloqueio total de entrega
+    if ( $is_island ) {
+        return array();
     }
     
+    $standard_cost  = custom_get_standard_shipping_cost();
+    $free_threshold = custom_get_free_shipping_min_amount();
+    
+    // Obter o subtotal do carrinho
+    $cart_total = 0;
+    if ( isset( $package['contents_cost'] ) ) {
+        $cart_total = (float) $package['contents_cost'];
+    } elseif ( function_exists( 'WC' ) && WC()->cart ) {
+        $cart_total = (float) WC()->cart->get_displayed_subtotal();
+    }
+    
+    $has_free_shipping = ( $cart_total >= $free_threshold );
+    
     foreach ( $rates as $rate_id => $rate ) {
-        if ( 'local_pickup' === $rate->method_id ) {
-            $rate->label = 'Levantamento na Loja (0 €)';
-        } elseif ( $is_island ) {
-            // Islands (Madeira & Açores): REMOVE BOTH flat_rate (4.99€) AND free_shipping (0€)!
-            // Online delivery is not permitted automatically; customer must contact store by phone/email.
-            if ( 'free_shipping' === $rate->method_id || 'flat_rate' === $rate->method_id ) {
+        if ( 'local_pickup' === $rate->method_id || false !== strpos( $rate_id, 'local_pickup' ) ) {
+            $rate->label = 'Levantamento na Loja';
+        } elseif ( 'free_shipping' === $rate->method_id || false !== strpos( $rate_id, 'free_shipping' ) ) {
+            if ( ! $has_free_shipping ) {
                 unset( $rates[ $rate_id ] );
+            } else {
+                $rate->label = 'Portugal Continental';
             }
-        } else {
-            // Portugal Continental:
-            if ( 'free_shipping' === $rate->method_id ) {
-                $rate->label = 'Portugal Continental (0 €)';
-            } elseif ( 'flat_rate' === $rate->method_id ) {
-                if ( $has_free_shipping ) {
-                    // Hide flat rate if free shipping is available
-                    unset( $rates[ $rate_id ] );
-                } else {
-                    $formatted_cost = wc_price( $rate->cost );
-                    $rate->label = 'Portugal Continental (' . strip_tags( $formatted_cost ) . ')';
-                }
+        } elseif ( 'flat_rate' === $rate->method_id || false !== strpos( $rate_id, 'flat_rate' ) ) {
+            if ( $has_free_shipping ) {
+                unset( $rates[ $rate_id ] );
+            } else {
+                $rate->cost = $standard_cost;
+                $rate->label = 'Portugal Continental';
             }
         }
     }
@@ -1251,81 +1381,237 @@ function custom_multidomain_filter_shipping_rates( $rates, $package ) {
 }
 
 /**
- * Format full label for Local Pickup to display the store address.
+ * Formatação do rótulo de Levantamento na Loja com a morada física.
  */
 add_filter( 'woocommerce_cart_shipping_method_full_label', 'custom_multidomain_shipping_method_full_label', 10, 2 );
 function custom_multidomain_shipping_method_full_label( $label, $method ) {
     if ( 'local_pickup' === $method->method_id || false !== strpos( $method->id, 'local_pickup' ) ) {
         $address = 'Rua Senador Sousa Fernandes 242, 4760-164 Vila Nova de Famalicão';
-        $label = 'Levantamento na Loja (0 €)';
+        $label = 'Levantamento na Loja: <span class="woocommerce-Price-amount amount">Grátis</span>';
         $label .= '<span class="shipping-method-address" style="display: block; font-size: 0.85em; color: #666; font-weight: normal; margin-top: 2px;">(Morada: ' . esc_html( $address ) . ')</span>';
     }
     return $label;
 }
 
 /**
- * Display notice above shipping methods on Checkout & Cart:
- * "* Para as Ilhas Madeira e Açores, contacte-nos"
+ * Validação no Checkout: Bloquear encomendas com destino às Ilhas (Madeira e Açores - 9000 a 9999).
  */
-add_action( 'woocommerce_review_order_before_shipping', 'custom_multidomain_render_islands_notice' );
-add_action( 'woocommerce_cart_totals_before_shipping', 'custom_multidomain_render_islands_notice' );
-function custom_multidomain_render_islands_notice() {
-    static $rendered = false;
-    if ( $rendered ) {
+add_action( 'woocommerce_after_checkout_validation', 'custom_multidomain_validate_islands_checkout', 10, 2 );
+function custom_multidomain_validate_islands_checkout( $data, $errors ) {
+    $ship_to_different = ! empty( $data['ship_to_different_address'] );
+    
+    $country  = $ship_to_different ? ( $data['shipping_country'] ?? 'PT' ) : ( $data['billing_country'] ?? 'PT' );
+    $postcode = $ship_to_different ? ( $data['shipping_postcode'] ?? '' ) : ( $data['billing_postcode'] ?? '' );
+    
+    if ( custom_is_portugal_islands( $postcode, $country ) ) {
+        $errors->add(
+            'shipping_islands_not_supported',
+            '<strong>Envio Indisponível:</strong> De momento não realizamos envios para as Regiões Autónomas da Madeira e dos Açores. Os nossos envios estão disponíveis exclusivamente para Portugal Continental.'
+        );
+    }
+}
+
+/**
+ * Script de validação visual e bloqueio em tempo real no Carrinho e Checkout para códigos postais das Ilhas.
+ */
+add_action( 'wp_footer', 'custom_multidomain_islands_realtime_block_script', 9999 );
+function custom_multidomain_islands_realtime_block_script() {
+    if ( ! is_checkout() && ! is_cart() ) {
         return;
     }
-    $rendered = true;
-    
-    $is_twistshake = custom_multidomain_is_twistshake();
-    
-    if ( $is_twistshake ) {
-        $contact_email = 'marketing@prestigehealth.pt';
-
-        $contact_phone = '+351 91 663 85 70';
-        $phone_link    = 'tel:+351916638570';
-        $phone_note    = '(Chamada para a rede móvel nacional)';
-        $accent_color  = '#e07a5f';
-    } else {
-        $contact_email = 'marketing@prestigehealth.pt';
-        $contact_phone = '252 095 673';
-        $phone_link    = 'tel:252095673';
-        $phone_note    = '(Chamada para a rede fixa nacional)';
-        $accent_color  = '#005492';
-    }
-    
     ?>
-    <div class="custom-islands-shipping-notice" style="margin: 10px 0 15px 0; padding: 14px 18px; background-color: #f8f9fa; border: 1px solid #e2e8f0; border-left: 4px solid <?php echo esc_attr( $accent_color ); ?>; border-radius: 6px; font-size: 0.93em; color: #333; line-height: 1.6;">
-        <p style="margin: 0 0 6px 0; font-weight: 600; color: #2d3748;">
-            * Para as Ilhas Madeira e Açores, contacte-nos por telefone ou email:
-        </p>
-        <div style="font-size: 0.95em; color: #4a5568;">
-            <div>
-                📞 <strong>Telefone:</strong> 
-                <a href="<?php echo esc_url( $phone_link ); ?>" style="color: <?php echo esc_attr( $accent_color ); ?>; font-weight: 600; text-decoration: none;"><?php echo esc_html( $contact_phone ); ?></a> 
-                <span style="font-size: 0.85em; color: #718096;"><?php echo esc_html( $phone_note ); ?></span>
-            </div>
-            <div style="margin-top: 2px;">
-                ✉️ <strong>Email:</strong> 
-                <a href="mailto:<?php echo esc_attr( $contact_email ); ?>" style="color: <?php echo esc_attr( $accent_color ); ?>; text-decoration: underline; font-weight: 600;"><?php echo esc_html( $contact_email ); ?></a>
-            </div>
-        </div>
-    </div>
-    <script>
-    if (typeof jQuery !== 'undefined') {
-        jQuery(function($) {
-            function removeDuplicateIslandsNotices() {
-                var $notices = $('.custom-islands-shipping-notice');
-                if ($notices.length > 1) {
-                    $notices.not(':first').remove();
+    <script type="text/javascript">
+    (function($) {
+        function checkIslandsPostcode() {
+            var isShipDiff = $('#ship-to-different-address-checkbox').is(':checked');
+            var country = isShipDiff ? $('#shipping_country').val() : $('#billing_country').val();
+            var postcode = isShipDiff ? $('#shipping_postcode').val() : $('#billing_postcode').val();
+            
+            if (!postcode) {
+                postcode = $('#calc_shipping_postcode').val();
+                country = $('#calc_shipping_country').val() || 'PT';
+            }
+            
+            var isIsland = false;
+            if (country === 'PT' && postcode) {
+                var clean = postcode.replace(/[^0-9]/g, '');
+                if (clean.length >= 1 && clean.charAt(0) === '9') {
+                    isIsland = true;
                 }
             }
-            removeDuplicateIslandsNotices();
-            $(document).on('updated_checkout updated_cart_totals updated_wc_div', function() {
-                removeDuplicateIslandsNotices();
+            
+            var noticeId = 'islands-blocked-warning-msg';
+            $('#' + noticeId).remove();
+            
+            if (isIsland) {
+                var alertHtml = '<div id="' + noticeId + '" style="margin: 12px 0; padding: 12px 16px; background-color: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; border-left: 4px solid #EF4444; border-radius: 6px; font-size: 13px; font-weight: 500; line-height: 1.5;">' +
+                    '⚠️ <strong>Atenção:</strong> De momento não realizamos envios para as Regiões Autónomas da Madeira e dos Açores. Os envios estão disponíveis exclusivamente para Portugal Continental.' +
+                    '</div>';
+                
+                if ($('#shipping_postcode_field').length && isShipDiff) {
+                    $('#shipping_postcode_field').after(alertHtml);
+                } else if ($('#billing_postcode_field').length) {
+                    $('#billing_postcode_field').after(alertHtml);
+                } else if ($('#calc_shipping_postcode').length) {
+                    $('#calc_shipping_postcode').after(alertHtml);
+                }
+                
+                $('#place_order').prop('disabled', true).css('opacity', '0.5');
+            } else {
+                $('#place_order').prop('disabled', false).css('opacity', '');
+            }
+        }
+        
+        $(document).ready(function() {
+            $(document).on('input change blur keyup', '#billing_postcode, #shipping_postcode, #calc_shipping_postcode, #billing_country, #shipping_country, #ship-to-different-address-checkbox', function() {
+                checkIslandsPostcode();
             });
+            $(document).on('updated_checkout updated_cart_totals updated_wc_div', function() {
+                checkIslandsPostcode();
+            });
+            checkIslandsPostcode();
         });
-    }
+    })(jQuery);
     </script>
+    <?php
+}
+
+/**
+ * Menu Administrativo WooCommerce: Portes & Mensagens
+ */
+add_action( 'admin_menu', 'custom_multidomain_register_shipping_admin_menu' );
+function custom_multidomain_register_shipping_admin_menu() {
+    add_submenu_page(
+        'woocommerce',
+        'Portes & Mensagens',
+        'Portes & Mensagens 🚚',
+        'manage_options',
+        'custom-shipping-settings',
+        'custom_multidomain_render_shipping_settings_page'
+    );
+}
+
+/**
+ * Página de Configuração de Portes e Mensagens no Painel de Admin
+ */
+function custom_multidomain_render_shipping_settings_page() {
+    if ( isset( $_POST['save_shipping_settings'] ) && check_admin_referer( 'custom_shipping_settings_action', 'custom_shipping_nonce' ) ) {
+        $cost           = isset( $_POST['shipping_standard_cost'] ) ? (float) str_replace( ',', '.', sanitize_text_field( $_POST['shipping_standard_cost'] ) ) : 6.00;
+        $free_threshold = isset( $_POST['shipping_free_threshold'] ) ? (float) str_replace( ',', '.', sanitize_text_field( $_POST['shipping_free_threshold'] ) ) : 100.00;
+        $promo_prestige = isset( $_POST['shipping_promo_prestige'] ) ? sanitize_text_field( wp_unslash( $_POST['shipping_promo_prestige'] ) ) : '';
+        $promo_twist    = isset( $_POST['shipping_promo_twistshake'] ) ? sanitize_text_field( wp_unslash( $_POST['shipping_promo_twistshake'] ) ) : '';
+        $footer_twist   = isset( $_POST['shipping_footer_twistshake'] ) ? sanitize_text_field( wp_unslash( $_POST['shipping_footer_twistshake'] ) ) : '';
+
+        update_option( 'custom_shipping_standard_cost', $cost );
+        update_option( 'custom_shipping_free_threshold', $free_threshold );
+        update_option( 'custom_shipping_promo_prestige', $promo_prestige );
+        update_option( 'custom_shipping_promo_twistshake', $promo_twist );
+        update_option( 'custom_shipping_footer_twistshake', $footer_twist );
+
+        // Sincronizar automaticamente com métodos de envio do WooCommerce
+        if ( class_exists( 'WC_Shipping_Zones' ) ) {
+            $zones = WC_Shipping_Zones::get_zones();
+            foreach ( $zones as $zone_data ) {
+                $zone = new WC_Shipping_Zone( $zone_data['id'] );
+                foreach ( $zone->get_shipping_methods() as $method ) {
+                    if ( 'flat_rate' === $method->id ) {
+                        $opt_key = $method->get_instance_option_key();
+                        $settings = get_option( $opt_key, array() );
+                        $settings['cost'] = (string) $cost;
+                        update_option( $opt_key, $settings );
+                    } elseif ( 'free_shipping' === $method->id ) {
+                        $opt_key = $method->get_instance_option_key();
+                        $settings = get_option( $opt_key, array() );
+                        $settings['min_amount'] = (string) $free_threshold;
+                        $settings['requires']   = 'min_amount';
+                        update_option( $opt_key, $settings );
+                    }
+                }
+            }
+        }
+
+        echo '<div class="updated notice is-dismissible" style="margin: 20px 0; padding: 12px 15px; background: #e6f4ea; border-left: 4px solid #2f855a;"><p><strong>Configurações de Portes guardadas com sucesso!</strong> Os valores e mensagens já foram sincronizados com as lojas Prestige Health e Twistshake.</p></div>';
+    }
+
+    $current_cost      = custom_get_standard_shipping_cost();
+    $current_threshold = custom_get_free_shipping_min_amount();
+    $promo_prestige    = get_option( 'custom_shipping_promo_prestige', 'Portes grátis para compras superiores a {min_amount} em Portugal Continental.' );
+    $promo_twist       = get_option( 'custom_shipping_promo_twistshake', 'Portes grátis em compras superiores a {min_amount} para Portugal Continental' );
+    $footer_twist      = get_option( 'custom_shipping_footer_twistshake', 'Em compras superiores a {min_amount} (PT Continental)' );
+    ?>
+    <div class="wrap" style="max-width: 900px;">
+        <h1 style="display: flex; align-items: center; gap: 10px;">Gestão de Portes & Mensagens 🚚</h1>
+        <p style="font-size: 14px; color: #555;">
+            Configure os valores de envio e personalize as mensagens promocionais exibidas nos cabeçalhos e rodapés de <strong>Prestige Health</strong> e <strong>Twistshake Portugal</strong>.
+        </p>
+
+        <form method="post" action="">
+            <?php wp_nonce_field( 'custom_shipping_settings_action', 'custom_shipping_nonce' ); ?>
+
+            <div class="card" style="padding: 20px; border-radius: 8px; margin-top: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+                <h2 style="margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; color: #005492;">Valores de Envio (Portugal Continental)</h2>
+                
+                <table class="form-table">
+                    <tr>
+                        <th scope="row"><label for="shipping_standard_cost">Portes Normais (€)</label></th>
+                        <td>
+                            <input type="number" step="0.01" min="0" name="shipping_standard_cost" id="shipping_standard_cost" value="<?php echo esc_attr( number_format( $current_cost, 2, '.', '' ) ); ?>" class="regular-text" style="width: 120px;" required> €
+                            <p class="description">Custo cobrado para encomendas abaixo do valor mínimo de portes grátis (ex: 6.00).</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="shipping_free_threshold">Valor Mínimo para Portes Grátis (€)</label></th>
+                        <td>
+                            <input type="number" step="0.01" min="0" name="shipping_free_threshold" id="shipping_free_threshold" value="<?php echo esc_attr( number_format( $current_threshold, 2, '.', '' ) ); ?>" class="regular-text" style="width: 120px;" required> €
+                            <p class="description">Valor de encomenda a partir do qual os portes passam a ser grátis (ex: 100.00).</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card" style="padding: 20px; border-radius: 8px; margin-top: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+                <h2 style="margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; color: #005492;">Mensagens Promocionais dos Sites</h2>
+                <p class="description" style="margin-bottom: 15px;">
+                    Dica: Pode usar a tag <code>{min_amount}</code> para inserir automaticamente o valor de portes grátis (ex: 100€) e <code>{shipping_cost}</code> para o valor do frete (ex: 6€).
+                </p>
+
+                <table class="form-table">
+                    <tr>
+                        <th scope="row"><label for="shipping_promo_prestige">Barra Superior — Prestige Health</label></th>
+                        <td>
+                            <input type="text" name="shipping_promo_prestige" id="shipping_promo_prestige" value="<?php echo esc_attr( $promo_prestige ); ?>" class="large-text" required>
+                            <p class="description">Exibida na barra azul no topo do site loja.prestigehealth.pt.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="shipping_promo_twistshake">Barra Superior — Twistshake</label></th>
+                        <td>
+                            <input type="text" name="shipping_promo_twistshake" id="shipping_promo_twistshake" value="<?php echo esc_attr( $promo_twist ); ?>" class="large-text" required>
+                            <p class="description">Exibida no carrossel de destaques no topo do site twistshakeportugal.pt.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="shipping_footer_twistshake">Selo Rodapé — Twistshake</label></th>
+                        <td>
+                            <input type="text" name="shipping_footer_twistshake" id="shipping_footer_twistshake" value="<?php echo esc_attr( $footer_twist ); ?>" class="large-text" required>
+                            <p class="description">Subtítulo do badge "PORTES GRÁTIS" na barra de confiança do rodapé da Twistshake.</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card" style="padding: 20px; border-radius: 8px; margin-top: 20px; background: #fdfefe; border-left: 4px solid #3b82f6;">
+                <h3 style="margin-top: 0;">ℹ️ Política de Envio para as Ilhas (Madeira e Açores)</h3>
+                <p style="margin: 0; color: #475569; font-size: 13.5px;">
+                    Os envios para os códigos postais das Ilhas (<strong>9000-000 a 9999-999</strong>) estão automaticamente bloqueados tanto na calculadora do carrinho quanto na finalização da compra (checkout), com aviso explicativo e prevenção de pedidos.
+                </p>
+            </div>
+
+            <p class="submit" style="margin-top: 20px;">
+                <input type="submit" name="save_shipping_settings" class="button button-primary button-hero" value="Guardar Alterações 💾">
+            </p>
+        </form>
+    </div>
     <?php
 }
 
@@ -1649,7 +1935,7 @@ function custom_multidomain_ensure_legal_pages() {
         $terms_id = wp_insert_post( array(
             'post_title'     => 'Termos e Condições',
             'post_name'      => 'termos-e-condicoes',
-            'post_content'   => '<h2>Termos e Condições de Utilização</h2><p>Bem-vindo ao nosso website. Ao aceder e efetuar compras nesta loja online, concorda com os seguintes termos e condições gerais de venda.</p><h3>1. Objeto</h3><p>As presentes condições regulam as vendas dos produtos apresentados nesta loja online.</p><h3>2. Encomendas e Preços</h3><p>Todos os preços apresentados incluem IVA à taxa legal em vigor. Reservamo-nos o direito de alterar os preços a qualquer momento, garantindo o preço em vigor no momento da confirmação da encomenda.</p><h3>3. Envio e Portes</h3><p>Os envios são efetuados para Portugal Continental e Ilhas. Portes grátis em compras superiores a 70€ para Portugal Continental.</p><h3>4. Devoluções e Direito de Livre Resolução</h3><p>Nos termos da legislação em vigor, o consumidor dispõe do prazo de 14 dias para proceder à devolução do produto adquiridos sem necessidade de indicar o motivo.</p><h3>5. Contactos</h3><p>Para suporte e questões comerciais, contacte <strong>marketing@prestigehealth.pt</strong>.</p>',
+            'post_content'   => '<h2>Termos e Condições de Utilização</h2><p>Bem-vindo ao nosso website. Ao aceder e efetuar compras nesta loja online, concorda com os seguintes termos e condições gerais de venda.</p><h3>1. Objeto</h3><p>As presentes condições regulam as vendas dos produtos apresentados nesta loja online.</p><h3>2. Encomendas e Preços</h3><p>Todos os preços apresentados incluem IVA à taxa legal em vigor. Reservamo-nos o direito de alterar os preços a qualquer momento, garantindo o preço em vigor no momento da confirmação da encomenda.</p><h3>3. Envio e Portes</h3><p>Os envios são efetuados exclusivamente para Portugal Continental. Portes grátis em compras superiores a 100€ para Portugal Continental.</p><h3>4. Devoluções e Direito de Livre Resolução</h3><p>Nos termos da legislação em vigor, o consumidor dispõe do prazo de 14 dias para proceder à devolução do produto adquiridos sem necessidade de indicar o motivo.</p><h3>5. Contactos</h3><p>Para suporte e questões comerciais, contacte <strong>marketing@prestigehealth.pt</strong>.</p>',
             'post_status'    => 'publish',
             'post_type'      => 'page',
             'comment_status' => 'closed',
