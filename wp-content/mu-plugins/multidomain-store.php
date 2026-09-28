@@ -2068,6 +2068,42 @@ function prestige_add_nif_to_admin_email( $order, $sent_to_admin, $plain_text ) 
  * ========================================================================== */
 
 /**
+ * Helper: verifica se um produto pertence à marca/categoria Twistshake.
+ */
+function prestige_is_twistshake_product( $product_id ) {
+    if ( ! $product_id ) {
+        return false;
+    }
+    $product = wc_get_product( $product_id );
+    if ( ! $product ) {
+        return false;
+    }
+    $parent_id = ( $product && $product->is_type( 'variation' ) ) ? $product->get_parent_id() : $product->get_id();
+
+    if ( has_term( 'twistshake', 'product_cat', $parent_id ) ) {
+        return true;
+    }
+
+    $terms = get_the_terms( $parent_id, 'product_cat' );
+    if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+        $twistshake_term = get_term_by( 'slug', 'twistshake', 'product_cat' );
+        $ts_term_id = $twistshake_term ? (int) $twistshake_term->term_id : 0;
+        foreach ( $terms as $term ) {
+            if ( $term->slug === 'twistshake' || stripos( $term->name, 'twistshake' ) !== false ) {
+                return true;
+            }
+            if ( $ts_term_id ) {
+                $ancestors = get_ancestors( $term->term_id, 'product_cat' );
+                if ( ! empty( $ancestors ) && in_array( $ts_term_id, $ancestors, true ) ) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+/**
  * Helper: detecta a loja a partir do domínio ou do meta da encomenda (funciona em cron).
  */
 function prestige_email_is_twistshake( $email_object = null ) {
@@ -2083,8 +2119,15 @@ function prestige_email_is_twistshake( $email_object = null ) {
             if ( $source === 'twistshakeportugal.pt' ) {
                 return true;
             }
-            if ( $source ) {
+            if ( $source === 'loja.prestigehealth.pt' ) {
                 return false;
+            }
+            // Fallback por itens da encomenda se meta não estiver definido
+            foreach ( $order->get_items() as $item ) {
+                $pid = $item->get_product_id();
+                if ( $pid && prestige_is_twistshake_product( $pid ) ) {
+                    return true;
+                }
             }
         }
     }
@@ -2095,16 +2138,12 @@ function prestige_email_is_twistshake( $email_object = null ) {
         if ( $source === 'twistshakeportugal.pt' ) {
             return true;
         }
+        $pid = get_post_meta( $sub_id, 'cwginstock_pid', true );
+        if ( $pid && prestige_is_twistshake_product( $pid ) ) {
+            return true;
+        }
         if ( $source === 'loja.prestigehealth.pt' ) {
             return false;
-        }
-        $pid = get_post_meta( $sub_id, 'cwginstock_pid', true );
-        if ( $pid ) {
-            $product = wc_get_product( $pid );
-            $parent_id = $product && $product->is_type( 'variation' ) ? $product->get_parent_id() : $pid;
-            if ( has_term( 'twistshake', 'product_cat', $parent_id ) ) {
-                return true;
-            }
         }
     }
     // 4. Fallback: detecção por HTTP_HOST (pedidos síncronos)
@@ -2345,13 +2384,20 @@ function prestige_configure_smtp( $phpmailer ) {
     $phpmailer->SMTPAutoTLS = false;
 
 
-    // Remetente padrão (pode ser sobreposto pelos filtros de loja)
-    if ( empty( $phpmailer->From ) || $phpmailer->From === 'wordpress@' . gethostname() ) {
-        $phpmailer->From     = 'marketing@prestigehealth.pt';
-        $phpmailer->FromName = defined( 'PRESTIGE_CURRENT_STORE' ) && PRESTIGE_CURRENT_STORE === 'twistshake'
-            ? 'Twistshake Portugal'
-            : 'Prestige Health';
+    // Remetente padrão (respeitando loja ativa e overrides)
+    $is_ts = false;
+    if ( ! empty( $GLOBALS['_prestige_email_domain_override'] ) ) {
+        $is_ts = ( $GLOBALS['_prestige_email_domain_override'] === 'twistshakeportugal.pt' );
+    } elseif ( defined( 'PRESTIGE_CURRENT_STORE' ) ) {
+        $is_ts = ( PRESTIGE_CURRENT_STORE === 'twistshake' );
+    } else {
+        $is_ts = custom_multidomain_is_twistshake();
     }
+
+    if ( empty( $phpmailer->From ) || $phpmailer->From === 'wordpress@' . gethostname() ) {
+        $phpmailer->From = 'marketing@prestigehealth.pt';
+    }
+    $phpmailer->FromName = $is_ts ? 'Twistshake Portugal' : 'Prestige Health';
 }
 
 /**
@@ -2362,7 +2408,7 @@ function prestige_smtp_from_email( $email ) {
     return 'marketing@prestigehealth.pt';
 }
 
-add_filter( 'wp_mail_from_name', 'prestige_smtp_from_name' );
+add_filter( 'wp_mail_from_name', 'prestige_smtp_from_name', 20 );
 function prestige_smtp_from_name( $name ) {
     if ( ! empty( $GLOBALS['_prestige_email_domain_override'] ) ) {
         return $GLOBALS['_prestige_email_domain_override'] === 'twistshakeportugal.pt'
@@ -2370,6 +2416,9 @@ function prestige_smtp_from_name( $name ) {
             : 'Prestige Health';
     }
     if ( defined( 'PRESTIGE_CURRENT_STORE' ) && PRESTIGE_CURRENT_STORE === 'twistshake' ) {
+        return 'Twistshake Portugal';
+    }
+    if ( custom_multidomain_is_twistshake() ) {
         return 'Twistshake Portugal';
     }
     return 'Prestige Health';
@@ -2386,7 +2435,27 @@ function prestige_smtp_from_name( $name ) {
  */
 add_action( 'cwginstock_after_insert_subscriber', 'prestige_bis_record_subscriber_store', 10, 2 );
 function prestige_bis_record_subscriber_store( $subscriber_id, $post_data ) {
-    $is_ts = custom_multidomain_is_twistshake();
+    $is_ts = false;
+
+    // 1. Verificar referer da requisição (ex: AJAX a partir de twistshakeportugal.pt)
+    $referer = $_SERVER['HTTP_REFERER'] ?? '';
+    if ( strpos( $referer, 'twistshake' ) !== false ) {
+        $is_ts = true;
+    }
+
+    // 2. Detecção geral da loja (HTTP_HOST, GET store, COOKIE store)
+    if ( ! $is_ts && custom_multidomain_is_twistshake() ) {
+        $is_ts = true;
+    }
+
+    // 3. Verificar se o produto pertence à categoria/marca Twistshake
+    if ( ! $is_ts ) {
+        $pid = ! empty( $post_data['product_id'] ) ? absint( $post_data['product_id'] ) : get_post_meta( $subscriber_id, 'cwginstock_pid', true );
+        if ( $pid && prestige_is_twistshake_product( $pid ) ) {
+            $is_ts = true;
+        }
+    }
+
     update_post_meta( $subscriber_id, '_subscriber_source_domain', $is_ts ? 'twistshakeportugal.pt' : 'loja.prestigehealth.pt' );
 }
 
@@ -2402,16 +2471,12 @@ function prestige_bis_filter_email_placeholders( $placeholders, $subscriber_id, 
         $source = get_post_meta( $subscriber_id, '_subscriber_source_domain', true );
         if ( $source === 'twistshakeportugal.pt' ) {
             $is_twistshake = true;
-        } elseif ( $source === 'loja.prestigehealth.pt' ) {
-            $is_twistshake = false;
         } else {
             $pid = get_post_meta( $subscriber_id, 'cwginstock_pid', true );
-            if ( $pid ) {
-                $product = wc_get_product( $pid );
-                $parent_id = $product && $product->is_type( 'variation' ) ? $product->get_parent_id() : $pid;
-                if ( has_term( 'twistshake', 'product_cat', $parent_id ) ) {
-                    $is_twistshake = true;
-                }
+            if ( $pid && prestige_is_twistshake_product( $pid ) ) {
+                $is_twistshake = true;
+            } elseif ( $source === 'loja.prestigehealth.pt' ) {
+                $is_twistshake = false;
             }
         }
     } else {
@@ -2467,8 +2532,8 @@ function prestige_bis_filter_email_placeholders( $placeholders, $subscriber_id, 
 /**
  * Limpar override global após envio do email.
  */
-add_action( 'woocommerce_email_sent', 'prestige_bis_clear_email_override', 99, 4 );
-function prestige_bis_clear_email_override( $return, $email_id, $object, $email ) {
+add_action( 'woocommerce_email_sent', 'prestige_bis_clear_email_override', 99, 2 );
+function prestige_bis_clear_email_override( $return = null, $email_id = '' ) {
     if ( in_array( $email_id, array( 'cwg_bis_subscription', 'cwg_bis_instock' ), true ) ) {
         unset( $GLOBALS['_prestige_email_domain_override'] );
     }
@@ -2477,37 +2542,61 @@ function prestige_bis_clear_email_override( $return, $email_id, $object, $email 
 /**
  * 3. Textos em Português de Portugal (PT-PT) para o email de confirmação de subscrição.
  */
-add_filter( 'woocommerce_email_subject_cwg_bis_subscription', 'prestige_bis_sub_subject', 20, 2 );
-function prestige_bis_sub_subject( $subject, $object ) {
-    return 'Subscrição confirmada: {product_name} em {shopname}';
+add_filter( 'woocommerce_email_subject_cwg_bis_subscription', 'prestige_bis_sub_subject', 20, 3 );
+function prestige_bis_sub_subject( $subject, $object, $email = null ) {
+    $text = 'Subscrição confirmada: {product_name} em {shopname}';
+    if ( is_object( $email ) && method_exists( $email, 'format_string' ) ) {
+        return $email->format_string( $text );
+    }
+    return $text;
 }
 
-add_filter( 'woocommerce_email_heading_cwg_bis_subscription', 'prestige_bis_sub_heading', 20, 2 );
-function prestige_bis_sub_heading( $heading, $object ) {
-    return 'Obrigado por subscrever o alerta para {product_name}';
+add_filter( 'woocommerce_email_heading_cwg_bis_subscription', 'prestige_bis_sub_heading', 20, 3 );
+function prestige_bis_sub_heading( $heading, $object, $email = null ) {
+    $text = 'Obrigado por subscrever o alerta para {product_name}';
+    if ( is_object( $email ) && method_exists( $email, 'format_string' ) ) {
+        return $email->format_string( $text );
+    }
+    return $text;
 }
 
-add_filter( 'woocommerce_email_additional_content_cwg_bis_subscription', 'prestige_bis_sub_additional_content', 20, 2 );
-function prestige_bis_sub_additional_content( $content, $object ) {
-    return "Olá {subscriber_name},<br/><br/>Confirmamos que subscreveu o alerta de reposição de stock para o produto <strong>{product_name}</strong>.<br/><br/>Assim que o artigo estiver novamente disponível em stock, enviaremos uma notificação para o seu email ({subscriber_email}).<br/><br/>Pode consultar o produto através do link: {product_link}<br/><br/>Obrigado pela sua visita à <strong>{shopname}</strong>!";
+add_filter( 'woocommerce_email_additional_content_cwg_bis_subscription', 'prestige_bis_sub_additional_content', 20, 3 );
+function prestige_bis_sub_additional_content( $content, $object, $email = null ) {
+    $text = "Olá {subscriber_name},<br/><br/>Confirmamos que subscreveu o alerta de reposição de stock para o produto <strong>{product_name}</strong>.<br/><br/>Assim que o artigo estiver novamente disponível em stock, enviaremos uma notificação para o seu email ({subscriber_email}).<br/><br/>Pode consultar o produto através do link: {product_link}<br/><br/>Obrigado pela sua visita à <strong>{shopname}</strong>!";
+    if ( is_object( $email ) && method_exists( $email, 'format_string' ) ) {
+        return $email->format_string( $text );
+    }
+    return $text;
 }
 
 /**
  * 4. Textos em Português de Portugal (PT-PT) para o email de produto disponível (reposição de stock).
  */
-add_filter( 'woocommerce_email_subject_cwg_bis_instock', 'prestige_bis_instock_subject', 20, 2 );
-function prestige_bis_instock_subject( $subject, $object ) {
-    return 'Boas notícias! {product_name} já se encontra disponível!';
+add_filter( 'woocommerce_email_subject_cwg_bis_instock', 'prestige_bis_instock_subject', 20, 3 );
+function prestige_bis_instock_subject( $subject, $object, $email = null ) {
+    $text = 'Boas notícias! {product_name} já se encontra disponível!';
+    if ( is_object( $email ) && method_exists( $email, 'format_string' ) ) {
+        return $email->format_string( $text );
+    }
+    return $text;
 }
 
-add_filter( 'woocommerce_email_heading_cwg_bis_instock', 'prestige_bis_instock_heading', 20, 2 );
-function prestige_bis_instock_heading( $heading, $object ) {
-    return '{product_name} já está disponível em stock';
+add_filter( 'woocommerce_email_heading_cwg_bis_instock', 'prestige_bis_instock_heading', 20, 3 );
+function prestige_bis_instock_heading( $heading, $object, $email = null ) {
+    $text = '{product_name} já está disponível em stock';
+    if ( is_object( $email ) && method_exists( $email, 'format_string' ) ) {
+        return $email->format_string( $text );
+    }
+    return $text;
 }
 
-add_filter( 'woocommerce_email_additional_content_cwg_bis_instock', 'prestige_bis_instock_additional_content', 20, 2 );
-function prestige_bis_instock_additional_content( $content, $object ) {
-    return "Olá {subscriber_name},<br/><br/>Boas notícias! O produto <strong>{product_name}</strong> que estava a aguardar já se encontra novamente disponível em stock.<br/><br/>Pode consultar o produto através do link: {product_link} ou adicioná-lo diretamente ao seu carrinho de compras: {cart_link}.<br/><br/>Nota: O stock é limitado, pelo que recomendamos que finalize a sua encomenda com brevidade para garantir o seu artigo.<br/><br/>Obrigado pela sua preferência na <strong>{shopname}</strong>!";
+add_filter( 'woocommerce_email_additional_content_cwg_bis_instock', 'prestige_bis_instock_additional_content', 20, 3 );
+function prestige_bis_instock_additional_content( $content, $object, $email = null ) {
+    $text = "Olá {subscriber_name},<br/><br/>Boas notícias! O produto <strong>{product_name}</strong> que estava a aguardar já se encontra novamente disponível em stock.<br/><br/>Pode consultar o produto através do link: {product_link} ou adicioná-lo diretamente ao seu carrinho de compras: {cart_link}.<br/><br/>Nota: O stock é limitado, pelo que recomendamos que finalize a sua encomenda com brevidade para garantir o seu artigo.<br/><br/>Obrigado pela sua preferência na <strong>{shopname}</strong>!";
+    if ( is_object( $email ) && method_exists( $email, 'format_string' ) ) {
+        return $email->format_string( $text );
+    }
+    return $text;
 }
 
 /**

@@ -20,6 +20,9 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
  * Show additional content defined via WooCommerce email settings.
  */
 if ( $additional_content ) {
+	if ( is_object( $email ) && method_exists( $email, 'format_string' ) ) {
+		$additional_content = $email->format_string( $additional_content );
+	}
 	echo wp_kses_post( wpautop( wptexturize( $additional_content ) ) );
 }
 

@@ -14,6 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 echo '= ' . wp_strip_all_tags( $email_heading ) . " =\n\n";
 
 if ( $additional_content ) {
+	if ( is_object( $email ) && method_exists( $email, 'format_string' ) ) {
+		$additional_content = $email->format_string( $additional_content );
+	}
 	echo "---\n\n";
 	echo wp_strip_all_tags( wptexturize( $additional_content ) );
 	echo "\n\n";
