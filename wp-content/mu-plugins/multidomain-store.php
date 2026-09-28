@@ -326,36 +326,34 @@ function custom_multidomain_is_twistshake() {
 
     $host = $_SERVER['HTTP_HOST'] ?? '';
     
-    // Check domain
+    // 1. Domínio Twistshake Portugal
     if ( strpos( $host, 'twistshakeportugal.pt' ) !== false || strpos( $host, 'twistshake' ) !== false ) {
         $is_ts = true;
         return true;
     }
     
-    // Check URL query parameter
+    // 2. Parâmetro explícito na URL (?store=twistshake ou ?store=prestige)
     if ( isset( $_GET['store'] ) ) {
         if ( $_GET['store'] === 'twistshake' ) {
-            if ( ! isset( $_COOKIE['store'] ) || $_COOKIE['store'] !== 'twistshake' ) {
-                if ( ! headers_sent() ) {
-                    @setcookie( 'store', 'twistshake', time() + 3600 * 24 * 30, '/' );
-                    $_COOKIE['store'] = 'twistshake';
-                }
-            }
             $is_ts = true;
             return true;
         } elseif ( $_GET['store'] === 'prestige' ) {
-            if ( isset( $_COOKIE['store'] ) ) {
-                if ( ! headers_sent() ) {
-                    @setcookie( 'store', '', time() - 3600, '/' );
-                    unset( $_COOKIE['store'] );
-                }
+            if ( isset( $_COOKIE['store'] ) && ! headers_sent() ) {
+                @setcookie( 'store', '', time() - 3600, '/' );
+                unset( $_COOKIE['store'] );
             }
             $is_ts = false;
             return false;
         }
     }
+
+    // 3. Se o domínio for loja.prestigehealth.pt ou prestigehealth.pt, é SEMPRE Prestige Health
+    if ( strpos( $host, 'prestigehealth.pt' ) !== false || strpos( $host, 'prestige' ) !== false ) {
+        $is_ts = false;
+        return false;
+    }
     
-    // Check cookie
+    // Check cookie (apenas para domínios neutros/locais)
     if ( isset( $_COOKIE['store'] ) && $_COOKIE['store'] === 'twistshake' ) {
         $is_ts = true;
         return true;
@@ -2521,19 +2519,29 @@ function prestige_bis_set_domain_before_mail( $email, $subscriber_id ) {
  */
 add_action( 'cwginstock_after_insert_subscriber', 'prestige_bis_record_subscriber_store', 10, 2 );
 function prestige_bis_record_subscriber_store( $subscriber_id, $post_data ) {
-    $referer = $_SERVER['HTTP_REFERER'] ?? '';
-    $host    = $_SERVER['HTTP_HOST'] ?? '';
+    $referer  = $_SERVER['HTTP_REFERER'] ?? '';
+    $ref_host = parse_url( $referer, PHP_URL_HOST );
+    if ( empty( $ref_host ) ) {
+        $ref_host = $_SERVER['HTTP_HOST'] ?? '';
+    }
 
     $is_ts = false;
-    if ( strpos( $referer, 'twistshake' ) !== false || strpos( $host, 'twistshake' ) !== false ) {
-        $is_ts = true;
-    } elseif ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain_is_twistshake() ) {
+    // O domínio de origem é determinado estritamente pelo HOST do referer (nunca pelo slug/caminho da página)
+    if ( strpos( $ref_host, 'twistshakeportugal.pt' ) !== false || strpos( $ref_host, 'twistshake' ) !== false ) {
         $is_ts = true;
     }
 
     $store_domain = $is_ts ? 'twistshakeportugal.pt' : 'loja.prestigehealth.pt';
     update_post_meta( $subscriber_id, '_subscriber_source_domain', $store_domain );
     $GLOBALS['_prestige_email_domain_override'] = $store_domain;
+
+    // Log detalhado para auditoria
+    $log_dir = WP_CONTENT_DIR . '/uploads';
+    @file_put_contents(
+        $log_dir . '/sent-emails.log',
+        "[" . date('Y-m-d H:i:s') . "] Subscribed #$subscriber_id | Referer Host: " . ($ref_host ?: 'none') . " | Assigned Store: $store_domain\n",
+        FILE_APPEND
+    );
 }
 
 /**
