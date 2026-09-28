@@ -20,6 +20,37 @@ if ( ! defined( 'CUSTOM_HIDE_TWISTSHAKE_ON_PRESTIGE' ) ) {
 }
 
 /**
+ * Configurar diretoria segura de sessões PHP dentro do open_basedir do servidor.
+ * Evita o aviso 'open(/tmp/session/...) failed: No such file or directory (2)'.
+ */
+$prestige_session_dir = WP_CONTENT_DIR . '/uploads/sessions';
+if ( ! is_dir( $prestige_session_dir ) ) {
+    @mkdir( $prestige_session_dir, 0700, true );
+    @file_put_contents( $prestige_session_dir . '/.htaccess', "Deny from all\n" );
+}
+if ( is_dir( $prestige_session_dir ) && is_writable( $prestige_session_dir ) ) {
+    @ini_set( 'session.save_path', $prestige_session_dir );
+}
+
+/**
+ * Desativar chamadas desnecessárias a session_start() da biblioteca WP_Persistent_Notices
+ * incluída no plugin Back In Stock Notifier for WooCommerce.
+ */
+add_filter( 'wp_persistent_notices_replace_initialization', '__return_true', 99 );
+add_filter( 'wp_persistent_notices_replace_save_notices', '__return_true', 99 );
+add_filter( 'wp_persistent_notices_replace_retrieve_notices', '__return_empty_array', 99 );
+
+/**
+ * Ocultar display_errors em produção para evitar que avisos do PHP quebrem a interface.
+ */
+if ( ! ( defined( 'WP_CLI' ) && WP_CLI ) ) {
+    $prestige_host = $_SERVER['HTTP_HOST'] ?? '';
+    if ( strpos( $prestige_host, 'localhost' ) === false && strpos( $prestige_host, '127.0.0.1' ) === false && strpos( $prestige_host, ':8081' ) === false ) {
+        @ini_set( 'display_errors', '0' );
+    }
+}
+
+/**
  * Add Meta Facebook and Google Search Console Domain Verification Tags globally across all domains.
  */
 add_action( 'wp_head', function() {
