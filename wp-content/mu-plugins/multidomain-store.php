@@ -2257,15 +2257,36 @@ function prestige_email_clear_domain_override( $order_id, $old_status, $new_stat
  */
 add_filter( 'wp_mail', 'prestige_fix_twistshake_email_links', 99 );
 function prestige_fix_twistshake_email_links( $args ) {
-    // Determinar se é Twistshake
+    // 1. Se estamos a enviar através da fila assíncrona (process_async_queued_email),
+    // o email já foi totalmente processado e formatado quando entrou na fila.
+    // Retornar $args diretamente sem modificar para manter integridade.
+    if ( ! empty( $GLOBALS['sending_async_email_now'] ) ) {
+        return $args;
+    }
+
+    // 2. Determinar se é Twistshake
+    $is_twistshake = false;
     if ( ! empty( $GLOBALS['_prestige_email_domain_override'] ) ) {
-        // Contexto de cron com status change
+        // Contexto explícito (encomendas, CWG Back-in-Stock, etc.)
         $is_twistshake = ( $GLOBALS['_prestige_email_domain_override'] === 'twistshakeportugal.pt' );
-    } elseif ( defined( 'PRESTIGE_CURRENT_STORE' ) ) {
-        // Constante definida no início do request (mais fiável)
-        $is_twistshake = ( PRESTIGE_CURRENT_STORE === 'twistshake' );
-    } else {
-        $is_twistshake = custom_multidomain_is_twistshake();
+    } elseif ( defined( 'PRESTIGE_CURRENT_STORE' ) && PRESTIGE_CURRENT_STORE === 'twistshake' ) {
+        $is_twistshake = true;
+    } elseif ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain_is_twistshake() ) {
+        $is_twistshake = true;
+    }
+
+    // 3. Verificação de segurança adicional:
+    // Se o assunto ou corpo da mensagem já contêm referências explícitas a Twistshake,
+    // o email foi intencionalmente gerado para a Twistshake Portugal.
+    // NUNCA devemos converter este email para Prestige Health!
+    if ( ! $is_twistshake ) {
+        $msg_str = ! empty( $args['message'] ) && is_string( $args['message'] ) ? $args['message'] : '';
+        $sub_str = ! empty( $args['subject'] ) && is_string( $args['subject'] ) ? $args['subject'] : '';
+        if ( stripos( $msg_str, 'twistshakeportugal.pt' ) !== false ||
+             stripos( $msg_str, 'Twistshake Portugal' ) !== false ||
+             stripos( $sub_str, 'Twistshake' ) !== false ) {
+            $is_twistshake = true;
+        }
     }
 
     if ( $is_twistshake ) {
@@ -2388,10 +2409,12 @@ function prestige_configure_smtp( $phpmailer ) {
     $is_ts = false;
     if ( ! empty( $GLOBALS['_prestige_email_domain_override'] ) ) {
         $is_ts = ( $GLOBALS['_prestige_email_domain_override'] === 'twistshakeportugal.pt' );
-    } elseif ( defined( 'PRESTIGE_CURRENT_STORE' ) ) {
-        $is_ts = ( PRESTIGE_CURRENT_STORE === 'twistshake' );
-    } else {
-        $is_ts = custom_multidomain_is_twistshake();
+    } elseif ( ! empty( $phpmailer->FromName ) && stripos( $phpmailer->FromName, 'twistshake' ) !== false ) {
+        $is_ts = true;
+    } elseif ( defined( 'PRESTIGE_CURRENT_STORE' ) && PRESTIGE_CURRENT_STORE === 'twistshake' ) {
+        $is_ts = true;
+    } elseif ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain_is_twistshake() ) {
+        $is_ts = true;
     }
 
     if ( empty( $phpmailer->From ) || $phpmailer->From === 'wordpress@' . gethostname() ) {
@@ -2415,10 +2438,13 @@ function prestige_smtp_from_name( $name ) {
             ? 'Twistshake Portugal'
             : 'Prestige Health';
     }
+    if ( ! empty( $name ) && stripos( $name, 'twistshake' ) !== false ) {
+        return 'Twistshake Portugal';
+    }
     if ( defined( 'PRESTIGE_CURRENT_STORE' ) && PRESTIGE_CURRENT_STORE === 'twistshake' ) {
         return 'Twistshake Portugal';
     }
-    if ( custom_multidomain_is_twistshake() ) {
+    if ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain_is_twistshake() ) {
         return 'Twistshake Portugal';
     }
     return 'Prestige Health';
@@ -2429,6 +2455,35 @@ function prestige_smtp_from_name( $name ) {
  * Back In Stock Notifier — Templates e Integração Multi-Loja (PT-PT)
  * Prestige Health vs. Twistshake Portugal
  * ========================================================================== */
+
+/**
+ * 0. Definir contexto de loja antes de enviar emails CWG (subscrição e reposição de stock).
+ */
+add_action( 'cwg_instock_before_instock_mail', 'prestige_bis_set_domain_before_mail', 1, 2 );
+add_action( 'cwg_instock_before_subscribe_mail', 'prestige_bis_set_domain_before_mail', 1, 2 );
+function prestige_bis_set_domain_before_mail( $email, $subscriber_id ) {
+    if ( ! $subscriber_id ) {
+        return;
+    }
+    $source = get_post_meta( $subscriber_id, '_subscriber_source_domain', true );
+    $is_ts  = false;
+    if ( $source === 'twistshakeportugal.pt' ) {
+        $is_ts = true;
+    } else {
+        $pid = get_post_meta( $subscriber_id, 'cwginstock_pid', true );
+        if ( ! $pid ) {
+            $pid = get_post_meta( $subscriber_id, 'cwginstock_bypass_pid', true );
+        }
+        if ( $pid && prestige_is_twistshake_product( $pid ) ) {
+            $is_ts = true;
+        } elseif ( $source === 'loja.prestigehealth.pt' ) {
+            $is_ts = false;
+        } elseif ( function_exists( 'custom_multidomain_is_twistshake' ) ) {
+            $is_ts = custom_multidomain_is_twistshake();
+        }
+    }
+    $GLOBALS['_prestige_email_domain_override'] = $is_ts ? 'twistshakeportugal.pt' : 'loja.prestigehealth.pt';
+}
 
 /**
  * 1. Gravar a loja no momento da subscrição do alerta de stock.

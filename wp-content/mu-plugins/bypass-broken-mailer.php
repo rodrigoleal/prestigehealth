@@ -28,12 +28,26 @@ function async_mail_queue_intercept( $return_val, $atts ) {
 	$headers     = $atts['headers'];
 	$attachments = $atts['attachments'];
 
+	// Determine active store context to preserve it across background execution
+	$store_override = '';
+	if ( ! empty( $GLOBALS['_prestige_email_domain_override'] ) ) {
+		$store_override = $GLOBALS['_prestige_email_domain_override'];
+	} elseif ( defined( 'PRESTIGE_CURRENT_STORE' ) && PRESTIGE_CURRENT_STORE === 'twistshake' ) {
+		$store_override = 'twistshakeportugal.pt';
+	} elseif ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain_is_twistshake() ) {
+		$store_override = 'twistshakeportugal.pt';
+	} elseif ( ( is_string( $subject ) && stripos( $subject, 'twistshake' ) !== false ) || ( is_string( $message ) && stripos( $message, 'twistshake' ) !== false ) ) {
+		$store_override = 'twistshakeportugal.pt';
+	} else {
+		$store_override = 'loja.prestigehealth.pt';
+	}
+
 	// Log that we are queueing
 	$log_dir = WP_CONTENT_DIR . '/uploads';
 	if ( ! is_dir( $log_dir ) ) {
 		@mkdir( $log_dir, 0755, true );
 	}
-	@file_put_contents( $log_dir . '/sent-emails.log', "[" . date('Y-m-d H:i:s') . "] Queueing email to: " . (is_array($to) ? implode(',', $to) : $to) . " (Subject: $subject)\n", FILE_APPEND );
+	@file_put_contents( $log_dir . '/sent-emails.log', "[" . date('Y-m-d H:i:s') . "] Queueing email to: " . (is_array($to) ? implode(',', $to) : $to) . " (Subject: $subject | Store: $store_override)\n", FILE_APPEND );
 
 	// Queue the email
 	$queue = get_option( 'async_email_queue', array() );
@@ -43,11 +57,12 @@ function async_mail_queue_intercept( $return_val, $atts ) {
 	
 	$email_id = uniqid( 'email_', true );
 	$queue[ $email_id ] = array(
-		'to'          => $to,
-		'subject'     => $subject,
-		'message'     => $message,
-		'headers'     => $headers,
-		'attachments' => $attachments,
+		'to'             => $to,
+		'subject'        => $subject,
+		'message'        => $message,
+		'headers'        => $headers,
+		'attachments'    => $attachments,
+		'store_override' => $store_override,
 	);
 	
 	update_option( 'async_email_queue', $queue, false );
@@ -75,6 +90,11 @@ function process_async_queued_email( $email_id ) {
 	
 	// Set the flag to true so pre_wp_mail doesn't intercept it
 	$GLOBALS['sending_async_email_now'] = true;
+
+	$prev_override = $GLOBALS['_prestige_email_domain_override'] ?? null;
+	if ( ! empty( $email['store_override'] ) ) {
+		$GLOBALS['_prestige_email_domain_override'] = $email['store_override'];
+	}
 	
 	$sent = wp_mail(
 		$email['to'],
@@ -83,7 +103,13 @@ function process_async_queued_email( $email_id ) {
 		$email['headers'],
 		$email['attachments']
 	);
-	
+
+	if ( $prev_override !== null ) {
+		$GLOBALS['_prestige_email_domain_override'] = $prev_override;
+	} else {
+		unset( $GLOBALS['_prestige_email_domain_override'] );
+	}
+
 	$GLOBALS['sending_async_email_now'] = false;
 
 	$log_dir = WP_CONTENT_DIR . '/uploads';

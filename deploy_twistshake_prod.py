@@ -14,7 +14,7 @@ files_to_deploy = [
     ("google350ee7dc820bf150.html", "google350ee7dc820bf150.html"),
 
     ("wp-content/mu-plugins/multidomain-store.php", "wp-content/mu-plugins/multidomain-store.php"),
-
+    ("wp-content/mu-plugins/bypass-broken-mailer.php", "wp-content/mu-plugins/bypass-broken-mailer.php"),
 
     ("wp-content/themes/prestige-child/functions.php", "wp-content/themes/prestige-child/functions.php"),
     ("wp-content/themes/prestige-child/style.css", "wp-content/themes/prestige-child/style.css"),
