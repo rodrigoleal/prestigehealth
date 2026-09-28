@@ -2541,10 +2541,11 @@ function prestige_bis_clear_email_override( $return = null, $email_id = '' ) {
 
 /**
  * 3. Textos em Português de Portugal (PT-PT) para o email de confirmação de subscrição.
+ * Personalizado conforme pedido da cliente por loja e produto.
  */
 add_filter( 'woocommerce_email_subject_cwg_bis_subscription', 'prestige_bis_sub_subject', 20, 3 );
 function prestige_bis_sub_subject( $subject, $object, $email = null ) {
-    $text = 'Subscrição confirmada: {product_name} em {shopname}';
+    $text = 'Subscrição confirmada | {shopname}';
     if ( is_object( $email ) && method_exists( $email, 'format_string' ) ) {
         return $email->format_string( $text );
     }
@@ -2553,7 +2554,7 @@ function prestige_bis_sub_subject( $subject, $object, $email = null ) {
 
 add_filter( 'woocommerce_email_heading_cwg_bis_subscription', 'prestige_bis_sub_heading', 20, 3 );
 function prestige_bis_sub_heading( $heading, $object, $email = null ) {
-    $text = 'Obrigado por subscrever o alerta para {product_name}';
+    $text = 'Subscrição confirmada';
     if ( is_object( $email ) && method_exists( $email, 'format_string' ) ) {
         return $email->format_string( $text );
     }
@@ -2562,7 +2563,7 @@ function prestige_bis_sub_heading( $heading, $object, $email = null ) {
 
 add_filter( 'woocommerce_email_additional_content_cwg_bis_subscription', 'prestige_bis_sub_additional_content', 20, 3 );
 function prestige_bis_sub_additional_content( $content, $object, $email = null ) {
-    $text = "Olá {subscriber_name},<br/><br/>Confirmamos que subscreveu o alerta de reposição de stock para o produto <strong>{product_name}</strong>.<br/><br/>Assim que o artigo estiver novamente disponível em stock, enviaremos uma notificação para o seu email ({subscriber_email}).<br/><br/>Pode consultar o produto através do link: {product_link}<br/><br/>Obrigado pela sua visita à <strong>{shopname}</strong>!";
+    $text = "Olá {subscriber_name},<br/><br/>A sua subscrição foi confirmada com sucesso.<br/><br/>Ficará agora na nossa lista de notificações e será informado assim que o produto que pretende estiver novamente disponível.<br/><br/><strong>Produto:</strong> <a href=\"{product_link}\" style=\"color: #111111; text-decoration: underline;\">{product_name}</a><br/><br/>Assim que houver reposição de stock, receberá um email para que possa efetuar a sua compra.<br/><br/>Obrigado pelo seu interesse na {shopname} e por confiar na nossa marca.<br/><br/><strong>{shopname}</strong>";
     if ( is_object( $email ) && method_exists( $email, 'format_string' ) ) {
         return $email->format_string( $text );
     }
@@ -2571,10 +2572,11 @@ function prestige_bis_sub_additional_content( $content, $object, $email = null )
 
 /**
  * 4. Textos em Português de Portugal (PT-PT) para o email de produto disponível (reposição de stock).
+ * Personalizado conforme pedido da cliente por loja e produto, com botão COMPRAR AGORA.
  */
 add_filter( 'woocommerce_email_subject_cwg_bis_instock', 'prestige_bis_instock_subject', 20, 3 );
 function prestige_bis_instock_subject( $subject, $object, $email = null ) {
-    $text = 'Boas notícias! {product_name} já se encontra disponível!';
+    $text = 'O seu produto já está novamente disponível';
     if ( is_object( $email ) && method_exists( $email, 'format_string' ) ) {
         return $email->format_string( $text );
     }
@@ -2583,7 +2585,7 @@ function prestige_bis_instock_subject( $subject, $object, $email = null ) {
 
 add_filter( 'woocommerce_email_heading_cwg_bis_instock', 'prestige_bis_instock_heading', 20, 3 );
 function prestige_bis_instock_heading( $heading, $object, $email = null ) {
-    $text = '{product_name} já está disponível em stock';
+    $text = 'O seu produto já está novamente disponível';
     if ( is_object( $email ) && method_exists( $email, 'format_string' ) ) {
         return $email->format_string( $text );
     }
@@ -2592,7 +2594,7 @@ function prestige_bis_instock_heading( $heading, $object, $email = null ) {
 
 add_filter( 'woocommerce_email_additional_content_cwg_bis_instock', 'prestige_bis_instock_additional_content', 20, 3 );
 function prestige_bis_instock_additional_content( $content, $object, $email = null ) {
-    $text = "Olá {subscriber_name},<br/><br/>Boas notícias! O produto <strong>{product_name}</strong> que estava a aguardar já se encontra novamente disponível em stock.<br/><br/>Pode consultar o produto através do link: {product_link} ou adicioná-lo diretamente ao seu carrinho de compras: {cart_link}.<br/><br/>Nota: O stock é limitado, pelo que recomendamos que finalize a sua encomenda com brevidade para garantir o seu artigo.<br/><br/>Obrigado pela sua preferência na <strong>{shopname}</strong>!";
+    $text = "Olá {subscriber_name},<br/><br/>Temos uma boa notícia: o produto que estava a aguardar já está novamente disponível.<br/><br/><strong>Produto:</strong> <a href=\"{product_link}\" style=\"color: #111111; text-decoration: underline;\">{product_name}</a><br/><br/>Não perca a oportunidade de garantir o seu antes que volte a esgotar.<br/><br/><p style=\"margin: 25px 0;\"><a href=\"{product_link}\" style=\"background-color: #111111; color: #ffffff; padding: 13px 28px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block; font-size: 14px; letter-spacing: 0.05em;\">COMPRAR AGORA</a></p>Obrigado por escolher a {shopname}.<br/><br/><strong>{shopname}</strong>";
     if ( is_object( $email ) && method_exists( $email, 'format_string' ) ) {
         return $email->format_string( $text );
     }
@@ -2607,11 +2609,9 @@ function prestige_bis_sub_settings_pt( $settings ) {
     if ( ! is_array( $settings ) ) {
         $settings = array();
     }
-    $settings['subject'] = 'Subscrição confirmada: {product_name} em {shopname}';
-    $settings['heading'] = 'Obrigado por subscrever o alerta para {product_name}';
-    if ( empty( $settings['additional_content'] ) || strpos( $settings['additional_content'], 'Hello ' ) !== false ) {
-        $settings['additional_content'] = "Olá {subscriber_name},<br/><br/>Confirmamos que subscreveu o alerta de reposição de stock para o produto <strong>{product_name}</strong>.<br/><br/>Assim que o artigo estiver novamente disponível em stock, enviaremos uma notificação para o seu email ({subscriber_email}).<br/><br/>Pode consultar o produto através do link: {product_link}<br/><br/>Obrigado pela sua visita à <strong>{shopname}</strong>!";
-    }
+    $settings['subject'] = 'Subscrição confirmada | {shopname}';
+    $settings['heading'] = 'Subscrição confirmada';
+    $settings['additional_content'] = "Olá {subscriber_name},<br/><br/>A sua subscrição foi confirmada com sucesso.<br/><br/>Ficará agora na nossa lista de notificações e será informado assim que o produto que pretende estiver novamente disponível.<br/><br/><strong>Produto:</strong> <a href=\"{product_link}\" style=\"color: #111111; text-decoration: underline;\">{product_name}</a><br/><br/>Assim que houver reposição de stock, receberá um email para que possa efetuar a sua compra.<br/><br/>Obrigado pelo seu interesse na {shopname} e por confiar na nossa marca.<br/><br/><strong>{shopname}</strong>";
     return $settings;
 }
 
@@ -2620,11 +2620,9 @@ function prestige_bis_instock_settings_pt( $settings ) {
     if ( ! is_array( $settings ) ) {
         $settings = array();
     }
-    $settings['subject'] = 'Boas notícias! {product_name} já se encontra disponível!';
-    $settings['heading'] = '{product_name} já está disponível em stock';
-    if ( empty( $settings['additional_content'] ) || strpos( $settings['additional_content'], 'Hello ' ) !== false ) {
-        $settings['additional_content'] = "Olá {subscriber_name},<br/><br/>Boas notícias! O produto <strong>{product_name}</strong> que estava a aguardar já se encontra novamente disponível em stock.<br/><br/>Pode consultar o produto através do link: {product_link} ou adicioná-lo diretamente ao seu carrinho de compras: {cart_link}.<br/><br/>Nota: O stock é limitado, pelo que recomendamos que finalize a sua encomenda com brevidade para garantir o seu artigo.<br/><br/>Obrigado pela sua preferência na <strong>{shopname}</strong>!";
-    }
+    $settings['subject'] = 'O seu produto já está novamente disponível';
+    $settings['heading'] = 'O seu produto já está novamente disponível';
+    $settings['additional_content'] = "Olá {subscriber_name},<br/><br/>Temos uma boa notícia: o produto que estava a aguardar já está novamente disponível.<br/><br/><strong>Produto:</strong> <a href=\"{product_link}\" style=\"color: #111111; text-decoration: underline;\">{product_name}</a><br/><br/>Não perca a oportunidade de garantir o seu antes que volte a esgotar.<br/><br/><p style=\"margin: 25px 0;\"><a href=\"{product_link}\" style=\"background-color: #111111; color: #ffffff; padding: 13px 28px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block; font-size: 14px; letter-spacing: 0.05em;\">COMPRAR AGORA</a></p>Obrigado por escolher a {shopname}.<br/><br/><strong>{shopname}</strong>";
     return $settings;
 }
 

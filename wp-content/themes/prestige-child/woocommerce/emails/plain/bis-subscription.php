@@ -17,8 +17,11 @@ if ( $additional_content ) {
 	if ( is_object( $email ) && method_exists( $email, 'format_string' ) ) {
 		$additional_content = $email->format_string( $additional_content );
 	}
+	$plain_content = preg_replace( '/<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/si', '$2: $1', $additional_content );
+	$plain_content = preg_replace( '/<br\s*\/?>/i', "\n", $plain_content );
+	$plain_content = preg_replace( '/<\/p>/i', "\n\n", $plain_content );
 	echo "---\n\n";
-	echo wp_strip_all_tags( wptexturize( $additional_content ) );
+	echo trim( wp_strip_all_tags( wptexturize( $plain_content ) ) );
 	echo "\n\n";
 }
 
