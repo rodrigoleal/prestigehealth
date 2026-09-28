@@ -36,8 +36,6 @@ function async_mail_queue_intercept( $return_val, $atts ) {
 		$store_override = 'twistshakeportugal.pt';
 	} elseif ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain_is_twistshake() ) {
 		$store_override = 'twistshakeportugal.pt';
-	} elseif ( ( is_string( $subject ) && stripos( $subject, 'twistshake' ) !== false ) || ( is_string( $message ) && stripos( $message, 'twistshake' ) !== false ) ) {
-		$store_override = 'twistshakeportugal.pt';
 	} else {
 		$store_override = 'loja.prestigehealth.pt';
 	}

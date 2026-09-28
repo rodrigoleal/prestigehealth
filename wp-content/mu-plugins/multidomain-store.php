@@ -2138,12 +2138,12 @@ function prestige_email_is_twistshake( $email_object = null ) {
         if ( $source === 'twistshakeportugal.pt' ) {
             return true;
         }
+        if ( $source === 'loja.prestigehealth.pt' ) {
+            return false;
+        }
         $pid = get_post_meta( $sub_id, 'cwginstock_pid', true );
         if ( $pid && prestige_is_twistshake_product( $pid ) ) {
             return true;
-        }
-        if ( $source === 'loja.prestigehealth.pt' ) {
-            return false;
         }
     }
     // 4. Fallback: detecção por HTTP_HOST (pedidos síncronos)
@@ -2275,20 +2275,6 @@ function prestige_fix_twistshake_email_links( $args ) {
         $is_twistshake = true;
     }
 
-    // 3. Verificação de segurança adicional:
-    // Se o assunto ou corpo da mensagem já contêm referências explícitas a Twistshake,
-    // o email foi intencionalmente gerado para a Twistshake Portugal.
-    // NUNCA devemos converter este email para Prestige Health!
-    if ( ! $is_twistshake ) {
-        $msg_str = ! empty( $args['message'] ) && is_string( $args['message'] ) ? $args['message'] : '';
-        $sub_str = ! empty( $args['subject'] ) && is_string( $args['subject'] ) ? $args['subject'] : '';
-        if ( stripos( $msg_str, 'twistshakeportugal.pt' ) !== false ||
-             stripos( $msg_str, 'Twistshake Portugal' ) !== false ||
-             stripos( $sub_str, 'Twistshake' ) !== false ) {
-            $is_twistshake = true;
-        }
-    }
-
     if ( $is_twistshake ) {
         // ==========================================
         // MODO: TWISTSHAKE PORTUGAL
@@ -2409,12 +2395,10 @@ function prestige_configure_smtp( $phpmailer ) {
     $is_ts = false;
     if ( ! empty( $GLOBALS['_prestige_email_domain_override'] ) ) {
         $is_ts = ( $GLOBALS['_prestige_email_domain_override'] === 'twistshakeportugal.pt' );
-    } elseif ( ! empty( $phpmailer->FromName ) && stripos( $phpmailer->FromName, 'twistshake' ) !== false ) {
-        $is_ts = true;
     } elseif ( defined( 'PRESTIGE_CURRENT_STORE' ) && PRESTIGE_CURRENT_STORE === 'twistshake' ) {
         $is_ts = true;
-    } elseif ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain_is_twistshake() ) {
-        $is_ts = true;
+    } else {
+        $is_ts = custom_multidomain_is_twistshake();
     }
 
     if ( empty( $phpmailer->From ) || $phpmailer->From === 'wordpress@' . gethostname() ) {
@@ -2438,9 +2422,6 @@ function prestige_smtp_from_name( $name ) {
             ? 'Twistshake Portugal'
             : 'Prestige Health';
     }
-    if ( ! empty( $name ) && stripos( $name, 'twistshake' ) !== false ) {
-        return 'Twistshake Portugal';
-    }
     if ( defined( 'PRESTIGE_CURRENT_STORE' ) && PRESTIGE_CURRENT_STORE === 'twistshake' ) {
         return 'Twistshake Portugal';
     }
@@ -2457,6 +2438,40 @@ function prestige_smtp_from_name( $name ) {
  * ========================================================================== */
 
 /**
+ * Helper: Obter a loja de um subscritor de alerta de stock.
+ * Prioridade:
+ * 1. Meta explícito '_subscriber_source_domain' (gravado aquando da subscrição pelo utilizador na loja).
+ * 2. Fallback APENAS para subscrições legadas sem meta: se o produto pertencer à categoria Twistshake.
+ */
+function prestige_bis_get_subscriber_store( $subscriber_id ) {
+    if ( ! $subscriber_id ) {
+        return ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain_is_twistshake() )
+            ? 'twistshakeportugal.pt'
+            : 'loja.prestigehealth.pt';
+    }
+
+    // 1. Meta explícito da subscrição (prioridade absoluta)
+    $source = get_post_meta( $subscriber_id, '_subscriber_source_domain', true );
+    if ( $source === 'twistshakeportugal.pt' ) {
+        return 'twistshakeportugal.pt';
+    }
+    if ( $source === 'loja.prestigehealth.pt' ) {
+        return 'loja.prestigehealth.pt';
+    }
+
+    // 2. Fallback APENAS se o meta não estiver gravado (registos antigos)
+    $pid = get_post_meta( $subscriber_id, 'cwginstock_pid', true );
+    if ( ! $pid ) {
+        $pid = get_post_meta( $subscriber_id, 'cwginstock_bypass_pid', true );
+    }
+    if ( $pid && prestige_is_twistshake_product( $pid ) ) {
+        return 'twistshakeportugal.pt';
+    }
+
+    return 'loja.prestigehealth.pt';
+}
+
+/**
  * 0. Definir contexto de loja antes de enviar emails CWG (subscrição e reposição de stock).
  */
 add_action( 'cwg_instock_before_instock_mail', 'prestige_bis_set_domain_before_mail', 1, 2 );
@@ -2465,53 +2480,29 @@ function prestige_bis_set_domain_before_mail( $email, $subscriber_id ) {
     if ( ! $subscriber_id ) {
         return;
     }
-    $source = get_post_meta( $subscriber_id, '_subscriber_source_domain', true );
-    $is_ts  = false;
-    if ( $source === 'twistshakeportugal.pt' ) {
-        $is_ts = true;
-    } else {
-        $pid = get_post_meta( $subscriber_id, 'cwginstock_pid', true );
-        if ( ! $pid ) {
-            $pid = get_post_meta( $subscriber_id, 'cwginstock_bypass_pid', true );
-        }
-        if ( $pid && prestige_is_twistshake_product( $pid ) ) {
-            $is_ts = true;
-        } elseif ( $source === 'loja.prestigehealth.pt' ) {
-            $is_ts = false;
-        } elseif ( function_exists( 'custom_multidomain_is_twistshake' ) ) {
-            $is_ts = custom_multidomain_is_twistshake();
-        }
-    }
-    $GLOBALS['_prestige_email_domain_override'] = $is_ts ? 'twistshakeportugal.pt' : 'loja.prestigehealth.pt';
+    $GLOBALS['_prestige_email_domain_override'] = prestige_bis_get_subscriber_store( $subscriber_id );
 }
 
 /**
  * 1. Gravar a loja no momento da subscrição do alerta de stock.
+ * Se o utilizador subscreveu em twistshakeportugal.pt -> grava twistshakeportugal.pt.
+ * Se o utilizador subscreveu em loja.prestigehealth.pt -> grava loja.prestigehealth.pt.
  */
 add_action( 'cwginstock_after_insert_subscriber', 'prestige_bis_record_subscriber_store', 10, 2 );
 function prestige_bis_record_subscriber_store( $subscriber_id, $post_data ) {
-    $is_ts = false;
-
-    // 1. Verificar referer da requisição (ex: AJAX a partir de twistshakeportugal.pt)
     $referer = $_SERVER['HTTP_REFERER'] ?? '';
-    if ( strpos( $referer, 'twistshake' ) !== false ) {
+    $host    = $_SERVER['HTTP_HOST'] ?? '';
+
+    $is_ts = false;
+    if ( strpos( $referer, 'twistshake' ) !== false || strpos( $host, 'twistshake' ) !== false ) {
+        $is_ts = true;
+    } elseif ( function_exists( 'custom_multidomain_is_twistshake' ) && custom_multidomain_is_twistshake() ) {
         $is_ts = true;
     }
 
-    // 2. Detecção geral da loja (HTTP_HOST, GET store, COOKIE store)
-    if ( ! $is_ts && custom_multidomain_is_twistshake() ) {
-        $is_ts = true;
-    }
-
-    // 3. Verificar se o produto pertence à categoria/marca Twistshake
-    if ( ! $is_ts ) {
-        $pid = ! empty( $post_data['product_id'] ) ? absint( $post_data['product_id'] ) : get_post_meta( $subscriber_id, 'cwginstock_pid', true );
-        if ( $pid && prestige_is_twistshake_product( $pid ) ) {
-            $is_ts = true;
-        }
-    }
-
-    update_post_meta( $subscriber_id, '_subscriber_source_domain', $is_ts ? 'twistshakeportugal.pt' : 'loja.prestigehealth.pt' );
+    $store_domain = $is_ts ? 'twistshakeportugal.pt' : 'loja.prestigehealth.pt';
+    update_post_meta( $subscriber_id, '_subscriber_source_domain', $store_domain );
+    $GLOBALS['_prestige_email_domain_override'] = $store_domain;
 }
 
 /**
@@ -2519,26 +2510,10 @@ function prestige_bis_record_subscriber_store( $subscriber_id, $post_data ) {
  */
 add_filter( 'cwginstock_email_placeholders', 'prestige_bis_filter_email_placeholders', 10, 3 );
 function prestige_bis_filter_email_placeholders( $placeholders, $subscriber_id, $email_obj ) {
-    $is_twistshake = false;
-    if ( ! empty( $GLOBALS['_prestige_email_domain_override'] ) ) {
-        $is_twistshake = ( $GLOBALS['_prestige_email_domain_override'] === 'twistshakeportugal.pt' );
-    } elseif ( $subscriber_id ) {
-        $source = get_post_meta( $subscriber_id, '_subscriber_source_domain', true );
-        if ( $source === 'twistshakeportugal.pt' ) {
-            $is_twistshake = true;
-        } else {
-            $pid = get_post_meta( $subscriber_id, 'cwginstock_pid', true );
-            if ( $pid && prestige_is_twistshake_product( $pid ) ) {
-                $is_twistshake = true;
-            } elseif ( $source === 'loja.prestigehealth.pt' ) {
-                $is_twistshake = false;
-            }
-        }
-    } else {
-        $is_twistshake = custom_multidomain_is_twistshake();
-    }
+    $store_domain  = prestige_bis_get_subscriber_store( $subscriber_id );
+    $is_twistshake = ( $store_domain === 'twistshakeportugal.pt' );
 
-    $GLOBALS['_prestige_email_domain_override'] = $is_twistshake ? 'twistshakeportugal.pt' : 'loja.prestigehealth.pt';
+    $GLOBALS['_prestige_email_domain_override'] = $store_domain;
 
     $shop_name = $is_twistshake ? 'Twistshake Portugal' : 'Prestige Health';
     $placeholders['{shopname}'] = $shop_name;
