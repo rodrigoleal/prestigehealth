@@ -3,7 +3,7 @@ import ftplib
 
 FTP_HOST = "erudis.pt"
 FTP_USER = "ftpprestig"
-FTP_PASS = "qJpKz##5QdP"
+FTP_PASS = "#Ibz3?70PS"
 REMOTE_ROOT = "public"
 
 files_to_deploy = [
