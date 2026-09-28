@@ -24,6 +24,11 @@ files_to_deploy = [
     ("wp-content/themes/prestige-child/footer-twistshake.php", "wp-content/themes/prestige-child/footer-twistshake.php"),
     ("wp-content/themes/prestige-child/footer.php", "wp-content/themes/prestige-child/footer.php"),
     ("wp-content/themes/prestige-child/front-page-twistshake.php", "wp-content/themes/prestige-child/front-page-twistshake.php"),
+
+    ("wp-content/themes/prestige-child/woocommerce/emails/bis-subscription.php", "wp-content/themes/prestige-child/woocommerce/emails/bis-subscription.php"),
+    ("wp-content/themes/prestige-child/woocommerce/emails/bis-instock.php", "wp-content/themes/prestige-child/woocommerce/emails/bis-instock.php"),
+    ("wp-content/themes/prestige-child/woocommerce/emails/plain/bis-subscription.php", "wp-content/themes/prestige-child/woocommerce/emails/plain/bis-subscription.php"),
+    ("wp-content/themes/prestige-child/woocommerce/emails/plain/bis-instock.php", "wp-content/themes/prestige-child/woocommerce/emails/plain/bis-instock.php"),
 ]
 
 def make_dirs(ftp, remote_dir):
